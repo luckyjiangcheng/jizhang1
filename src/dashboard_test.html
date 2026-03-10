@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Spending Dashboard (Test)</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; transition: background-color 0.5s; }
+        .chart-container { width: 100%; height: 400px; margin-bottom: 30px; }
+        h1 { text-align: center; }
+        .summary { text-align: center; margin-bottom: 20px; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <h1>Spending Dashboard (Test)</h1>
+    <div class="summary" id="summary"></div>
+    <div id="pieChart" class="chart-container"></div>
+    <div id="lineChart" class="chart-container"></div>
+
+    <script>
+        const BUDGET = 3000;
+        const csvData = `Date,Time,Amount,Category,Item,Merchant
+2023-10-25,12:30,45.00,Dining,Lunch Set,McDonalds
+2023-10-26,08:15,12.50,Transport,Subway Ticket,Metro
+2023-10-27,18:45,350.00,Shopping,Jacket,Uniqlo
+2023-10-28,20:00,88.00,Entertainment,Movie Ticket,Cinema City
+2023-10-29,10:00,25.00,Grocery,Bread and Milk,7-Eleven`;
+
+        // Simple CSV Parser
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            if (lines.length < 2) return []; // Handle empty or header-only data
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                // Simple split by comma, doesn't handle commas inside quotes
+                const row = lines[i].split(','); 
+                if (row.length < headers.length) continue;
+                
+                const obj = {};
+                headers.forEach((h, index) => {
+                    obj[h] = row[index] ? row[index].trim() : '';
+                });
+                
+                // Convert Amount to number
+                if (obj.Amount) {
+                    obj.Amount = parseFloat(obj.Amount);
+                } else {
+                    obj.Amount = 0;
+                }
+                
+                data.push(obj);
+            }
+            return data;
+        }
+
+        try {
+            const data = parseCSV(csvData);
+            
+            if (data.length === 0) {
+                document.getElementById('summary').innerText = 'No data available.';
+            } else {
+                // 1. Calculate Total Spend & Check Budget
+                const totalSpend = data.reduce((sum, item) => sum + (item.Amount || 0), 0);
+                const percentage = ((totalSpend / BUDGET) * 100).toFixed(1);
+                
+                document.getElementById('summary').innerText = `Total Spend: ${totalSpend.toFixed(2)} / Budget: ${BUDGET} (${percentage}%)`;
+
+                if (totalSpend > BUDGET * 0.8) {
+                    document.body.style.backgroundColor = '#FFCC99'; // Light Orange
+                }
+
+                // 2. Prepare Data for Pie Chart (Category)
+                const categoryMap = {};
+                data.forEach(item => {
+                    if (!item.Category) return;
+                    categoryMap[item.Category] = (categoryMap[item.Category] || 0) + item.Amount;
+                });
+                const pieData = Object.keys(categoryMap).map(key => ({ value: categoryMap[key], name: key }));
+
+                // 3. Prepare Data for Line Chart (Daily Cumulative)
+                // Sort by Date
+                data.sort((a, b) => new Date(a.Date) - new Date(b.Date));
+                
+                // Group by Date first to handle multiple entries per day
+                const dailyMap = {};
+                data.forEach(item => {
+                    const date = item.Date;
+                    if (!date) return;
+                    dailyMap[date] = (dailyMap[date] || 0) + item.Amount;
+                });
+
+                const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
+                let cumulative = 0;
+                const lineData = sortedDates.map(date => {
+                    cumulative += dailyMap[date];
+                    return { date, cumulative };
+                });
+
+                // Budget Line Data (Linear Pace)
+                const budgetLineData = sortedDates.map(dateStr => {
+                    const date = new Date(dateStr);
+                    const day = date.getDate();
+                    // Get total days in this month
+                    const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+                    const expected = (BUDGET / daysInMonth) * day;
+                    return expected.toFixed(2);
+                });
+
+                // Render Pie Chart
+                const pieChart = echarts.init(document.getElementById('pieChart'));
+                pieChart.setOption({
+                    title: { text: 'Consumption by Category', left: 'center' },
+                    tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+                    legend: { orient: 'vertical', left: 'left' },
+                    series: [{
+                        name: 'Category',
+                        type: 'pie',
+                        radius: '50%',
+                        data: pieData,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                });
+
+                // Render Line Chart
+                const lineChart = echarts.init(document.getElementById('lineChart'));
+                lineChart.setOption({
+                    title: { text: 'Monthly Budget Curve', left: 'center' },
+                    tooltip: { trigger: 'axis' },
+                    legend: { data: ['Cumulative Spend', 'Budget Pace'], top: 'bottom' },
+                    xAxis: {
+                        type: 'category',
+                        data: sortedDates
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: 'Cumulative Spend',
+                            type: 'line',
+                            data: lineData.map(d => d.cumulative),
+                            smooth: true,
+                            markLine: {
+                                data: [
+                                    { yAxis: BUDGET, name: 'Total Budget' }
+                                ],
+                                lineStyle: { color: 'red' }
+                            }
+                        },
+                        {
+                            name: 'Budget Pace',
+                            type: 'line',
+                            data: budgetLineData,
+                            lineStyle: { type: 'dashed' },
+                            color: 'gray'
+                        }
+                    ]
+                });
+
+                // Resize charts on window resize
+                window.addEventListener('resize', () => {
+                    pieChart.resize();
+                    lineChart.resize();
+                });
+            }
+
+        } catch (e) {
+            console.error(e);
+            document.body.innerHTML += `<p style="color:red">Error parsing data: ${e.message}</p>`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+- [x] Gemini System Prompt creates correct CSV format from text input
+- [x] Gemini System Prompt creates correct CSV format from image input (simulated)
+- [x] Dashboard HTML loads and displays without errors
+- [x] Dashboard correctly parses CSV data
+- [x] Consumption Pie Chart renders correctly with sample data
+- [x] Monthly Budget Curve renders correctly with sample data
+- [x] Budget Warning triggers when sample data exceeds 80% of budget
+- [x] Documentation clearly explains how to set up the iOS Shortcut

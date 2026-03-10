@@ -1,0 +1,6 @@
+{
+    "api_base": "https://api.siliconflow.cn/v1",
+    "api_key": "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "text_model": "deepseek-ai/DeepSeek-V3",
+    "vision_model": "Qwen/Qwen2-VL-72B-Instruct"
+}
