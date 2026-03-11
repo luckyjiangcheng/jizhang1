@@ -19,7 +19,17 @@
 
     <script>
         const BUDGET = 3000;
-        const csvData = `/* CSV_DATA_PLACEHOLDER */`;
+        let csvData = `/* CSV_DATA_PLACEHOLDER */`;
+
+        // Default Sample Data (if no data is provided)
+        const sampleData = `Date,Time,Amount,Category,Item,Merchant
+2023-10-01,08:00,15.00,Dining,Breakfast,KFC
+2023-10-02,12:30,35.00,Dining,Lunch,McDonalds
+2023-10-03,18:00,120.00,Shopping,Shoes,Nike
+2023-10-05,09:00,50.00,Transport,Taxi,Uber
+2023-10-08,19:00,200.00,Entertainment,Movie,Cinema
+2023-10-12,10:00,80.00,Grocery,Fruits,Supermarket
+2023-10-15,14:00,45.00,Dining,Coffee,Starbucks`;
 
         // Simple CSV Parser
         function parseCSV(csv) {
@@ -57,14 +67,17 @@
         try {
             // Check if placeholder was replaced
             if (csvData.includes("/* CSV_DATA_PLACEHOLDER */")) {
-                 document.getElementById('summary').innerText = 'Waiting for data...';
+                 console.log("Using sample data...");
+                 csvData = sampleData; // Fallback to sample data
+                 document.getElementById('summary').innerHTML += '<br><small style="color:gray">(Preview Mode: Showing Sample Data)</small>';
+            }
+            
+            const data = parseCSV(csvData);
+            
+            if (data.length === 0) {
+                document.getElementById('summary').innerText = 'No transaction data found.';
             } else {
-                const data = parseCSV(csvData);
-                
-                if (data.length === 0) {
-                    document.getElementById('summary').innerText = 'No transaction data found.';
-                } else {
-                    // 1. Calculate Total Spend & Check Budget
+                // 1. Calculate Total Spend & Check Budget
                 const totalSpend = data.reduce((sum, item) => sum + (item.Amount || 0), 0);
                 const percentage = ((totalSpend / BUDGET) * 100).toFixed(1);
                 

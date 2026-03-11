@@ -93,13 +93,21 @@
 
 ### 5. 分支逻辑 C：查看账单
 7.  **在“📊 查看账单”下**:
-    *   **获取文件**: `Shortcuts/ZenLedger/ZenLedger.csv` -> 存为 `CSVData`。
-    *   **获取文件**: `Shortcuts/ZenLedger/dashboard.html` -> 存为 `HTMLTemplate`。
+    *   **获取文件**:
+        *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
+        *   *注意：一定要带上 .csv 后缀*。
+        *   (这一步获取到的结果，我们称之为变量 **CSVData**)
+    *   **获取文件**:
+        *   路径: `Shortcuts/ZenLedger/dashboard.html`
+        *   *注意：一定要带上 .html 后缀*。
+        *   (这一步获取到的结果，我们称之为变量 **HTMLTemplate**)
     *   **替换文本**:
-        *   查找: `/* CSV_DATA_PLACEHOLDER */`
-        *   替换为: 变量 `CSVData`
-        *   在: 变量 `HTMLTemplate`
-    *   **显示网页视图**。
+        *   查找: `/* CSV_DATA_PLACEHOLDER */` (注意空格，建议直接复制)
+        *   替换为: 选择变量 **CSVData**
+        *   在: 选择变量 **HTMLTemplate**
+        *   (这一步生成的结果是“更新后的文本”)
+    *   **显示网页视图**:
+        *   输入: 选择上一步生成的 **“更新后的文本”** (千万不要选成 HTMLTemplate)
 
 > **完成后**：点击分享按钮 -> 拷贝 iCloud 链接。这就是 **链接 B**（填入安装器的最后一步）。
 
