@@ -1,0 +1,8 @@
+- [x] Verify `src/dashboard.txt` parses CSV data correctly
+- [x] Verify time range filtering works (e.g., filter last 7 days, custom range)
+- [x] Verify aggregation logic (Day/Week/Month/Year)
+- [x] Verify charts render correctly (Trend, Pie, Scatter)
+- [x] Verify comparison logic (YoY/MoM) displays correctly
+- [x] Verify tab navigation switches views properly
+- [x] Verify table shows transaction details
+- [x] Verify mobile responsiveness (e.g., chart containers adapt to screen width)

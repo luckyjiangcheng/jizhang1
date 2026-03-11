@@ -53,6 +53,13 @@ ZenLedger/
     ```bash
     python3 scripts/build.py
     ```
+    该脚本会执行以下操作：
+    - 读取 `src/config.json` 中的配置（包括 API Key）。
+    - 读取 `src/prompt.txt` 中的系统提示词。
+    - 读取 `src/dashboard.txt` 模板。
+    - 将以上内容打包生成到 `public/` 目录中。
+    
+    > **注意**：生成的 `public/config.json` 将包含您的 API Key。如果您将 `public` 目录托管到公开网络（如 GitHub Pages），请确保您了解相关风险。推荐使用限制额度的 API Key。
     然后将 `public` 目录推送到您的静态资源服务器（如 GitHub Pages）。
 
 4.  **制作快捷指令**:

@@ -1,230 +1,653 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Spending Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; transition: background-color 0.5s; }
-        .chart-container { width: 100%; height: 400px; margin-bottom: 30px; }
-        h1 { text-align: center; }
-        .summary { text-align: center; margin-bottom: 20px; font-size: 1.2em; }
+        :root {
+            --primary-color: #3b82f6;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Controls */
+        .controls {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        input[type="date"], select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: #fff;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px; /* Scrollbar space */
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards & Charts */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Utility */
+        .hidden { display: none; }
         #debug-log { 
             color: red; 
             font-family: monospace; 
             background: #ffe6e6; 
             padding: 10px; 
             border: 1px solid red; 
+            margin-bottom: 20px;
+            border-radius: 8px;
             display: none; 
             white-space: pre-wrap;
             word-break: break-all;
+            font-size: 0.8rem;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .chart-container {
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Spending Dashboard</h1>
+
+<div class="container">
+    <header>
+        <h1>Expense Dashboard</h1>
+    </header>
+
     <div id="debug-log"></div>
-    <div class="summary" id="summary"></div>
-    <div id="pieChart" class="chart-container"></div>
-    <div id="lineChart" class="chart-container"></div>
 
-    <script>
-        // Global Error Handler
-        window.onerror = function(message, source, lineno, colno, error) {
-            const debugEl = document.getElementById('debug-log');
-            debugEl.style.display = 'block';
-            debugEl.innerText += `[Error] ${message} at line ${lineno}:${colno}\n`;
-            return false;
-        };
+    <!-- Controls -->
+    <div class="controls">
+        <div class="control-group">
+            <label>Date Range:</label>
+            <input type="date" id="startDate">
+            <span style="text-align:center">-</span>
+            <input type="date" id="endDate">
+        </div>
+        <div class="control-group">
+            <label>Granularity:</label>
+            <select id="granularity">
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month" selected>Month</option>
+                <option value="year">Year</option>
+            </select>
+        </div>
+    </div>
 
-        const BUDGET = 3000;
-        let csvData = `CSV_DATA_PLACEHOLDER`;
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+        <button class="tab-btn" onclick="switchTab('analysis')">Analysis</button>
+        <button class="tab-btn" onclick="switchTab('details')">Details</button>
+    </div>
 
-        // Default Sample Data (if no data is provided)
-        const sampleData = `Date,Time,Amount,Category,Item,Merchant
+    <!-- Tab: Overview -->
+    <div id="tab-overview" class="tab-content active">
+        <div class="summary-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Expense</div>
+                <div class="stat-value" id="stat-total">0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Transaction</div>
+                <div class="stat-value" id="stat-avg">0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Transaction Count</div>
+                <div class="stat-value" id="stat-count">0</div>
+            </div>
+        </div>
+        <div class="card">
+            <div id="chart-pie" class="chart-container"></div>
+        </div>
+    </div>
+
+    <!-- Tab: Analysis -->
+    <div id="tab-analysis" class="tab-content">
+        <div class="card">
+            <div id="chart-trend" class="chart-container"></div>
+        </div>
+        <div class="card">
+            <div id="chart-scatter" class="chart-container"></div>
+        </div>
+    </div>
+
+    <!-- Tab: Details -->
+    <div id="tab-details" class="tab-content">
+        <div class="card table-container">
+            <table id="details-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Category</th>
+                        <th>Item</th>
+                        <th>Merchant</th>
+                        <th style="text-align:right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Global State ---
+    let rawData = [];
+    let filteredData = [];
+    let charts = {};
+
+    // --- Configuration ---
+    // Do NOT change this placeholder pattern, it is used by external tools
+    const CSV_PLACEHOLDER_KEY = "CSV_DATA_" + "PLACEHOLDER";
+    
+    // Sample Data for Preview
+    const SAMPLE_DATA = `Date,Time,Amount,Category,Item,Merchant
 2023-10-01,08:00,15.00,Dining,Breakfast,KFC
 2023-10-02,12:30,35.00,Dining,Lunch,McDonalds
 2023-10-03,18:00,120.00,Shopping,Shoes,Nike
 2023-10-05,09:00,50.00,Transport,Taxi,Uber
 2023-10-08,19:00,200.00,Entertainment,Movie,Cinema
 2023-10-12,10:00,80.00,Grocery,Fruits,Supermarket
-2023-10-15,14:00,45.00,Dining,Coffee,Starbucks`;
+2023-10-15,14:00,45.00,Dining,Coffee,Starbucks
+2023-11-01,09:00,60.00,Grocery,Weekly Shop,Walmart
+2023-11-05,19:30,100.00,Dining,Dinner,Italian Place
+2023-12-10,15:00,300.00,Shopping,Gifts,Mall`;
 
-        // Simple CSV Parser
-        function parseCSV(csv) {
-            // Normalize line endings and trim
-            const lines = csv.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n');
-            
-            // Filter out empty lines and lines that don't look like data (too short)
-            const nonEmptyLines = lines.filter(l => l.trim().length > 5);
-            
-            if (nonEmptyLines.length < 2) return [];
+    let csvContent = `CSV_DATA_PLACEHOLDER`;
 
-            const headers = nonEmptyLines[0].split(',').map(h => h.trim());
-            const data = [];
-            
-            for (let i = 1; i < nonEmptyLines.length; i++) {
-                // Handle potential trailing commas or extra whitespace
-                const line = nonEmptyLines[i].trim();
-                if (!line) continue;
+    // --- Error Handling ---
+    window.onerror = function(message, source, lineno, colno, error) {
+        const debugEl = document.getElementById('debug-log');
+        debugEl.style.display = 'block';
+        debugEl.innerText += `[Error] ${message} at line ${lineno}:${colno}\n`;
+        return false;
+    };
 
-                // Simple split by comma, doesn't handle commas inside quotes
-                const row = line.split(','); 
-                
-                // Allow row to be longer than headers (ignore extra columns), but not shorter
-                if (row.length < headers.length) continue;
-                
-                const obj = {};
-                headers.forEach((h, index) => {
-                    obj[h] = row[index] ? row[index].trim() : '';
-                });
-                
-                // Convert Amount to number
-                if (obj.Amount) {
-                    obj.Amount = parseFloat(obj.Amount);
-                } else {
-                    obj.Amount = 0;
-                }
-                
-                // Validate Amount is a number
-                if (isNaN(obj.Amount)) {
-                    obj.Amount = 0;
-                }
-
-                data.push(obj);
-            }
-            return data;
-        }
-
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
         try {
-            // Check if placeholder was replaced (or if it's still the placeholder)
-            // We split the check string to avoid it being replaced by Shortcuts
-            const placeholder = "CSV_DATA_" + "PLACEHOLDER";
-            if (csvData.includes(placeholder)) {
-                 console.log("Using sample data...");
-                 csvData = sampleData; // Fallback to sample data
-                 document.getElementById('summary').innerHTML += '<br><small style="color:gray">(Preview Mode: Showing Sample Data)</small>';
-            }
-            
-            const data = parseCSV(csvData);
-            
-            if (data.length === 0) {
-                document.getElementById('summary').innerText = 'No transaction data found.';
+            // 1. Load Data
+            if (csvContent.includes(CSV_PLACEHOLDER_KEY)) {
+                console.log("Using sample data (Preview Mode)");
+                rawData = parseCSV(SAMPLE_DATA);
+                document.querySelector('header h1').innerHTML += ' <span style="font-size:0.6em; color:gray; font-weight:normal">(Preview)</span>';
             } else {
-                // 1. Calculate Total Spend & Check Budget
-                const totalSpend = data.reduce((sum, item) => sum + (item.Amount || 0), 0);
-                const percentage = ((totalSpend / BUDGET) * 100).toFixed(1);
-                
-                document.getElementById('summary').innerText = `Total Spend: ${totalSpend.toFixed(2)} / Budget: ${BUDGET} (${percentage}%)`;
-
-                if (totalSpend > BUDGET * 0.8) {
-                    document.body.style.backgroundColor = '#FFCC99'; // Light Orange
-                }
-
-                // 2. Prepare Data for Pie Chart (Category)
-                const categoryMap = {};
-                data.forEach(item => {
-                    if (!item.Category) return;
-                    categoryMap[item.Category] = (categoryMap[item.Category] || 0) + item.Amount;
-                });
-                const pieData = Object.keys(categoryMap).map(key => ({ value: categoryMap[key], name: key }));
-
-                // 3. Prepare Data for Line Chart (Daily Cumulative)
-                // Sort by Date
-                data.sort((a, b) => new Date(a.Date) - new Date(b.Date));
-                
-                // Group by Date first to handle multiple entries per day
-                const dailyMap = {};
-                data.forEach(item => {
-                    const date = item.Date;
-                    if (!date) return;
-                    dailyMap[date] = (dailyMap[date] || 0) + item.Amount;
-                });
-
-                const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
-                let cumulative = 0;
-                const lineData = sortedDates.map(date => {
-                    cumulative += dailyMap[date];
-                    return { date, cumulative };
-                });
-
-                // Budget Line Data (Linear Pace)
-                const budgetLineData = sortedDates.map(dateStr => {
-                    const date = new Date(dateStr);
-                    const day = date.getDate();
-                    // Get total days in this month
-                    const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-                    const expected = (BUDGET / daysInMonth) * day;
-                    return expected.toFixed(2);
-                });
-
-                // Render Pie Chart
-                const pieChart = echarts.init(document.getElementById('pieChart'));
-                pieChart.setOption({
-                    title: { text: 'Consumption by Category', left: 'center' },
-                    tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-                    legend: { orient: 'vertical', left: 'left' },
-                    series: [{
-                        name: 'Category',
-                        type: 'pie',
-                        radius: '50%',
-                        data: pieData,
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }]
-                });
-
-                // Render Line Chart
-                const lineChart = echarts.init(document.getElementById('lineChart'));
-                lineChart.setOption({
-                    title: { text: 'Monthly Budget Curve', left: 'center' },
-                    tooltip: { trigger: 'axis' },
-                    legend: { data: ['Cumulative Spend', 'Budget Pace'], top: 'bottom' },
-                    xAxis: {
-                        type: 'category',
-                        data: sortedDates
-                    },
-                    yAxis: {
-                        type: 'value'
-                    },
-                    series: [
-                        {
-                            name: 'Cumulative Spend',
-                            type: 'line',
-                            data: lineData.map(d => d.cumulative),
-                            smooth: true,
-                            markLine: {
-                                data: [
-                                    { yAxis: BUDGET, name: 'Total Budget' }
-                                ],
-                                lineStyle: { color: 'red' }
-                            }
-                        },
-                        {
-                            name: 'Budget Pace',
-                            type: 'line',
-                            data: budgetLineData,
-                            lineStyle: { type: 'dashed' },
-                            color: 'gray'
-                        }
-                    ]
-                });
-
-                // Resize charts on window resize
-                window.addEventListener('resize', () => {
-                    pieChart.resize();
-                    lineChart.resize();
-                });
+                rawData = parseCSV(csvContent);
             }
+
+            // 2. Initialize Filters
+            initFilters();
+
+            // 3. Initial Render
+            applyFilters();
+
+            // 4. Resize Listener
+            window.addEventListener('resize', () => {
+                Object.values(charts).forEach(chart => chart && chart.resize());
+            });
+
         } catch (e) {
             console.error(e);
-            document.body.innerHTML += `<p style="color:red">Error parsing data: ${e.message}</p>`;
+            document.getElementById('debug-log').style.display = 'block';
+            document.getElementById('debug-log').innerText = `Init Error: ${e.message}`;
         }
-    </script>
+    });
+
+    // --- Core Logic ---
+
+    function parseCSV(csv) {
+        const lines = csv.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n');
+        const nonEmptyLines = lines.filter(l => l.trim().length > 0);
+        if (nonEmptyLines.length < 2) return [];
+
+        const headers = nonEmptyLines[0].split(',').map(h => h.trim());
+        
+        return nonEmptyLines.slice(1).map(line => {
+            // Handle simplistic CSV parsing (no quotes support for now as per previous logic)
+            const row = line.split(',');
+            const item = {};
+            headers.forEach((h, i) => {
+                item[h] = row[i] ? row[i].trim() : '';
+            });
+            
+            // Type conversion
+            item.Amount = parseFloat(item.Amount);
+            if (isNaN(item.Amount)) item.Amount = 0;
+            
+            // Date parsing helpers
+            if (item.Date) {
+                item.dateObj = new Date(item.Date + (item.Time ? 'T' + item.Time : ''));
+            } else {
+                item.dateObj = new Date(0); // Invalid date fallback
+            }
+
+            return item;
+        }).filter(item => item.Date); // Filter out rows without date
+    }
+
+    function initFilters() {
+        if (rawData.length === 0) return;
+
+        // Sort by date
+        rawData.sort((a, b) => a.dateObj - b.dateObj);
+
+        const startInput = document.getElementById('startDate');
+        const endInput = document.getElementById('endDate');
+        const granularitySelect = document.getElementById('granularity');
+
+        // Set default range (Full range of data)
+        if (rawData.length > 0) {
+            startInput.value = rawData[0].Date;
+            endInput.value = rawData[rawData.length - 1].Date;
+        }
+
+        // Event Listeners
+        startInput.addEventListener('change', applyFilters);
+        endInput.addEventListener('change', applyFilters);
+        granularitySelect.addEventListener('change', () => {
+            // Only re-render charts if granularity changes, but simplest to just re-apply all
+            applyFilters();
+        });
+    }
+
+    function applyFilters() {
+        const startStr = document.getElementById('startDate').value;
+        const endStr = document.getElementById('endDate').value;
+        const startDate = startStr ? new Date(startStr) : new Date(-8640000000000000);
+        const endDate = endStr ? new Date(endStr) : new Date(8640000000000000);
+        
+        // Adjust end date to include the full day (if it's just YYYY-MM-DD)
+        endDate.setHours(23, 59, 59, 999);
+
+        filteredData = rawData.filter(item => {
+            return item.dateObj >= startDate && item.dateObj <= endDate;
+        });
+
+        renderAll();
+    }
+
+    // --- UI Logic ---
+
+    function switchTab(tabId) {
+        // Update Buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Update Content
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+
+        // Resize charts in the new tab (ECharts sometimes needs this when unhidden)
+        setTimeout(() => {
+            Object.values(charts).forEach(chart => chart && chart.resize());
+        }, 50);
+    }
+
+    function renderAll() {
+        renderOverview();
+        renderAnalysis();
+        renderDetails();
+    }
+
+    function renderOverview() {
+        // 1. Summaries
+        const total = filteredData.reduce((sum, item) => sum + item.Amount, 0);
+        const count = filteredData.length;
+        const avg = count > 0 ? total / count : 0;
+
+        document.getElementById('stat-total').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('stat-avg').innerText = avg.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('stat-count').innerText = count;
+
+        // YoY Comparison Logic
+        const startStr = document.getElementById('startDate').value;
+        const endStr = document.getElementById('endDate').value;
+        if (startStr && endStr) {
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+            
+            // Shift back 1 year
+            const prevStartDate = new Date(startDate);
+            prevStartDate.setFullYear(startDate.getFullYear() - 1);
+            
+            const prevEndDate = new Date(endDate);
+            prevEndDate.setFullYear(endDate.getFullYear() - 1);
+            
+            const prevTotal = rawData.reduce((sum, item) => {
+                if (item.dateObj >= prevStartDate && item.dateObj <= prevEndDate) {
+                    return sum + item.Amount;
+                }
+                return sum;
+            }, 0);
+            
+            let diffHtml = '';
+            if (prevTotal === 0) {
+                diffHtml = '<small style="color:gray">No data last year</small>';
+            } else {
+                const percent = ((total - prevTotal) / prevTotal) * 100;
+                const color = percent > 0 ? 'red' : 'green'; // Red = Increased spending (bad?), Green = Decreased
+                const arrow = percent > 0 ? '↑' : '↓';
+                diffHtml = `<small style="color:${color}">${arrow} ${Math.abs(percent).toFixed(1)}% YoY</small>`;
+            }
+            
+            // Append to Total Stat
+            document.getElementById('stat-total').innerHTML += `<br>${diffHtml}`;
+        }
+
+        // 2. Pie Chart (Category)
+        const categoryMap = {};
+        filteredData.forEach(item => {
+            const cat = item.Category || 'Uncategorized';
+            categoryMap[cat] = (categoryMap[cat] || 0) + item.Amount;
+        });
+
+        const pieData = Object.entries(categoryMap)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value);
+
+        initChart('chart-pie', {
+            title: { text: 'Expenses by Category', left: 'center' },
+            tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+            legend: { orient: 'horizontal', bottom: 'bottom' },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                label: { show: false, position: 'center' },
+                emphasis: {
+                    label: { show: true, fontSize: 20, fontWeight: 'bold' }
+                },
+                data: pieData
+            }]
+        });
+    }
+
+    function renderAnalysis() {
+        const granularity = document.getElementById('granularity').value;
+        
+        // 1. Trend Chart (Bar)
+        const aggregated = {};
+        
+        filteredData.forEach(item => {
+            let key;
+            const d = item.dateObj;
+            if (granularity === 'day') {
+                key = item.Date; // YYYY-MM-DD
+            } else if (granularity === 'month') {
+                key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            } else if (granularity === 'year') {
+                key = `${d.getFullYear()}`;
+            } else if (granularity === 'week') {
+                // Simple Week calculation (ISO week would be better but this is dependency-free)
+                const firstDayOfYear = new Date(d.getFullYear(), 0, 1);
+                const pastDays = (d - firstDayOfYear) / 86400000;
+                const weekNum = Math.ceil((pastDays + firstDayOfYear.getDay() + 1) / 7);
+                key = `${d.getFullYear()}-W${weekNum}`;
+            }
+            aggregated[key] = (aggregated[key] || 0) + item.Amount;
+        });
+
+        const sortedKeys = Object.keys(aggregated).sort();
+        const trendData = sortedKeys.map(k => aggregated[k]);
+
+        initChart('chart-trend', {
+            title: { text: 'Expense Trend', left: 'center' },
+            tooltip: { trigger: 'axis' },
+            xAxis: { type: 'category', data: sortedKeys },
+            yAxis: { type: 'value' },
+            series: [{
+                data: trendData,
+                type: 'bar',
+                color: '#3b82f6',
+                backgroundStyle: { color: 'rgba(180, 180, 180, 0.2)' }
+            }]
+        });
+
+        // 2. Scatter Plot (Date vs Amount)
+        // Helps identify outliers or spending habits by time
+        const scatterData = filteredData.map(item => {
+            return [
+                item.Date, // X: Date
+                item.Amount, // Y: Amount
+                item.Category, // For tooltip
+                item.Item
+            ];
+        });
+
+        initChart('chart-scatter', {
+            title: { text: 'Individual Transactions', left: 'center' },
+            tooltip: {
+                trigger: 'item',
+                formatter: (params) => {
+                    return `${params.data[0]}<br/>${params.data[2]} - ${params.data[3]}<br/><b>${params.data[1]}</b>`;
+                }
+            },
+            xAxis: { type: 'time', splitLine: { show: false } },
+            yAxis: { type: 'value', splitLine: { show: true } },
+            series: [{
+                symbolSize: 10,
+                data: scatterData,
+                type: 'scatter',
+                itemStyle: { color: '#ef4444' }
+            }]
+        });
+    }
+
+    function renderDetails() {
+        const tbody = document.querySelector('#details-table tbody');
+        tbody.innerHTML = '';
+
+        // Reverse chronological order for table
+        const sortedForTable = [...filteredData].sort((a, b) => b.dateObj - a.dateObj);
+
+        if (sortedForTable.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No data found</td></tr>';
+            return;
+        }
+
+        sortedForTable.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.Date}</td>
+                <td>${item.Time || '-'}</td>
+                <td>${item.Category || '-'}</td>
+                <td>${item.Item || '-'}</td>
+                <td>${item.Merchant || '-'}</td>
+                <td style="text-align:right; font-weight:bold">${item.Amount.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function initChart(domId, option) {
+        const dom = document.getElementById(domId);
+        if (!dom) return;
+
+        if (charts[domId]) {
+            charts[domId].dispose();
+        }
+        
+        charts[domId] = echarts.init(dom);
+        charts[domId].setOption(option);
+    }
+
+</script>
 </body>
 </html>

@@ -47,10 +47,14 @@ Content: [Image of Starbucks receipt: 2023-10-20 14:30, Latte $5.40]
 Output:
 2023-10-20,14:30,5.40,餐饮美食,拿铁,星巴克
 
-Input: "交了房租3000元"
+Input: 
+Current Date: 2023-10-27
+Content: "交了房租3000元"
 Output:
 2023-10-27,,3000.00,居家生活,房租,
 
-Input: "给妈妈转了2000块生活费"
+Input: 
+Current Date: 2023-10-27
+Content: "给妈妈转了2000块生活费"
 Output:
 2023-10-27,,2000.00,孝敬父母,生活费,
