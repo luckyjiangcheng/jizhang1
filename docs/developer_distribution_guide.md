@@ -99,16 +99,20 @@
         *   *注意：一定要带上 .csv 后缀*。
         *   (这一步获取到的结果，我们称之为变量 **CSVData**)
     *   **获取文件**:
-        *   路径: `Shortcuts/ZenLedger/dashboard.html`
-        *   *注意：一定要带上 .html 后缀*。
+        *   路径: `Shortcuts/ZenLedger/dashboard.txt`
+        *   (因为是 .txt，iOS 会直接把它当作文本读取，不会去渲染它)
         *   (这一步获取到的结果，我们称之为变量 **HTMLTemplate**)
     *   **替换文本**:
-        *   查找: `CSV_DATA_PLACEHOLDER` (注意没有注释符号了)
+        *   查找: `CSV_DATA_PLACEHOLDER`
         *   替换为: 选择变量 **CSVData**
         *   在: 选择变量 **HTMLTemplate**
         *   (这一步生成的结果是“更新后的文本”)
+    *   **设置名称** (Set Name):
+        *   输入: 选择上一步的 **“更新后的文本”**
+        *   名称: `dashboard.html`
+        *   (这一步是为了让 iOS 知道这是一段 HTML 代码，以便后续渲染)
     *   **显示网页视图**:
-        *   输入: 选择上一步生成的 **“更新后的文本”** (千万不要选成 HTMLTemplate)
+        *   输入: 选择上一步 **“设置名称后的项目”**
 
 > **完成后**：点击分享按钮 -> 拷贝 iCloud 链接。这就是 **链接 B**（填入安装器的最后一步）。
 
