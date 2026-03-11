@@ -75,10 +75,15 @@
 ### 3. 分支逻辑 A：语音记账
 5.  **在“🎙️ 语音记账”下**:
     *   **听写文本**: 语言选中文。
+    *   **获取当前日期**: 格式选择 `自定义: yyyy-MM-dd` (结果存为变量 `CurrentDate`)。
     *   **获取 URL 内容** (调用 API):
         *   URL: 变量 `api_base` + `/chat/completions`
         *   Headers: `Authorization: Bearer 变量api_key`
-        *   Body (JSON): `model`=变量 `text_model`, `messages`=[system_prompt, user_content]
+        *   Body (JSON): 
+            *   `model`=变量 `text_model`
+            *   `messages` (Array):
+                *   Item 1 (Dictionary): `role`="system", `content`=变量 `system_prompt`
+                *   Item 2 (Dictionary): `role`="user", `content`="Current Date: " + `CurrentDate` + "\nContent: " + `听写文本`
     *   **追加到文件**: 将结果追加到 `Shortcuts/ZenLedger/ZenLedger.csv`。
     *   **朗读文本**: "已记账"。
 
@@ -86,9 +91,16 @@
 6.  **在“📷 截图记账”下**:
     *   **截取屏幕**。
     *   **Base64 编码**: 换行选“无”。
+    *   **获取当前日期**: 格式选择 `自定义: yyyy-MM-dd` (结果存为变量 `CurrentDate`)。
     *   **获取 URL 内容** (调用 API):
         *   URL: 同上。
-        *   Body (JSON): `model`=变量 `vision_model`, `messages`=[带 image_url 的结构]
+        *   Body (JSON): 
+            *   `model`=变量 `vision_model`
+            *   `messages` (Array):
+                *   Item 1 (Dictionary): `role`="system", `content`=变量 `system_prompt`
+                *   Item 2 (Dictionary): `role`="user", `content` (Array):
+                    *   Item 1 (Dictionary): `type`="text", `text`="Current Date: " + `CurrentDate`
+                    *   Item 2 (Dictionary): `type`="image_url", `image_url` (Dictionary): `url`="data:image/jpeg;base64," + `Base64编码结果`
     *   **追加到文件**: 同上。
     *   **删除照片**: 输入为“屏幕快照”。
 

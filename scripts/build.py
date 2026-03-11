@@ -16,15 +16,20 @@ def build_public():
     
     print(f"Building public resources in: {public_dir}")
 
-    # 2. Read Config (for API Key)
+    # 2. Read Config (for API Key and Models)
     config_path = src_dir / "config.json"
+    api_key = "sk-ohgicalwixwraxcmzckymthpjnktwzokmuzrakwtbkibxabf"
+    text_model = "Qwen/Qwen2.5-7B-Instruct"
+    vision_model = "Qwen/Qwen2-VL-72B-Instruct"
+
     try:
         with open(config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
-            api_key = config.get("api_key", "sk-ohgicalwixwraxcmzckymthpjnktwzokmuzrakwtbkibxabf")
+            api_key = config.get("api_key", api_key)
+            text_model = config.get("text_model", text_model)
+            vision_model = config.get("vision_model", vision_model)
     except Exception as e:
         print(f"Warning: Could not read config.json: {e}")
-        api_key = "sk-ohgicalwixwraxcmzckymthpjnktwzokmuzrakwtbkibxabf"
 
     # 3. Read Prompt
     prompt_path = src_dir / "prompt.txt"
@@ -39,8 +44,8 @@ def build_public():
     config_public = {
         "api_key": api_key,
         "api_base": "https://api.siliconflow.cn/v1",
-        "text_model": "deepseek-ai/DeepSeek-V3",
-        "vision_model": "Qwen/Qwen2-VL-72B-Instruct",
+        "text_model": text_model,
+        "vision_model": vision_model,
         "system_prompt": prompt_content
     }
     

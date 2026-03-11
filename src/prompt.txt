@@ -4,10 +4,21 @@ Please output the extracted information in the following CSV columns:
 Date,Time,Amount,Category,Item,Merchant
 
 Specific requirements:
-- **Date**: YYYY-MM-DD. If year is missing, assume current year. If date is not mentioned, use today's date based on context or leave empty if ambiguous.
+- **Date**: YYYY-MM-DD. If the input text or image contains a specific date, use it. If not, use the "Current Date" provided in the user input.
 - **Time**: HH:MM (24-hour). Leave empty if not available.
 - **Amount**: Number only (e.g., 12.50). No currency symbols.
-- **Category**: Use **Chinese** categories: 餐饮, 交通, 购物, 娱乐, 居家, 其他.
+- **Category**: Use **Chinese** categories: 
+  - **餐饮美食**: (Dining out, Takeout, Snacks, Drinks, Groceries/Ingredients)
+  - **交通出行**: (Public Transport, Taxi, Fuel, Parking, Car Maintenance, Vehicle Purchase, Tolls)
+  - **购物消费**: (Clothing, Electronics, Personal Care, Furniture, Appliances, Luxury Goods, Daily Necessities)
+  - **居家生活**: (Utilities(Water/Elec/Gas), Rent, Mortgage, Property Management, Home Maintenance, Renovation, Internet/Phone Bill)
+  - **休闲娱乐**: (Movies, Games, Travel/Vacation, Hobbies, Gym/Sports, Subscriptions)
+  - **人情往来**: (Gifts, Red Packets, Treating Guests, Wedding/Funeral Gifts, Charity)
+  - **医疗健康**: (Hospital, Medicine, Checkups, Surgery, Health Supplements)
+  - **教育培训**: (Tuition, Books, Online Courses, Extracurricular Activities, School Fees)
+  - **金融保险**: (Insurance Premiums, Investment Principal, Loan Repayment, Taxes, Bank Fees)
+  - **孝敬父母**: (Living Allowance for Parents, Gifts for Parents, Medical for Parents)
+  - **其他**: (Fines, Lost Money, Uncategorizable)
 - **Item**: Brief description in **Chinese** (e.g., 西瓜, 打车).
 - **Merchant**: Name in **Chinese** if possible, or original name.
 
@@ -18,14 +29,28 @@ Specific requirements:
 
 **Examples:**
 
-Input: "我买西瓜花了十块钱" (Assuming today is 2023-10-27)
+Input: 
+Current Date: 2023-10-27
+Content: "我买西瓜花了十块钱"
 Output:
-2023-10-27,,10.00,居家,西瓜,
+2023-10-27,,10.00,餐饮美食,西瓜,
 
-Input: "打车去机场花了50元，早上8点"
+Input: 
+Current Date: 2023-10-27
+Content: "昨天打车去机场花了50元，早上8点"
 Output:
-2023-10-27,08:00,50.00,交通,打车去机场,
+2023-10-26,08:00,50.00,交通出行,打车去机场,
 
-Input: [Image of Starbucks receipt: 2023-10-27 14:30, Latte $5.40]
+Input: 
+Current Date: 2023-10-27
+Content: [Image of Starbucks receipt: 2023-10-20 14:30, Latte $5.40]
 Output:
-2023-10-27,14:30,5.40,餐饮,拿铁,星巴克
+2023-10-20,14:30,5.40,餐饮美食,拿铁,星巴克
+
+Input: "交了房租3000元"
+Output:
+2023-10-27,,3000.00,居家生活,房租,
+
+Input: "给妈妈转了2000块生活费"
+Output:
+2023-10-27,,2000.00,孝敬父母,生活费,
