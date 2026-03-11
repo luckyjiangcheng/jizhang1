@@ -33,18 +33,26 @@
 
         // Simple CSV Parser
         function parseCSV(csv) {
-            const lines = csv.trim().split('\n');
-            if (lines.length < 2) return []; // Handle empty or header-only data
-            // Filter out empty lines
-            const nonEmptyLines = lines.filter(l => l.trim().length > 0);
+            // Normalize line endings and trim
+            const lines = csv.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n');
+            
+            // Filter out empty lines and lines that don't look like data (too short)
+            const nonEmptyLines = lines.filter(l => l.trim().length > 5);
+            
             if (nonEmptyLines.length < 2) return [];
 
             const headers = nonEmptyLines[0].split(',').map(h => h.trim());
             const data = [];
             
             for (let i = 1; i < nonEmptyLines.length; i++) {
+                // Handle potential trailing commas or extra whitespace
+                const line = nonEmptyLines[i].trim();
+                if (!line) continue;
+
                 // Simple split by comma, doesn't handle commas inside quotes
-                const row = nonEmptyLines[i].split(','); 
+                const row = line.split(','); 
+                
+                // Allow row to be longer than headers (ignore extra columns), but not shorter
                 if (row.length < headers.length) continue;
                 
                 const obj = {};
@@ -59,13 +67,18 @@
                     obj.Amount = 0;
                 }
                 
+                // Validate Amount is a number
+                if (isNaN(obj.Amount)) {
+                    obj.Amount = 0;
+                }
+
                 data.push(obj);
             }
             return data;
         }
 
         try {
-            // Check if placeholder was replaced
+            // Check if placeholder was replaced (or if it's still the placeholder comment)
             if (csvData.includes("/* CSV_DATA_PLACEHOLDER */")) {
                  console.log("Using sample data...");
                  csvData = sampleData; // Fallback to sample data
@@ -187,8 +200,6 @@
                     lineChart.resize();
                 });
             }
-        }
-
         } catch (e) {
             console.error(e);
             document.body.innerHTML += `<p style="color:red">Error parsing data: ${e.message}</p>`;
