@@ -50,8 +50,8 @@ def build_public():
 
     # 4. Copy Dashboard Template
     try:
-        shutil.copy2(src_dir / "dashboard.html", public_dir / "dashboard.html")
-        print("✓ Copied dashboard.html")
+        shutil.copy2(src_dir / "dashboard.txt", public_dir / "dashboard.txt")
+        print("✓ Copied dashboard.txt")
     except Exception as e:
         print(f"Error copying dashboard: {e}")
 
@@ -67,8 +67,8 @@ def build_public():
     <h1>ZenLedger Resources</h1>
     <p>This page hosts static resources for ZenLedger Shortcuts.</p>
     <ul>
-        <li><a href="config_template.json">Config Template</a></li>
-        <li><a href="dashboard.html">Dashboard Template</a></li>
+        <li><a href="config.json">Config Template</a></li>
+        <li><a href="dashboard.txt">Dashboard Template (TXT)</a></li>
     </ul>
 </body>
 </html>

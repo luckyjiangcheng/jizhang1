@@ -32,9 +32,10 @@
     *   文件: 上一步的字典
     *   路径: `Shortcuts/ZenLedger/config.json` (开启覆盖)
 4.  **获取 URL 内容**:
-    *   URL: `https://your-username.github.io/zenledger/dashboard.html`
+    *   URL: `https://your-username.github.io/zenledger/dashboard.txt`
 5.  **保存文件**:
-    *   路径: `Shortcuts/ZenLedger/dashboard.html` (开启覆盖)
+    *   路径: `Shortcuts/ZenLedger/dashboard.txt` (开启覆盖)
+    *   *注意：这里我们故意保存为 .txt 后缀，防止 iOS 自动渲染*。
 6.  **创建文件夹**: (如果需要) 确保 `Shortcuts/ZenLedger` 存在。
 7.  **文本**: 输入 `Date,Time,Amount,Category,Item,Merchant`
 8.  **保存文件**:
