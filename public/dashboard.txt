@@ -98,7 +98,9 @@
 
         try {
             // Check if placeholder was replaced (or if it's still the placeholder)
-            if (csvData.includes("CSV_DATA_PLACEHOLDER")) {
+            // We split the check string to avoid it being replaced by Shortcuts
+            const placeholder = "CSV_DATA_" + "PLACEHOLDER";
+            if (csvData.includes(placeholder)) {
                  console.log("Using sample data...");
                  csvData = sampleData; // Fallback to sample data
                  document.getElementById('summary').innerHTML += '<br><small style="color:gray">(Preview Mode: Showing Sample Data)</small>';
