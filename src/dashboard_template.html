@@ -25,12 +25,16 @@
         function parseCSV(csv) {
             const lines = csv.trim().split('\n');
             if (lines.length < 2) return []; // Handle empty or header-only data
-            const headers = lines[0].split(',').map(h => h.trim());
+            // Filter out empty lines
+            const nonEmptyLines = lines.filter(l => l.trim().length > 0);
+            if (nonEmptyLines.length < 2) return [];
+
+            const headers = nonEmptyLines[0].split(',').map(h => h.trim());
             const data = [];
             
-            for (let i = 1; i < lines.length; i++) {
+            for (let i = 1; i < nonEmptyLines.length; i++) {
                 // Simple split by comma, doesn't handle commas inside quotes
-                const row = lines[i].split(','); 
+                const row = nonEmptyLines[i].split(','); 
                 if (row.length < headers.length) continue;
                 
                 const obj = {};
@@ -51,12 +55,16 @@
         }
 
         try {
-            const data = parseCSV(csvData);
-            
-            if (data.length === 0) {
-                document.getElementById('summary').innerText = 'No data available.';
+            // Check if placeholder was replaced
+            if (csvData.includes("/* CSV_DATA_PLACEHOLDER */")) {
+                 document.getElementById('summary').innerText = 'Waiting for data...';
             } else {
-                // 1. Calculate Total Spend & Check Budget
+                const data = parseCSV(csvData);
+                
+                if (data.length === 0) {
+                    document.getElementById('summary').innerText = 'No transaction data found.';
+                } else {
+                    // 1. Calculate Total Spend & Check Budget
                 const totalSpend = data.reduce((sum, item) => sum + (item.Amount || 0), 0);
                 const percentage = ((totalSpend / BUDGET) * 100).toFixed(1);
                 
@@ -166,6 +174,7 @@
                     lineChart.resize();
                 });
             }
+        }
 
         } catch (e) {
             console.error(e);

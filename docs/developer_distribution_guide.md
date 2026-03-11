@@ -50,19 +50,56 @@
 
 ## 第三步：制作 "ZenLedger" (主程序)
 
-创建一个新的快捷指令，命名为 **`ZenLedger`**。
+这是一个**三合一**的快捷指令。请在 iPhone 上创建一个新的快捷指令，命名为 **`ZenLedger`**。
 
-1.  **获取文件**: `Shortcuts/ZenLedger/config.json` -> 获取字典 -> 存为变量 `Config`。
-2.  **从菜单中选择**:
+### 1. 读取全局配置
+1.  **获取文件**:
+    *   路径: `Shortcuts/ZenLedger/config.json`
+    *   (如果不存，提示用户先运行安装器)
+2.  **获取字典**: 从上一步的文件获取字典。
+3.  **获取字典值**: 分别获取以下值并存为变量：
+    *   `api_key`
+    *   `api_base`
+    *   `text_model`
+    *   `vision_model`
+    *   `system_prompt`
+
+### 2. 创建主菜单
+4.  **从菜单中选择**:
+    *   提示: "请选择操作"
     *   选项 1: 🎙️ 语音记账
     *   选项 2: 📷 截图记账
     *   选项 3: 📊 查看账单
-3.  **如果选择 语音记账**:
-    *   听写文本 -> 调用 API (使用 `Config` 中的 `api_key` 等参数) -> 追加到 CSV。
-4.  **如果选择 截图记账**:
-    *   截屏 -> Base64 -> 调用 API (使用 `Config` 中的 `vision_model` 等参数) -> 追加到 CSV。
-5.  **如果选择 查看账单**:
-    *   获取 CSV -> 获取 HTML -> 替换文本 -> 显示网页。
+
+### 3. 分支逻辑 A：语音记账
+5.  **在“🎙️ 语音记账”下**:
+    *   **听写文本**: 语言选中文。
+    *   **获取 URL 内容** (调用 API):
+        *   URL: 变量 `api_base` + `/chat/completions`
+        *   Headers: `Authorization: Bearer 变量api_key`
+        *   Body (JSON): `model`=变量 `text_model`, `messages`=[system_prompt, user_content]
+    *   **追加到文件**: 将结果追加到 `Shortcuts/ZenLedger/ZenLedger.csv`。
+    *   **朗读文本**: "已记账"。
+
+### 4. 分支逻辑 B：截图记账
+6.  **在“📷 截图记账”下**:
+    *   **截取屏幕**。
+    *   **Base64 编码**: 换行选“无”。
+    *   **获取 URL 内容** (调用 API):
+        *   URL: 同上。
+        *   Body (JSON): `model`=变量 `vision_model`, `messages`=[带 image_url 的结构]
+    *   **追加到文件**: 同上。
+    *   **删除照片**: 输入为“屏幕快照”。
+
+### 5. 分支逻辑 C：查看账单
+7.  **在“📊 查看账单”下**:
+    *   **获取文件**: `Shortcuts/ZenLedger/ZenLedger.csv` -> 存为 `CSVData`。
+    *   **获取文件**: `Shortcuts/ZenLedger/dashboard.html` -> 存为 `HTMLTemplate`。
+    *   **替换文本**:
+        *   查找: `/* CSV_DATA_PLACEHOLDER */`
+        *   替换为: 变量 `CSVData`
+        *   在: 变量 `HTMLTemplate`
+    *   **显示网页视图**。
 
 > **完成后**：点击分享按钮 -> 拷贝 iCloud 链接。这就是 **链接 B**（填入安装器的最后一步）。
 
