@@ -11,7 +11,7 @@ from openai import OpenAI
 
 def load_config():
     """Reads configuration from config.json."""
-    config_path = Path(__file__).parent / "config.json"
+    config_path = Path(__file__).parent.parent / "src" / "config.json"
     try:
         with open(config_path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -25,7 +25,7 @@ def load_config():
 
 def load_prompt():
     """Reads the prompt from prompt.txt."""
-    prompt_path = Path(__file__).parent / "prompt.txt"
+    prompt_path = Path(__file__).parent.parent / "src" / "prompt.txt"
     try:
         with open(prompt_path, "r", encoding="utf-8") as f:
             return f.read()

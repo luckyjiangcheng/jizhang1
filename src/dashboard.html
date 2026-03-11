@@ -19,7 +19,7 @@
 
     <script>
         const BUDGET = 3000;
-        let csvData = `/* CSV_DATA_PLACEHOLDER */`;
+        let csvData = `CSV_DATA_PLACEHOLDER`;
 
         // Default Sample Data (if no data is provided)
         const sampleData = `Date,Time,Amount,Category,Item,Merchant
@@ -78,8 +78,8 @@
         }
 
         try {
-            // Check if placeholder was replaced (or if it's still the placeholder comment)
-            if (csvData.includes("/* CSV_DATA_PLACEHOLDER */")) {
+            // Check if placeholder was replaced (or if it's still the placeholder)
+            if (csvData.includes("CSV_DATA_PLACEHOLDER")) {
                  console.log("Using sample data...");
                  csvData = sampleData; // Fallback to sample data
                  document.getElementById('summary').innerHTML += '<br><small style="color:gray">(Preview Mode: Showing Sample Data)</small>';

@@ -50,7 +50,7 @@ def build_public():
 
     # 4. Copy Dashboard Template
     try:
-        shutil.copy2(src_dir / "dashboard_template.html", public_dir / "dashboard.html")
+        shutil.copy2(src_dir / "dashboard.html", public_dir / "dashboard.html")
         print("✓ Copied dashboard.html")
     except Exception as e:
         print(f"Error copying dashboard: {e}")

@@ -102,7 +102,7 @@
         *   *注意：一定要带上 .html 后缀*。
         *   (这一步获取到的结果，我们称之为变量 **HTMLTemplate**)
     *   **替换文本**:
-        *   查找: `/* CSV_DATA_PLACEHOLDER */` (注意空格，建议直接复制)
+        *   查找: `CSV_DATA_PLACEHOLDER` (注意没有注释符号了)
         *   替换为: 选择变量 **CSVData**
         *   在: 选择变量 **HTMLTemplate**
         *   (这一步生成的结果是“更新后的文本”)
