@@ -16,9 +16,11 @@
             --border: #d1d1d6;
             --success: #34c759;
             --danger: #ff3b30;
-            --radius-lg: 16px;
+            --income: #34c759;
+            --expense: #ff3b30;
+            --radius-lg: 24px;
             --radius-md: 12px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -30,6 +32,8 @@
                 --text: #ffffff;
                 --text-sec: #aeaeb2;
                 --border: #38383a;
+                --income: #30d158;
+                --expense: #ff453a;
             }
         }
 
@@ -39,17 +43,47 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            padding-bottom: 40px;
+            padding-bottom: 80px;
             -webkit-font-smoothing: antialiased;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px 16px;
+            padding: 16px;
         }
 
-        /* Tabs */
+        /* Top Navigation Bar */
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background: var(--card);
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-sec);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 20px; }
+
+        /* Tabs (Period Filters) */
         .tabs {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -63,12 +97,12 @@
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 10px 0;
-            font-size: 14px;
+            padding: 8px 0;
+            font-size: 13px;
             font-weight: 500;
             color: var(--text-sec);
             cursor: pointer;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -76,76 +110,69 @@
             background: var(--primary);
             color: #ffffff;
             font-weight: 600;
-            box-shadow: 0 2px 8px var(--primary-bg);
         }
 
-        /* Metrics Grid */
+        /* Metrics Row */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
 
         .metric-card {
             background: var(--card);
-            padding: 16px;
+            padding: 16px 12px;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            transition: transform 0.2s;
+            align-items: center;
+            text-align: center;
         }
-        .metric-card:active { transform: scale(0.98); }
 
         .metric-label {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-sec);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-weight: 500;
         }
 
         .metric-value {
-            font-size: 22px;
+            font-size: 17px;
             font-weight: 700;
             color: var(--text);
-            margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
 
-        .metric-trend {
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 500;
+        .metric-value.income { color: var(--income); }
+        .metric-value.expense { color: var(--expense); }
+
+        /* Chart Grid */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
-        .trend-up { color: var(--danger); }
-        .trend-down { color: var(--success); }
-        .trend-neutral { color: var(--text-sec); }
-
-        /* Charts */
         .chart-card {
             background: var(--card);
             border-radius: var(--radius-lg);
             padding: 20px;
             box-shadow: var(--shadow);
-            margin-bottom: 20px;
         }
 
         .chart-header {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 16px;
             color: var(--text);
-            letter-spacing: -0.3px;
         }
 
         .chart-container {
             width: 100%;
-            height: 260px;
-            position: relative;
+            height: 240px;
         }
 
         /* Transaction List */
@@ -154,37 +181,51 @@
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
             overflow: hidden;
+            margin-bottom: 20px;
         }
 
         .list-header {
             padding: 16px 20px;
             border-bottom: 1px solid var(--border);
             font-weight: 600;
-            font-size: 17px;
-        }
-
-        .transaction-list {
-            list-style: none;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .transaction-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 20px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
             transition: background 0.2s;
         }
         .transaction-item:active { background: var(--bg); }
-
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
+        .transaction-item:last-child { border-bottom: none; }
 
         .tx-left {
             display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tx-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .tx-info {
+            display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
 
         .tx-category {
@@ -196,24 +237,51 @@
         .tx-meta {
             font-size: 12px;
             color: var(--text-sec);
-            font-weight: 400;
+        }
+
+        .tx-right {
+            text-align: right;
         }
 
         .tx-amount {
             font-weight: 700;
-            color: var(--text);
             font-size: 16px;
             letter-spacing: -0.3px;
         }
+
+        .amount-expense { color: var(--text); }
+        .amount-income { color: var(--income); }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            right: 24px;
+            bottom: 30px;
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 28px;
+            font-size: 32px;
+            font-weight: 300;
+            box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background 0.2s;
+            z-index: 1000;
+        }
+        .fab:active { transform: scale(0.9) rotate(90deg); }
 
         .empty-state {
             padding: 60px 20px;
             text-align: center;
             color: var(--text-sec);
-            font-size: 15px;
+            font-size: 14px;
         }
 
-        /* Debug */
         #debug-log {
             display: none;
             padding: 12px;
@@ -231,7 +299,27 @@
 <div class="container">
     <div id="debug-log"></div>
 
-    <!-- Tabs -->
+    <!-- Main Navigation -->
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchSection('overview')">
+            <span class="nav-icon">📊</span>
+            <span>总览</span>
+        </div>
+        <div class="nav-item" onclick="switchSection('trends')">
+            <span class="nav-icon">📈</span>
+            <span>趋势</span>
+        </div>
+        <div class="nav-item" onclick="switchSection('categories')">
+            <span class="nav-icon">🏷️</span>
+            <span>分类</span>
+        </div>
+        <div class="nav-item" onclick="switchSection('settings')">
+            <span class="nav-icon">⚙️</span>
+            <span>设置</span>
+        </div>
+    </div>
+
+    <!-- Period Tabs -->
     <div class="tabs">
         <button class="tab-btn" onclick="setPeriod('today')" id="tab-today">今天</button>
         <button class="tab-btn" onclick="setPeriod('week')" id="tab-week">本周</button>
@@ -239,54 +327,71 @@
         <button class="tab-btn" onclick="setPeriod('year')" id="tab-year">本年</button>
     </div>
 
-    <!-- Metrics -->
+    <!-- Metrics Row -->
     <div class="metrics-grid">
         <div class="metric-card">
-            <span class="metric-label">总支出</span>
-            <span class="metric-value" id="val-total">0.00</span>
-            <span class="metric-trend" id="trend-total">-</span>
+            <span class="metric-label">收入</span>
+            <span class="metric-value income" id="val-income">¥0.00</span>
         </div>
         <div class="metric-card">
-            <span class="metric-label">平均支出</span>
-            <span class="metric-value" id="val-avg">0.00</span>
-            <span class="metric-trend" id="trend-avg">-</span>
+            <span class="metric-label">支出</span>
+            <span class="metric-value expense" id="val-expense">¥0.00</span>
         </div>
         <div class="metric-card">
-            <span class="metric-label">笔数</span>
-            <span class="metric-value" id="val-count">0</span>
-            <span class="metric-trend" id="trend-count">-</span>
-        </div>
-        <div class="metric-card" style="justify-content:center; align-items:center; background:var(--primary-light);">
-             <span class="metric-label" style="color:var(--primary); margin-bottom:0" id="current-range-label">YYYY-MM-DD</span>
+            <span class="metric-label">结余</span>
+            <span class="metric-value" id="val-balance">¥0.00</span>
         </div>
     </div>
 
-    <!-- Trend Chart -->
-    <div class="chart-card">
-        <div class="chart-header">趋势图</div>
-        <div id="chart-trend" class="chart-container"></div>
-    </div>
+    <div class="chart-grid">
+        <!-- Trend Chart -->
+        <div class="chart-card">
+            <div class="chart-header">支出趋势</div>
+            <div id="chart-trend" class="chart-container"></div>
+        </div>
 
-    <!-- Pie Chart -->
-    <div class="chart-card">
-        <div class="chart-header">消费分布</div>
-        <div id="chart-pie" class="chart-container"></div>
+        <!-- Pie Chart -->
+        <div class="chart-card">
+            <div class="chart-header">分类分布</div>
+            <div id="chart-pie" class="chart-container"></div>
+        </div>
     </div>
 
     <!-- List -->
     <div class="list-card">
-        <div class="list-header">交易明细</div>
+        <div class="list-header">
+            <span>最近交易</span>
+            <span id="current-range-label" style="font-size: 12px; color: var(--text-sec); font-weight: normal;"></span>
+        </div>
         <ul class="transaction-list" id="transaction-list">
             <!-- Items injected here -->
         </ul>
     </div>
 </div>
 
+<button class="fab" onclick="window.location.reload()">+</button>
+
 <script>
     // --- State ---
     let allData = [];
     let currentPeriod = 'month'; // default
     let charts = {};
+
+    // Category Emoji Mapping
+    const categoryEmojis = {
+        "餐饮美食": "🍔",
+        "交通出行": "🚗",
+        "购物消费": "🛍️",
+        "居家生活": "🏠",
+        "休闲娱乐": "🎮",
+        "人情往来": "🎁",
+        "医疗健康": "🏥",
+        "教育培训": "📚",
+        "金融保险": "💰",
+        "孝敬父母": "❤️",
+        "其他": "✨",
+        "收入": "💵"
+    };
 
     // --- Config ---
     const CSV_PLACEHOLDER_KEY = "CSV_DATA_" + "PLACEHOLDER";
@@ -449,41 +554,42 @@
         renderList(currentData);
     }
 
+    function switchSection(section) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        console.log('Switching to section:', section);
+        // Placeholder for future multi-page logic
+    }
+
     function renderMetrics(curr, prev) {
-        // Total
-        const totalCurr = curr.reduce((sum, item) => sum + item.Amount, 0);
-        const totalPrev = prev.reduce((sum, item) => sum + item.Amount, 0);
+        // Calculate Income vs Expense
+        // For simplicity, we assume positive Amount is Expense, 
+        // unless Category is '收入' (case insensitive or match mapping)
         
-        // Count
-        const countCurr = curr.length;
-        const countPrev = prev.length;
-
-        // Avg
-        const avgCurr = countCurr ? totalCurr / countCurr : 0;
-        const avgPrev = countPrev ? totalPrev / countPrev : 0;
-
-        // Helper: Calculate Trend
-        const calcTrend = (c, p) => {
-            if (p === 0) return { val: c === 0 ? '0%' : '+∞%', type: 'neutral' };
-            const pct = ((c - p) / p) * 100;
-            const sign = pct > 0 ? '↑' : (pct < 0 ? '↓' : '');
-            const type = pct > 0 ? 'trend-up' : (pct < 0 ? 'trend-down' : 'trend-neutral');
-            return { val: `${sign} ${Math.abs(pct).toFixed(1)}%`, type };
+        const calcTotals = (data) => {
+            let inc = 0, exp = 0;
+            data.forEach(item => {
+                if (item.Category === '收入' || item.Amount < 0) {
+                    inc += Math.abs(item.Amount);
+                } else {
+                    exp += item.Amount;
+                }
+            });
+            return { inc, exp, bal: inc - exp };
         };
 
-        const tTotal = calcTrend(totalCurr, totalPrev);
-        const tAvg = calcTrend(avgCurr, avgPrev);
-        const tCount = calcTrend(countCurr, countPrev);
-
+        const current = calcTotals(curr);
+        
         // Update DOM
-        document.getElementById('val-total').innerText = '¥' + totalCurr.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('trend-total').innerHTML = `<span class="${tTotal.type}">${tTotal.val}</span> <span style="color:#9ca3af">环比</span>`;
-
-        document.getElementById('val-avg').innerText = '¥' + avgCurr.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 2});
-        document.getElementById('trend-avg').innerHTML = `<span class="${tAvg.type}">${tAvg.val}</span> <span style="color:#9ca3af">环比</span>`;
-
-        document.getElementById('val-count').innerText = countCurr;
-        document.getElementById('trend-count').innerHTML = `<span class="${tCount.type}">${tCount.val}</span> <span style="color:#9ca3af">环比</span>`;
+        const fmt = (v) => '¥' + v.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        document.getElementById('val-income').innerText = fmt(current.inc);
+        document.getElementById('val-expense').innerText = fmt(current.exp);
+        document.getElementById('val-balance').innerText = fmt(current.bal);
+        
+        // Color balance
+        const balEl = document.getElementById('val-balance');
+        balEl.style.color = current.bal >= 0 ? 'var(--income)' : 'var(--expense)';
     }
 
     function renderCharts(data, granularity, start, end) {
@@ -491,9 +597,12 @@
         const textColor = isDark ? '#aeaeb2' : '#8e8e93';
         const splitLineColor = isDark ? '#38383a' : '#f2f2f7';
 
+        // Filter out income for spending charts
+        const expenseData = data.filter(d => d.Category !== '收入' && d.Amount > 0);
+
         // 1. Pie Chart (By Category)
         const catMap = {};
-        data.forEach(d => {
+        expenseData.forEach(d => {
             const c = d.Category || '未分类';
             catMap[c] = (catMap[c] || 0) + d.Amount;
         });
@@ -505,6 +614,7 @@
             color: ['#007aff', '#34c759', '#ff9500', '#ff3b30', '#af52de', '#ff2d55', '#5856d6'],
             tooltip: { 
                 trigger: 'item', 
+                formatter: '{b}: ¥{c} ({d}%)',
                 backgroundColor: isDark ? '#1c1c1e' : '#ffffff',
                 borderColor: isDark ? '#38383a' : '#e5e7eb',
                 textStyle: { color: isDark ? '#ffffff' : '#1c1c1e' }
@@ -517,17 +627,16 @@
             },
             series: [{
                 type: 'pie',
-                radius: ['50%', '75%'],
+                radius: ['40%', '70%'],
                 center: ['50%', '45%'],
                 avoidLabelOverlap: false,
                 itemStyle: {
-                    borderRadius: 10,
+                    borderRadius: 8,
                     borderColor: isDark ? '#1c1c1e' : '#fff',
                     borderWidth: 2
                 },
                 label: { show: false },
-                emphasis: { label: { show: false } },
-                data: pieData.length ? pieData : [{name:'无数据', value:0}]
+                data: pieData.length ? pieData : [{name:'无支出', value:0}]
             }]
         });
 
@@ -537,23 +646,22 @@
         // Initialize Trend Map with 0s for complete timeline
         if (granularity === 'hour') {
             for(let i=0; i<24; i++) trendMap[i] = 0;
-            data.forEach(d => {
+            expenseData.forEach(d => {
                 const h = d.dateObj.getHours();
                 trendMap[h] = (trendMap[h] || 0) + d.Amount;
             });
         } else if (granularity === 'day') {
-            // Fill days between start and end
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                 const k = d.toISOString().slice(0, 10);
                 trendMap[k] = 0;
             }
-            data.forEach(d => {
+            expenseData.forEach(d => {
                 const k = d.dateObj.toISOString().slice(0, 10);
                 trendMap[k] = (trendMap[k] || 0) + d.Amount;
             });
         } else if (granularity === 'month') {
             for(let i=0; i<12; i++) trendMap[i] = 0;
-            data.forEach(d => {
+            expenseData.forEach(d => {
                 const m = d.dateObj.getMonth();
                 trendMap[m] = (trendMap[m] || 0) + d.Amount;
             });
@@ -561,12 +669,10 @@
 
         const xData = Object.keys(trendMap);
         const yData = Object.values(trendMap);
-        
-        // Format X Axis Labels
         const xLabels = xData.map(k => {
             if (granularity === 'hour') return `${k}:00`;
             if (granularity === 'month') return `${parseInt(k)+1}月`;
-            if (granularity === 'day') return k.slice(5); // MM-DD
+            if (granularity === 'day') return k.slice(5);
             return k;
         });
 
@@ -577,18 +683,18 @@
                 borderColor: isDark ? '#38383a' : '#e5e7eb',
                 textStyle: { color: isDark ? '#ffffff' : '#1c1c1e' }
             },
-            grid: { left: '2%', right: '2%', bottom: '3%', top: '10%', containLabel: true },
+            grid: { left: '4%', right: '4%', bottom: '10%', top: '10%', containLabel: true },
             xAxis: { 
                 type: 'category', 
                 data: xLabels,
                 axisLine: { show: false },
                 axisTick: { show: false },
-                axisLabel: { color: textColor, fontSize: 11 }
+                axisLabel: { color: textColor, fontSize: 10 }
             },
             yAxis: { 
                 type: 'value',
-                splitLine: { lineStyle: { color: splitLineColor } },
-                axisLabel: { color: textColor, fontSize: 11 }
+                splitLine: { lineStyle: { color: splitLineColor, type: 'dashed' } },
+                axisLabel: { color: textColor, fontSize: 10 }
             },
             series: [{
                 data: yData,
@@ -598,7 +704,7 @@
                 lineStyle: { width: 3, color: '#007aff' },
                 areaStyle: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: 'rgba(0, 122, 255, 0.3)' },
+                        { offset: 0, color: 'rgba(0, 122, 255, 0.2)' },
                         { offset: 1, color: 'rgba(0, 122, 255, 0)' }
                     ])
                 },
@@ -611,32 +717,33 @@
         const listEl = document.getElementById('transaction-list');
         listEl.innerHTML = '';
 
-        // Sort by Time Desc (Date + Time)
         const sorted = [...data].sort((a, b) => b.dateObj - a.dateObj);
-
         if (sorted.length === 0) {
             listEl.innerHTML = '<li class="empty-state">本时段无交易记录</li>';
             return;
         }
 
-        // Limit to 50 items for performance
-        const displayList = sorted.slice(0, 50);
-
-        displayList.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'transaction-item';
+        sorted.slice(0, 50).forEach(item => {
+            const isIncome = item.Category === '收入' || item.Amount < 0;
+            const emoji = categoryEmojis[item.Category] || "✨";
+            const amountClass = isIncome ? 'amount-income' : 'amount-expense';
+            const amountPrefix = isIncome ? '+' : '-';
             
-            // Format Time
             const timeStr = item.dateObj.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             const dateStr = item.dateObj.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
 
+            const li = document.createElement('li');
+            li.className = 'transaction-item';
             li.innerHTML = `
                 <div class="tx-left">
-                    <span class="tx-category">${item.Category || '未分类'} <span style="font-weight:normal; font-size:0.9em"> - ${item.Item || ''}</span></span>
-                    <span class="tx-meta">${dateStr} ${timeStr} · ${item.Merchant || ''}</span>
+                    <div class="tx-icon">${emoji}</div>
+                    <div class="tx-info">
+                        <span class="tx-category">${item.Category || '未分类'}</span>
+                        <span class="tx-meta">${dateStr} ${timeStr} · ${item.Item || item.Merchant || ''}</span>
+                    </div>
                 </div>
                 <div class="tx-right">
-                    <span class="tx-amount">¥${item.Amount.toFixed(2)}</span>
+                    <span class="tx-amount ${amountClass}">${amountPrefix}¥${Math.abs(item.Amount).toFixed(2)}</span>
                 </div>
             `;
             listEl.appendChild(li);
