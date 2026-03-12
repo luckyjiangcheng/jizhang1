@@ -273,14 +273,30 @@
     const chipsEl = document.getElementById("chips");
 
     function endWith(value) {
-        if (window.completion) {
-            window.completion(value);
-            return;
+        const completeFn =
+            typeof window.completion === "function"
+                ? window.completion
+                : (typeof completion === "function" ? completion : null);
+
+        if (completeFn) {
+            try {
+                completeFn(value);
+                return;
+            } catch (_) {}
         }
+
+        try {
+            const handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.completion;
+            if (handler && typeof handler.postMessage === "function") {
+                handler.postMessage(value);
+                return;
+            }
+        } catch (_) {}
+
         setTimeout(() => {
+            try { window.location.href = "shortcuts://"; } catch (_) {}
             try { window.close(); } catch (_) {}
             try { history.back(); } catch (_) {}
-            try { location.replace("about:blank"); } catch (_) {}
         }, 0);
     }
 
