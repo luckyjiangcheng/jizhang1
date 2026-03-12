@@ -126,57 +126,8 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="card">
-        <h1 class="title">✨ 记账确认</h1>
-        <form id="form">
-            <div class="row">
-                <div class="group">
-                    <label>日期</label>
-                    <input id="date" type="date" required>
-                </div>
-                <div class="group">
-                    <label>时间</label>
-                    <input id="time" type="time">
-                </div>
-            </div>
-            <div class="group">
-                <label>金额</label>
-                <input id="amount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" required>
-            </div>
-            <div class="group">
-                <label>类目</label>
-                <div id="chips" class="chips"></div>
-                <input id="category" type="hidden" required>
-            </div>
-            <div class="group">
-                <label>事项</label>
-                <input id="item" type="text" placeholder="例如：午餐、地铁">
-            </div>
-            <div class="group">
-                <label>商户</label>
-                <input id="merchant" type="text" placeholder="例如：便利店">
-            </div>
-            <div id="error" class="error"></div>
-            <div class="actions">
-                <button id="cancelBtn" type="button">取消</button>
-                <button class="btn-primary" type="submit">确认记账</button>
-            </div>
-        </form>
-    </div>
-</div>
 <script>
-    let rawData = `JSON_DATA_PLACEHOLDER`;
-    const categories = ["餐饮美食","交通出行","购物消费","居家生活","休闲娱乐","人情往来","医疗健康","教育培训","金融保险","孝敬父母","其他"];
-
-    const dateEl = document.getElementById("date");
-    const timeEl = document.getElementById("time");
-    const amountEl = document.getElementById("amount");
-    const categoryEl = document.getElementById("category");
-    const itemEl = document.getElementById("item");
-    const merchantEl = document.getElementById("merchant");
-    const errorEl = document.getElementById("error");
-    const chipsEl = document.getElementById("chips");
+    const rawData = `JSON_DATA_PLACEHOLDER`;
 
     function endWith(value) {
         if (window.completion) {
@@ -186,27 +137,7 @@
         document.body.innerText = value;
     }
 
-    function selectCategory(name) {
-        categoryEl.value = name;
-        const chips = chipsEl.querySelectorAll(".chip");
-        chips.forEach(chip => {
-            chip.classList.toggle("active", chip.dataset.value === name);
-        });
-    }
-
-    function initChips() {
-        chipsEl.innerHTML = "";
-        categories.forEach(name => {
-            const chip = document.createElement("div");
-            chip.className = "chip";
-            chip.dataset.value = name;
-            chip.innerText = name;
-            chip.addEventListener("click", () => selectCategory(name));
-            chipsEl.appendChild(chip);
-        });
-    }
-
-    function parseJsonData() {
+    function parseData() {
         if (rawData === "JSON_DATA_PLACEHOLDER") return {};
         try {
             return JSON.parse(rawData);
@@ -215,53 +146,43 @@
         }
     }
 
-    function fillDefaults() {
+    function normalizeDate(dateText) {
+        if (dateText) return String(dateText);
         const now = new Date();
         const yyyy = now.getFullYear();
         const mm = String(now.getMonth() + 1).padStart(2, "0");
         const dd = String(now.getDate()).padStart(2, "0");
-        const hh = String(now.getHours()).padStart(2, "0");
-        const mi = String(now.getMinutes()).padStart(2, "0");
-        const data = parseJsonData();
-
-        dateEl.value = data.date || `${yyyy}-${mm}-${dd}`;
-        timeEl.value = data.time || `${hh}:${mi}`;
-        if (data.amount !== undefined && data.amount !== null && data.amount !== "") {
-            amountEl.value = data.amount;
-        }
-        if (data.item) itemEl.value = data.item;
-        if (data.merchant) merchantEl.value = data.merchant;
-        if (data.category && categories.includes(data.category)) {
-            selectCategory(data.category);
-        }
+        return `${yyyy}-${mm}-${dd}`;
     }
 
-    function toCsvLine() {
-        const date = dateEl.value || "";
-        const time = timeEl.value || "";
-        const amount = amountEl.value || "";
-        const category = categoryEl.value || "";
-        const item = (itemEl.value || "").replace(/,/g, " ");
-        const merchant = (merchantEl.value || "").replace(/,/g, " ");
+    function normalizeTime(timeText) {
+        if (timeText) return String(timeText);
+        return "";
+    }
+
+    function normalizeAmount(amount) {
+        if (amount === undefined || amount === null || amount === "") return "";
+        const n = Number(amount);
+        if (Number.isNaN(n)) return "";
+        return n.toFixed(2);
+    }
+
+    function cleanText(value) {
+        return String(value || "").replace(/,/g, " ");
+    }
+
+    function toCsvLine(data) {
+        const date = normalizeDate(data.date);
+        const time = normalizeTime(data.time);
+        const amount = normalizeAmount(data.amount);
+        const category = cleanText(data.category || "其他");
+        const item = cleanText(data.item);
+        const merchant = cleanText(data.merchant);
         return `${date},${time},${amount},${category},${item},${merchant}`;
     }
 
-    document.getElementById("cancelBtn").addEventListener("click", () => {
-        endWith("");
-    });
-
-    document.getElementById("form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        errorEl.innerText = "";
-        if (!amountEl.value || !categoryEl.value) {
-            errorEl.innerText = "请填写金额并选择类目";
-            return;
-        }
-        endWith(toCsvLine());
-    });
-
-    initChips();
-    fillDefaults();
+    const data = parseData();
+    endWith(toCsvLine(data));
 </script>
 </body>
 </html>
