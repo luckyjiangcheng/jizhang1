@@ -33,6 +33,12 @@
   - [x] SubTask 5.3: 验证最终 CSV 写入格式无误。
   - [x] SubTask 5.4: 确认流程中无多余弹框。
 
+- [x] Task 6: 修复确认页确认/取消响应一致性
+  - [x] SubTask 6.1: 确认按钮改为同步写剪贴板并立即关闭页面。
+  - [x] SubTask 6.2: 取消按钮改为直接关闭页面，不参与异步流程。
+  - [x] SubTask 6.3: 增加异步剪贴板补写但不阻塞关闭动作。
+  - [x] SubTask 6.4: 同步更新 `public` 资源与用户/开发者文档描述。
+
 # Task Dependencies
 - Task 2 依赖 Task 1 (Prompt 确定后，HTML 才能解析数据)。
 - Task 4 依赖 Task 2。

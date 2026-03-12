@@ -6,123 +6,129 @@
     <title>记账确认</title>
     <style>
         :root {
-            --primary-color: #007aff;
-            --bg-color: #f2f2f7;
-            --card-bg: #ffffff;
-            --text-primary: #111111;
-            --text-secondary: #8e8e93;
-            --border-color: #d1d1d6;
-            --danger-color: #ff3b30;
-            --radius-lg: 14px;
-            --radius-md: 10px;
+            --primary: #007aff;
+            --primary-bg: rgba(0, 122, 255, 0.1);
+            --bg: #f2f2f7;
+            --card: #ffffff;
+            --text: #1c1c1e;
+            --text-sec: #8e8e93;
+            --border: #d1d1d6;
+            --danger: #ff3b30;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary-color: #0a84ff;
-                --bg-color: #1c1c1e;
-                --card-bg: #2c2c2e;
-                --text-primary: #ffffff;
-                --text-secondary: #aeaeb2;
-                --border-color: #3a3a3c;
+                --primary: #0a84ff;
+                --primary-bg: rgba(10, 132, 255, 0.15);
+                --bg: #000000;
+                --card: #1c1c1e;
+                --text: #ffffff;
+                --text-sec: #aeaeb2;
+                --border: #38383a;
             }
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; width: 100%; height: 100%; background: var(--bg-color); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        html, body { margin: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
         .container {
             width: 100%;
             min-height: 100%;
-            padding: 16px;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
         }
         .card {
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             margin: 0 auto;
-            background: var(--card-bg);
+            background: var(--card);
             border-radius: var(--radius-lg);
-            padding: 18px;
+            padding: 24px;
+            box-shadow: var(--shadow);
         }
         .title {
-            margin: 0 0 16px;
+            margin: 0 0 24px;
             text-align: center;
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
         }
-        .row {
-            display: flex;
-            gap: 10px;
-        }
-        .group {
-            margin-bottom: 14px;
-            width: 100%;
-        }
+        .row { display: flex; gap: 12px; }
+        .group { margin-bottom: 20px; width: 100%; }
         label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-sec);
             font-weight: 500;
+            padding-left: 2px;
         }
         input {
             width: 100%;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            background: var(--card-bg);
-            color: var(--text-primary);
-            padding: 12px;
+            background: var(--card);
+            color: var(--text);
+            padding: 12px 14px;
             font-size: 16px;
-            outline: none;
+            transition: all 0.2s;
         }
-        input:focus { border-color: var(--primary-color); }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-bg); }
         .chips {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            margin-top: 4px;
         }
         .chip {
-            border: 1px solid transparent;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            border-radius: 20px;
-            padding: 8px 12px;
+            background: var(--bg);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 8px 14px;
             font-size: 14px;
-            user-select: none;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
         }
         .chip.active {
-            background: var(--primary-color);
-            color: #fff;
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 8px var(--primary-bg);
         }
+        .chip:active { transform: scale(0.95); }
         .error {
             min-height: 18px;
-            margin-top: 2px;
-            margin-bottom: 10px;
-            color: var(--danger-color);
+            margin-bottom: 16px;
+            color: var(--danger);
             font-size: 13px;
+            text-align: center;
         }
-        .actions {
-            display: flex;
-            gap: 12px;
-        }
+        .actions { display: flex; gap: 12px; margin-top: 8px; }
         button {
             flex: 1;
-            border: 1px solid var(--border-color);
+            border: none;
             border-radius: var(--radius-md);
-            padding: 13px 0;
+            padding: 14px 0;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            background: transparent;
-            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        #cancelBtn {
+            background: var(--bg);
+            color: var(--text-sec);
         }
         .btn-primary {
-            background: var(--primary-color);
-            color: #fff;
-            border-color: var(--primary-color);
+            background: var(--primary);
+            color: #ffffff;
         }
+        button:active { transform: scale(0.98); opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -247,13 +253,7 @@
         return `${date},${time},${amount},${category},${item},${merchant}`;
     }
 
-    async function writeClipboard(text) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            try {
-                await navigator.clipboard.writeText(text);
-                return;
-            } catch (_) {}
-        }
+    function writeClipboardSync(text) {
         const textarea = document.createElement("textarea");
         textarea.value = text;
         textarea.style.position = "fixed";
@@ -261,17 +261,26 @@
         document.body.appendChild(textarea);
         textarea.focus();
         textarea.select();
+        let copied = false;
         try {
-            document.execCommand("copy");
+            copied = document.execCommand("copy");
         } catch (_) {}
         document.body.removeChild(textarea);
+        return copied;
     }
 
-    document.getElementById("cancelBtn").addEventListener("click", async () => {
+    function writeClipboardAsync(text) {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            return;
+        }
+        navigator.clipboard.writeText(text).catch(() => {});
+    }
+
+    document.getElementById("cancelBtn").addEventListener("click", () => {
         endWith();
     });
 
-    document.getElementById("form").addEventListener("submit", async (e) => {
+    document.getElementById("form").addEventListener("submit", (e) => {
         e.preventDefault();
         errorEl.innerText = "";
         if (!amountEl.value || !categoryEl.value) {
@@ -279,11 +288,9 @@
             return;
         }
         const line = toCsvLine();
-        try {
-            await writeClipboard(line);
-        } finally {
-            endWith();
-        }
+        writeClipboardSync(line);
+        writeClipboardAsync(line);
+        endWith();
     });
 
     initChips();
