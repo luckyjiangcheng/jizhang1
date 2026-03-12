@@ -5,34 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>✨ 记账确认</title>
     <style>
-        /* ... existing styles ... */
-        
-        /* Fix for iOS Web View rendering issue where it might show as a plain text list if CSS fails to load or viewport is weird */
-        /* Ensure the container takes full width/height */
+        /* Fix for iOS Web View rendering issue */
         html, body {
             height: 100%;
             width: 100%;
-            overflow: hidden; /* Prevent scrolling if not needed */
-            background-color: var(--bg-color); /* Ensure background is set */
+            overflow: hidden;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
         }
         
         .container {
-            /* Adjust container to be more robust */
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
             width: 100%;
             height: 100%;
-            max-width: none; /* Override max-width for full screen feel */
-            border-radius: 0; /* No radius for full screen */
+            background: var(--card-bg);
             padding: 20px;
-            overflow-y: auto; /* Allow scrolling within form */
+            overflow-y: auto;
+            border-radius: 0;
             box-shadow: none;
+            display: block;
         }
-
-        /* ... */
             --primary-color: #007aff;
             --bg-color: #f2f2f7;
             --card-bg: #ffffff;

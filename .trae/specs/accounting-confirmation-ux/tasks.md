@@ -12,6 +12,7 @@
     - [ ] 实现类目选择器（下拉或 Chip 标签）。
     - [ ] 点击“确认”时，生成最终的 CSV 字符串。
     - [ ] 调用 `completion()` 或复制到剪贴板，以便快捷指令获取。
+    - [ ] 移除所有不必要的 `alert` 弹框。
 
 - [ ] Task 3: 更新开发者指南 (`docs/developer_distribution_guide.md`)
   - [ ] SubTask 3.1: 更新“安装器”流程：
@@ -20,6 +21,7 @@
   - [ ] SubTask 3.2: 更新“主程序”流程：
     - [ ] 逻辑变更为：API 调用 -> 获取 JSON -> 读取 `confirm.txt` -> 替换 JSON 占位符 -> 显示网页视图 -> 获取网页输出 -> 写入 CSV。
     - [ ] 增加“显示通知”步骤。
+    - [ ] 确保指南中没有提及额外的确认弹框步骤。
 
 - [ ] Task 4: 更新构建脚本 (`scripts/build.py`)
   - [ ] SubTask 4.1: 将 `src/confirm.txt` 加入打包流程。
@@ -29,6 +31,7 @@
   - [ ] SubTask 5.1: 验证 Prompt 输出的 JSON 能被 HTML 正确解析。
   - [ ] SubTask 5.2: 验证 HTML 表单修改后的数据能正确传回快捷指令。
   - [ ] SubTask 5.3: 验证最终 CSV 写入格式无误。
+  - [ ] SubTask 5.4: 确认流程中无多余弹框。
 
 # Task Dependencies
 - Task 2 依赖 Task 1 (Prompt 确定后，HTML 才能解析数据)。

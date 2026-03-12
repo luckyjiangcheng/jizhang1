@@ -5,7 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>✨ 记账确认</title>
     <style>
-        :root {
+        /* Fix for iOS Web View rendering issue */
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            padding: 20px;
+            overflow-y: auto;
+            border-radius: 0;
+            box-shadow: none;
+            display: block;
+        }
             --primary-color: #007aff;
             --bg-color: #f2f2f7;
             --card-bg: #ffffff;
@@ -207,7 +229,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupCategories();
         // If placeholder is not replaced, use empty object
-        if (RAW_DATA.includes('JSON_DATA_PLACEHOLDER')) {
+        if (RAW_DATA === 'JSON_DATA_PLACEHOLDER') {
              RAW_DATA = '{}';
         }
         prefillData();
@@ -319,6 +341,17 @@
 
         // Replace body content with CSV string for Shortcuts to capture
         document.body.innerText = csvLine;
+
+        // Call Shortcuts completion handler to close the web view automatically
+        // This is the standard way to return data and close the view in iOS Shortcuts
+        if (window.completion) {
+            window.completion(csvLine);
+        } else {
+            // Fallback: If completion handler is not available, just show the text.
+            // But ideally, the user should tap "Done" in the top right if auto-close fails.
+            // Or we can try window.close()
+            window.close();
+        }
     }
 </script>
 
