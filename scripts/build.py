@@ -53,12 +53,14 @@ def build_public():
         json.dump(config_public, f, indent=4, ensure_ascii=False)
     print("✓ Created config.json (with API Key)")
 
-    # 4. Copy Dashboard Template
+    # 4. Copy Dashboard & Confirm Templates
     try:
         shutil.copy2(src_dir / "dashboard.txt", public_dir / "dashboard.txt")
         print("✓ Copied dashboard.txt")
+        shutil.copy2(src_dir / "confirm.txt", public_dir / "confirm.txt")
+        print("✓ Copied confirm.txt")
     except Exception as e:
-        print(f"Error copying dashboard: {e}")
+        print(f"Error copying templates: {e}")
 
     # 5. Create index.html (Simple landing page)
     index_html = """
@@ -74,6 +76,7 @@ def build_public():
     <ul>
         <li><a href="config.json">Config Template</a></li>
         <li><a href="dashboard.txt">Dashboard Template (TXT)</a></li>
+        <li><a href="confirm.txt">Confirmation Page Template (TXT)</a></li>
     </ul>
 </body>
 </html>

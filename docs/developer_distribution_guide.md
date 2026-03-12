@@ -30,18 +30,22 @@
 2.  **获取字典**: 从 URL 内容获取字典。
 3.  **保存文件**:
     *   文件: 上一步的字典
-    *   路径: `Shortcuts/ZenLedger/config.json` (开启覆盖)
+    *   路径: `ZenLedger/config.json` (开启覆盖)
 4.  **获取 URL 内容**:
     *   URL: `https://your-username.github.io/zenledger/dashboard.txt`
 5.  **保存文件**:
-    *   路径: `Shortcuts/ZenLedger/dashboard.txt` (开启覆盖)
-    *   *注意：这里我们故意保存为 .txt 后缀，防止 iOS 自动渲染*。
-6.  **创建文件夹**: (如果需要) 确保 `Shortcuts/ZenLedger` 存在。
-7.  **文本**: 输入 `Date,Time,Amount,Category,Item,Merchant`
-8.  **保存文件**:
+    *   路径: `ZenLedger/dashboard.txt` (开启覆盖)
+6.  **获取 URL 内容**:
+    *   URL: `https://your-username.github.io/zenledger/confirm.txt`
+7.  **保存文件**:
+    *   路径: `ZenLedger/confirm.txt` (开启覆盖)
+8.  **创建文件夹**: (如果需要) 确保 `ZenLedger` 存在。
+9.  **文本**: 输入 `Date,Time,Amount,Category,Item,Merchant`
+10. **将文本保存到文件**:
     *   文件: 上一步的文本
-    *   路径: `Shortcuts/ZenLedger/ZenLedger.csv` (关闭覆盖，仅当文件不存在时创建，或者检查文件是否存在) -> *为了简化，可以直接覆盖或者用“追加到文件”如果不存的话*。
-    *   *建议逻辑*：获取文件 `ZenLedger.csv` -> 如果报错 -> 保存文本到 `ZenLedger.csv`。
+    *   路径: `ZenLedger/ZenLedger.csv`
+    *   **重要设置**: 点击“展开”，取消勾选“覆盖（如果文件存在）”。
+    *   *说明*：这样如果 CSV 文件已经存在（里面有用户的旧账本），就不会被覆盖；如果不存在，则会创建一个新的并写入表头。
 9.  **显示提醒**: "环境配置完成！即将安装主程序。"
 10. **打开 URL**: (填入第三步生成的主程序分享链接)
 
@@ -55,7 +59,7 @@
 
 ### 1. 读取全局配置
 1.  **获取文件**:
-    *   路径: `Shortcuts/ZenLedger/config.json`
+    *   路径: `ZenLedger/config.json`
     *   (如果不存，提示用户先运行安装器)
 2.  **获取字典**: 从上一步的文件获取字典。
 3.  **获取字典值**: 分别获取以下值并存为变量：
@@ -77,15 +81,33 @@
     *   **听写文本**: 语言选中文。
     *   **获取当前日期**: 格式选择 `自定义: yyyy-MM-dd` (结果存为变量 `CurrentDate`)。
     *   **获取 URL 内容** (调用 API):
-        *   URL: 变量 `api_base` + `/chat/completions`
-        *   Headers: `Authorization: Bearer 变量api_key`
-        *   Body (JSON): 
-            *   `model`=变量 `text_model`
-            *   `messages` (Array):
-                *   Item 1 (Dictionary): `role`="system", `content`=变量 `system_prompt`
-                *   Item 2 (Dictionary): `role`="user", `content`="Current Date: " + `CurrentDate` + "\nContent: " + `听写文本`
-    *   **追加到文件**: 将结果追加到 `Shortcuts/ZenLedger/ZenLedger.csv`。
-    *   **朗读文本**: "已记账"。
+        *   ... (API调用部分保持不变)
+        *   (这一步获取到的结果是 AI 生成的 JSON，例如 `{"amount": 12.00, ...}`)
+        *   (我们将这个结果存为变量 **AIResult**)
+    *   **获取文件**:
+        *   路径: `ZenLedger/confirm.txt`
+        *   (存为变量 **ConfirmTemplate**)
+    *   **替换文本**:
+        *   查找: `JSON_DATA_PLACEHOLDER`
+        *   替换为: 变量 **AIResult**
+        *   在: 变量 **ConfirmTemplate**
+        *   (存为变量 **ConfirmHTML**)
+    *   **设置名称** (Set Name):
+        *   输入: 变量 **ConfirmHTML**
+        *   名称: `confirm.html`
+    *   **显示网页视图**:
+        *   输入: 上一步的结果
+        *   (用户在网页中点击确认后，网页会显示最终的 CSV 字符串)
+        *   (Shortcuts 会自动获取网页显示的文本)
+        *   (存为变量 **FinalCSV**)
+    *   **如果** (If): 变量 **FinalCSV** 有值
+        *   **追加到文件**:
+            *   文件: 变量 **FinalCSV**
+            *   路径: `ZenLedger/ZenLedger.csv`
+        *   **显示通知**: "✨ 记账成功！"
+    *   **否则**:
+        *   **显示通知**: "已取消记账"
+    *   **结束如果**
 
 ### 4. 分支逻辑 B：截图记账
 6.  **在“📷 截图记账”下**:
@@ -93,25 +115,40 @@
     *   **Base64 编码**: 换行选“无”。
     *   **获取当前日期**: 格式选择 `自定义: yyyy-MM-dd` (结果存为变量 `CurrentDate`)。
     *   **获取 URL 内容** (调用 API):
-        *   URL: 同上。
-        *   Body (JSON): 
-            *   `model`=变量 `vision_model`
-            *   `messages` (Array):
-                *   Item 1 (Dictionary): `role`="system", `content`=变量 `system_prompt`
-                *   Item 2 (Dictionary): `role`="user", `content` (Array):
-                    *   Item 1 (Dictionary): `type`="text", `text`="Current Date: " + `CurrentDate`
-                    *   Item 2 (Dictionary): `type`="image_url", `image_url` (Dictionary): `url`="data:image/jpeg;base64," + `Base64编码结果`
-    *   **追加到文件**: 同上。
-    *   **删除照片**: 输入为“屏幕快照”。
+        *   ... (API调用部分保持不变)
+        *   (这一步获取到的结果存为变量 **AIResult**)
+    *   **获取文件**:
+        *   路径: `ZenLedger/confirm.txt`
+        *   (存为变量 **ConfirmTemplate**)
+    *   **替换文本**:
+        *   查找: `JSON_DATA_PLACEHOLDER`
+        *   替换为: 变量 **AIResult**
+        *   在: 变量 **ConfirmTemplate**
+        *   (存为变量 **ConfirmHTML**)
+    *   **设置名称** (Set Name):
+        *   输入: 变量 **ConfirmHTML**
+        *   名称: `confirm.html`
+    *   **显示网页视图**:
+        *   输入: 上一步的结果
+        *   (存为变量 **FinalCSV**)
+    *   **如果** (If): 变量 **FinalCSV** 有值
+        *   **追加到文件**:
+            *   文件: 变量 **FinalCSV**
+            *   路径: `ZenLedger/ZenLedger.csv`
+        *   **删除照片**: 输入为“屏幕快照”。
+        *   **显示通知**: "✨ 记账成功！"
+    *   **否则**:
+        *   **显示通知**: "已取消记账"
+    *   **结束如果**
 
 ### 5. 分支逻辑 C：查看账单
 7.  **在“📊 查看账单”下**:
     *   **获取文件**:
-        *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
+        *   路径: `ZenLedger/ZenLedger.csv`
         *   *注意：一定要带上 .csv 后缀*。
         *   (这一步获取到的结果，我们称之为变量 **CSVData**)
     *   **获取文件**:
-        *   路径: `Shortcuts/ZenLedger/dashboard.txt`
+        *   路径: `ZenLedger/dashboard.txt`
         *   (因为是 .txt，iOS 会直接把它当作文本读取，不会去渲染它)
         *   (这一步获取到的结果，我们称之为变量 **HTMLTemplate**)
     *   **替换文本**:
