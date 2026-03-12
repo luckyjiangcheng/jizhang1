@@ -5,7 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>✨ 记账确认</title>
     <style>
-        :root {
+        /* ... existing styles ... */
+        
+        /* Fix for iOS Web View rendering issue where it might show as a plain text list if CSS fails to load or viewport is weird */
+        /* Ensure the container takes full width/height */
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Prevent scrolling if not needed */
+            background-color: var(--bg-color); /* Ensure background is set */
+        }
+        
+        .container {
+            /* Adjust container to be more robust */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            max-width: none; /* Override max-width for full screen feel */
+            border-radius: 0; /* No radius for full screen */
+            padding: 20px;
+            overflow-y: auto; /* Allow scrolling within form */
+            box-shadow: none;
+        }
+
+        /* ... */
             --primary-color: #007aff;
             --bg-color: #f2f2f7;
             --card-bg: #ffffff;
@@ -207,7 +234,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupCategories();
         // If placeholder is not replaced, use empty object
-        if (RAW_DATA.includes('JSON_DATA_PLACEHOLDER')) {
+        if (RAW_DATA === 'JSON_DATA_PLACEHOLDER') {
              RAW_DATA = '{}';
         }
         prefillData();
@@ -319,6 +346,17 @@
 
         // Replace body content with CSV string for Shortcuts to capture
         document.body.innerText = csvLine;
+
+        // Call Shortcuts completion handler to close the web view automatically
+        // This is the standard way to return data and close the view in iOS Shortcuts
+        if (window.completion) {
+            window.completion(csvLine);
+        } else {
+            // Fallback: If completion handler is not available, just show the text.
+            // But ideally, the user should tap "Done" in the top right if auto-close fails.
+            // Or we can try window.close()
+            window.close();
+        }
     }
 </script>
 
