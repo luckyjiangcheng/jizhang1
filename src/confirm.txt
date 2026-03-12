@@ -181,7 +181,9 @@
 
     function endWith() {
         setTimeout(() => {
-            window.close();
+            try { window.close(); } catch (_) {}
+            try { history.back(); } catch (_) {}
+            try { location.replace("about:blank"); } catch (_) {}
         }, 0);
     }
 
@@ -277,8 +279,11 @@
             return;
         }
         const line = toCsvLine();
-        await writeClipboard(line);
-        endWith();
+        try {
+            await writeClipboard(line);
+        } finally {
+            endWith();
+        }
     });
 
     initChips();
