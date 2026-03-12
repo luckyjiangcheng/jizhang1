@@ -261,34 +261,6 @@
         "🛡️ 金融保险", "👴 孝敬父母", "✨ 其他"
     ];
 
-    // 添加页面顶部的小型状态指示器
-    function showStatus(message, duration = 1500) {
-        const status = document.createElement("div");
-        status.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-        `;
-        status.textContent = message;
-        document.body.appendChild(status);
-        
-        // 淡入淡出动画
-        setTimeout(() => status.style.opacity = "1", 10);
-        setTimeout(() => {
-            status.style.opacity = "0";
-            setTimeout(() => document.body.removeChild(status), 300);
-        }, duration);
-    }
-
     const dateEl = document.getElementById("date");
     const timeEl = document.getElementById("time");
     const amountEl = document.getElementById("amount");
@@ -301,52 +273,31 @@
     const chipsEl = document.getElementById("chips");
 
     function endWith(value) {
-        // 延迟执行确保剪贴板操作完成
-        setTimeout(() => {
-            // 1. 尝试iOS Shortcuts标准回调
+        const completeFn =
+            typeof window.completion === "function"
+                ? window.completion
+                : (typeof completion === "function" ? completion : null);
+
+        if (completeFn) {
             try {
-                if (typeof window.completion === "function") {
-                    window.completion(value);
-                    return;
-                }
-            } catch (_) {}
-            
-            // 2. 尝试全局completion函数
-            try {
-                if (typeof completion === "function") {
-                    completion(value);
-                    return;
-                }
-            } catch (_) {}
-            
-            // 3. 尝试WebKit消息处理器
-            try {
-                const handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.completion;
-                if (handler && typeof handler.postMessage === "function") {
-                    handler.postMessage(value);
-                    return;
-                }
-            } catch (_) {}
-            
-            // 4. 尝试通过URL scheme触发Shortcuts关闭
-            try {
-                window.location.replace("shortcuts://x-callback-url/return");
+                completeFn(value);
                 return;
             } catch (_) {}
-            
-            // 5. 最后的备用方案
-            try {
-                // 尝试多种关闭方式
-                window.close();
-                setTimeout(() => {
-                    history.back();
-                    setTimeout(() => {
-                        // 如果所有方法都失败，尝试清空页面避免白屏
-                        document.body.style.display = "none";
-                    }, 100);
-                }, 100);
-            } catch (_) {}
-        }, 50); // 50ms延迟确保异步操作完成
+        }
+
+        try {
+            const handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.completion;
+            if (handler && typeof handler.postMessage === "function") {
+                handler.postMessage(value);
+                return;
+            }
+        } catch (_) {}
+
+        setTimeout(() => {
+            try { window.location.href = "shortcuts://"; } catch (_) {}
+            try { window.close(); } catch (_) {}
+            try { history.back(); } catch (_) {}
+        }, 0);
     }
 
     function selectCategory(name) {
@@ -443,34 +394,16 @@
         endWith("");
     });
 
-    document.getElementById("form").addEventListener("submit", async (e) => {
+    document.getElementById("form").addEventListener("submit", (e) => {
         e.preventDefault();
         errorEl.innerText = "";
-        
-        // 验证输入
         if (!amountEl.value || !categoryEl.value) {
             errorEl.innerText = "请填写金额并选择类目";
             return;
         }
-        
         const line = toCsvLine();
-        
-        // 优先使用现代剪贴板API
-        try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(line);
-                // 成功写入后立即关闭
-                endWith(line);
-                return;
-            }
-        } catch (clipboardError) {
-            console.warn("现代剪贴板API失败，使用备用方案", clipboardError);
-        }
-        
-        // 备用方案：使用传统方法
-        const syncSuccess = writeClipboardSync(line);
-        
-        // 无论剪贴板是否成功，都关闭页面
+        writeClipboardSync(line);
+        writeClipboardAsync(line);
         endWith(line);
     });
 
