@@ -89,7 +89,7 @@
 如果你点击“确认记账”后出现中间页（显示一行 CSV 文本）或写入异常，请按下面顺序排查：
 *   先重新运行 **ZenLedger Installer**，确保本地 `Shortcuts/ZenLedger/confirm.txt` 是最新版本。
 *   在主程序中删除所有 **显示文本** 调试动作，再测试。
-*   确认写入链路是：**显示网页视图 -> 获取剪贴板 -> FinalCSVLine -> 追加到文件**。
+*   确认写入链路是：**设置剪贴板(空文本) -> 显示网页视图 -> 获取剪贴板 -> FinalCSVLine -> 追加到文件**。
 *   确认“追加到文件”使用的是 `FinalCSVLine`，而不是 `AIResult`、`请求输入`、`更新后的文本` 或网页页面文本。
 
 如果出现你截图里的两个现象，请按对应方式处理：
@@ -117,19 +117,19 @@
     *   **设置名称** (Set Name):
         *   输入: 变量 **ConfirmHTML**
         *   名称: `confirm.html`
+    *   **设置剪贴板**:
+        *   文本: 空文本 ``
     *   **显示网页视图**:
         *   输入: 上一步的结果
         *   (用户在网页中点击确认后，confirm 会把 CSV 写入剪贴板)
     *   **获取剪贴板**:
         *   (存为变量 **FinalCSVLine**)
     *   **如果** (If): 变量 **FinalCSVLine** 有值
-        *   **如果** (If): 变量 **FinalCSVLine** 不等于 `__ZL_CANCEL__`
-            *   **追加到文件**:
-                *   文件: 变量 **FinalCSVLine**
-                *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
-            *   **显示通知**:
-                *   标题: `✨ 记账成功！已存入账本`
-        *   **结束如果**
+        *   **追加到文件**:
+            *   文件: 变量 **FinalCSVLine**
+            *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
+        *   **显示通知**:
+            *   标题: `✨ 记账成功！已存入账本`
     *   **结束如果**
 
 ### 4. 分支逻辑 B：截图记账
@@ -153,20 +153,20 @@
     *   **设置名称** (Set Name):
         *   输入: 变量 **ConfirmHTML**
         *   名称: `confirm.html`
+    *   **设置剪贴板**:
+        *   文本: 空文本 ``
     *   **显示网页视图**:
         *   输入: 上一步的结果
         *   (用户在网页中点击确认后，confirm 会把 CSV 写入剪贴板)
     *   **获取剪贴板**:
         *   (存为变量 **FinalCSVLine**)
     *   **如果** (If): 变量 **FinalCSVLine** 有值
-        *   **如果** (If): 变量 **FinalCSVLine** 不等于 `__ZL_CANCEL__`
-            *   **追加到文件**:
-                *   文件: 变量 **FinalCSVLine**
-                *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
-            *   **显示通知**:
-                *   标题: `✨ 记账成功！已存入账本`
-            *   **删除照片**: 输入为“屏幕快照”。
-        *   **结束如果**
+        *   **追加到文件**:
+            *   文件: 变量 **FinalCSVLine**
+            *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
+        *   **显示通知**:
+            *   标题: `✨ 记账成功！已存入账本`
+        *   **删除照片**: 输入为“屏幕快照”。
     *   **结束如果**
 
 ### 5. 分支逻辑 C：查看账单

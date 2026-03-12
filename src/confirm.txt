@@ -179,12 +179,7 @@
     const errorEl = document.getElementById("error");
     const chipsEl = document.getElementById("chips");
 
-    function endWith(value) {
-        if (window.completion) {
-            window.completion(value);
-            return;
-        }
-        document.body.innerText = value || "";
+    function endWith() {
         setTimeout(() => {
             window.close();
         }, 0);
@@ -271,8 +266,7 @@
     }
 
     document.getElementById("cancelBtn").addEventListener("click", async () => {
-        await writeClipboard("__ZL_CANCEL__");
-        endWith("");
+        endWith();
     });
 
     document.getElementById("form").addEventListener("submit", async (e) => {
@@ -284,7 +278,7 @@
         }
         const line = toCsvLine();
         await writeClipboard(line);
-        endWith(line);
+        endWith();
     });
 
     initChips();
