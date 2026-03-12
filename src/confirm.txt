@@ -250,18 +250,41 @@
         return `${date},${time},${amount},${category},${item},${merchant}`;
     }
 
-    document.getElementById("cancelBtn").addEventListener("click", () => {
+    async function writeClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return;
+            } catch (_) {}
+        }
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+            document.execCommand("copy");
+        } catch (_) {}
+        document.body.removeChild(textarea);
+    }
+
+    document.getElementById("cancelBtn").addEventListener("click", async () => {
+        await writeClipboard("__ZL_CANCEL__");
         endWith("");
     });
 
-    document.getElementById("form").addEventListener("submit", (e) => {
+    document.getElementById("form").addEventListener("submit", async (e) => {
         e.preventDefault();
         errorEl.innerText = "";
         if (!amountEl.value || !categoryEl.value) {
             errorEl.innerText = "请填写金额并选择类目";
             return;
         }
-        endWith(toCsvLine());
+        const line = toCsvLine();
+        await writeClipboard(line);
+        endWith(line);
     });
 
     initChips();
