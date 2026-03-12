@@ -12,7 +12,7 @@
 ### 第一步：安装“配置助手” (Installer)
 
 请在 iPhone 上点击此链接（模拟链接，需替换为真实链接）：
-👉 **[点击安装 ZenLedger Installer](https://www.icloud.com/shortcuts/example_installer)**
+👉 **[点击安装 ZenLedger Installer](https://www.icloud.com/shortcuts/ZenLedger_Installer)**
 
 1.  点击 **“添加快捷指令”**。
 2.  运行 **`ZenLedger Installer`**。

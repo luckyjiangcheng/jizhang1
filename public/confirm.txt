@@ -196,23 +196,28 @@
 
 <script>
     // Placeholder to be replaced by Shortcut
-    const RAW_DATA = `JSON_DATA_PLACEHOLDER`;
+    let RAW_DATA = `JSON_DATA_PLACEHOLDER`;
 
     const CATEGORIES = [
-        "Dining", "Transport", "Shopping", "Home", "Entertainment",
-        "Social", "Health", "Education", "Finance", "Parents", "Other"
+        "餐饮美食", "交通出行", "购物消费", "居家生活", "休闲娱乐",
+        "人情往来", "医疗健康", "教育培训", "金融保险", "孝敬父母", "其他"
     ];
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
         setupCategories();
+        // If placeholder is not replaced, use empty object
+        if (RAW_DATA === 'JSON_DATA_PLACEHOLDER') {
+             RAW_DATA = '{}';
+        }
         prefillData();
     });
 
     function setupCategories() {
         const container = document.getElementById('category-chips');
-        const hiddenInput = document.getElementById('category');
-
+        // Clear existing
+        container.innerHTML = '';
+        
         CATEGORIES.forEach(cat => {
             const chip = document.createElement('div');
             chip.className = 'chip';
@@ -233,20 +238,16 @@
                 c.classList.remove('selected');
             }
         });
-
-        hiddenInput.value = cat;
+        
+        // Update hidden input
+        if(hiddenInput) hiddenInput.value = cat;
     }
 
     function prefillData() {
         let data = {};
         
-        // Parse JSON if valid, otherwise use defaults
         try {
-            // Check if placeholder was replaced (not equal to the literal string)
-            // Or if it is the literal string, we might want to use empty defaults for testing
-            if (RAW_DATA !== 'JSON_DATA_PLACEHOLDER') {
-                data = JSON.parse(RAW_DATA);
-            }
+            data = JSON.parse(RAW_DATA);
         } catch (e) {
             console.error("Invalid JSON data", e);
         }
@@ -255,68 +256,68 @@
         
         // Set Date
         const dateInput = document.getElementById('date');
-        // If data.date is provided (YYYY-MM-DD), use it. Else today.
-        dateInput.value = data.date || now.toISOString().split('T')[0];
+        // Use data.date or today
+        if (dateInput) dateInput.value = data.date || now.toISOString().split('T')[0];
 
         // Set Time
         const timeInput = document.getElementById('time');
-        // If data.time provided (HH:MM), use it. Else now.
+        // Use data.time or now
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
-        timeInput.value = data.time || `${hours}:${minutes}`;
+        if (timeInput) timeInput.value = data.time || `${hours}:${minutes}`;
 
         // Set Amount
         if (data.amount) {
-            document.getElementById('amount').value = data.amount;
+            const amtInput = document.getElementById('amount');
+            if(amtInput) amtInput.value = data.amount;
         }
 
         // Set Category
+        const catInput = document.getElementById('category');
         if (data.category && CATEGORIES.includes(data.category)) {
             selectCategory(data.category);
-        } else {
-            // Default to 'Other' or first item if needed, or leave empty
-            // selectCategory('Other');
+            if(catInput) catInput.value = data.category;
         }
 
         // Set Item & Merchant
-        if (data.item) document.getElementById('item').value = data.item;
-        if (data.merchant) document.getElementById('merchant').value = data.merchant;
+        if (data.item) {
+             const itemInput = document.getElementById('item');
+             if(itemInput) itemInput.value = data.item;
+        }
+        if (data.merchant) {
+             const merchInput = document.getElementById('merchant');
+             if(merchInput) merchInput.value = data.merchant;
+        }
     }
 
     function handleCancel() {
-        // Shortcuts logic: output nothing or specific cancel string?
-        // Usually, closing the web view without output is enough for "Cancel" flow if handled in Shortcuts
-        // Or we can output a specific flag.
-        // For now, let's just clear body to indicate exit or use window.close()
-        // window.close() might not work in all web views.
-        document.body.innerHTML = ""; 
+        // Clear body to indicate cancellation
+        document.body.innerText = "";
     }
 
     function handleSubmit(e) {
-        e.preventDefault();
+        e.preventDefault(); // Prevent actual form submission
 
         const date = document.getElementById('date').value;
         const time = document.getElementById('time').value;
         const amount = document.getElementById('amount').value;
-        const category = document.getElementById('category').value;
+        const category = document.getElementById('category').value; // hidden input
         const item = document.getElementById('item').value || "";
         const merchant = document.getElementById('merchant').value || "";
 
         if (!amount || !category) {
-            alert("Please fill in Amount and Category.");
+            alert("请填写金额和分类。");
             return;
         }
 
         // CSV Format: Date,Time,Amount,Category,Item,Merchant
-        // Ensure no commas in text fields to break CSV, or wrap in quotes if needed.
-        // Simple approach: remove commas from text inputs
+        // Remove commas to prevent CSV breakage
         const cleanItem = item.replace(/,/g, " ");
         const cleanMerchant = merchant.replace(/,/g, " ");
 
         const csvLine = `${date},${time},${amount},${category},${cleanItem},${cleanMerchant}`;
 
-        // Replace entire body content with just the CSV string
-        // This allows Shortcuts "Get Text from Web View Input" to capture exactly this string.
+        // Replace body content with CSV string for Shortcuts to capture
         document.body.innerText = csvLine;
     }
 </script>

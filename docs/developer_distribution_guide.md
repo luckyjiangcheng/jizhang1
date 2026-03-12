@@ -16,8 +16,8 @@
 2.  在 GitHub 仓库设置中，开启 **GitHub Pages**，源选择 `public` 文件夹（如果无法选择子文件夹，可能需要通过 GitHub Actions 或将 public 内容推送到独立分支，最简单的方式是将 public 内容直接放在根目录或 `docs` 目录）。
     *   *建议*：为了简单起见，您可以直接将 `public` 文件夹内的文件上传到一个支持直链的图床或对象存储（如 OSS/S3），或者直接使用 GitHub Raw 链接（注意缓存问题）。
     *   假设您的资源 URL 为：
-        *   `https://your-username.github.io/zenledger/config_template.json`
-        *   `https://your-username.github.io/zenledger/dashboard.html`
+        *   `https://luckyjiangcheng.github.io/jizhang1/public/config.json`
+        *   `https://luckyjiangcheng.github.io/jizhang1/public/dashboard.txt`
 
 ---
 
@@ -26,24 +26,24 @@
 在您的 iPhone 上创建一个新的快捷指令，命名为 **`ZenLedger Installer`**。
 
 1.  **获取 URL 内容**:
-    *   URL: `https://your-username.github.io/zenledger/config.json` (包含您预设 API Key 的静态资源地址)
+    *   URL: `https://luckyjiangcheng.github.io/jizhang1/public/config.json` (包含您预设 API Key 的静态资源地址)
 2.  **获取字典**: 从 URL 内容获取字典。
 3.  **保存文件**:
     *   文件: 上一步的字典
-    *   路径: `ZenLedger/config.json` (开启覆盖)
+    *   路径: `Shortcuts/ZenLedger/config.json` (开启覆盖)
 4.  **获取 URL 内容**:
-    *   URL: `https://your-username.github.io/zenledger/dashboard.txt`
+    *   URL: `https://luckyjiangcheng.github.io/jizhang1/public/dashboard.txt`
 5.  **保存文件**:
-    *   路径: `ZenLedger/dashboard.txt` (开启覆盖)
+    *   路径: `Shortcuts/ZenLedger/dashboard.txt` (开启覆盖)
 6.  **获取 URL 内容**:
-    *   URL: `https://your-username.github.io/zenledger/confirm.txt`
+    *   URL: `https://luckyjiangcheng.github.io/jizhang1/public/confirm.txt`
 7.  **保存文件**:
-    *   路径: `ZenLedger/confirm.txt` (开启覆盖)
+    *   路径: `Shortcuts/ZenLedger/confirm.txt` (开启覆盖)
 8.  **创建文件夹**: (如果需要) 确保 `ZenLedger` 存在。
 9.  **文本**: 输入 `Date,Time,Amount,Category,Item,Merchant`
 10. **将文本保存到文件**:
     *   文件: 上一步的文本
-    *   路径: `ZenLedger/ZenLedger.csv`
+    *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
     *   **重要设置**: 点击“展开”，取消勾选“覆盖（如果文件存在）”。
     *   *说明*：这样如果 CSV 文件已经存在（里面有用户的旧账本），就不会被覆盖；如果不存在，则会创建一个新的并写入表头。
 9.  **显示提醒**: "环境配置完成！即将安装主程序。"
@@ -59,7 +59,7 @@
 
 ### 1. 读取全局配置
 1.  **获取文件**:
-    *   路径: `ZenLedger/config.json`
+    *   路径: `Shortcuts/ZenLedger/config.json`
     *   (如果不存，提示用户先运行安装器)
 2.  **获取字典**: 从上一步的文件获取字典。
 3.  **获取字典值**: 分别获取以下值并存为变量：
@@ -85,7 +85,7 @@
         *   (这一步获取到的结果是 AI 生成的 JSON，例如 `{"amount": 12.00, ...}`)
         *   (我们将这个结果存为变量 **AIResult**)
     *   **获取文件**:
-        *   路径: `ZenLedger/confirm.txt`
+        *   路径: `Shortcuts/ZenLedger/confirm.txt`
         *   (存为变量 **ConfirmTemplate**)
     *   **替换文本**:
         *   查找: `JSON_DATA_PLACEHOLDER`
@@ -103,7 +103,7 @@
     *   **如果** (If): 变量 **FinalCSV** 有值
         *   **追加到文件**:
             *   文件: 变量 **FinalCSV**
-            *   路径: `ZenLedger/ZenLedger.csv`
+            *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
         *   **显示通知**: "✨ 记账成功！"
     *   **否则**:
         *   **显示通知**: "已取消记账"
@@ -118,7 +118,7 @@
         *   ... (API调用部分保持不变)
         *   (这一步获取到的结果存为变量 **AIResult**)
     *   **获取文件**:
-        *   路径: `ZenLedger/confirm.txt`
+        *   路径: `Shortcuts/ZenLedger/confirm.txt`
         *   (存为变量 **ConfirmTemplate**)
     *   **替换文本**:
         *   查找: `JSON_DATA_PLACEHOLDER`
@@ -134,7 +134,7 @@
     *   **如果** (If): 变量 **FinalCSV** 有值
         *   **追加到文件**:
             *   文件: 变量 **FinalCSV**
-            *   路径: `ZenLedger/ZenLedger.csv`
+            *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
         *   **删除照片**: 输入为“屏幕快照”。
         *   **显示通知**: "✨ 记账成功！"
     *   **否则**:
@@ -144,11 +144,11 @@
 ### 5. 分支逻辑 C：查看账单
 7.  **在“📊 查看账单”下**:
     *   **获取文件**:
-        *   路径: `ZenLedger/ZenLedger.csv`
+        *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
         *   *注意：一定要带上 .csv 后缀*。
         *   (这一步获取到的结果，我们称之为变量 **CSVData**)
     *   **获取文件**:
-        *   路径: `ZenLedger/dashboard.txt`
+        *   路径: `Shortcuts/ZenLedger/dashboard.txt`
         *   (因为是 .txt，iOS 会直接把它当作文本读取，不会去渲染它)
         *   (这一步获取到的结果，我们称之为变量 **HTMLTemplate**)
     *   **替换文本**:
