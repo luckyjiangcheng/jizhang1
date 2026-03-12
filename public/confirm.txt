@@ -207,7 +207,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupCategories();
         // If placeholder is not replaced, use empty object
-        if (RAW_DATA === 'JSON_DATA_PLACEHOLDER') {
+        if (RAW_DATA.includes('JSON_DATA_PLACEHOLDER')) {
              RAW_DATA = '{}';
         }
         prefillData();

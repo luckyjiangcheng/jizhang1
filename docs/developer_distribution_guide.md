@@ -130,10 +130,17 @@
         *   名称: `confirm.html`
     *   **显示网页视图**:
         *   输入: 上一步的结果
+        *   (用户在网页中点击确认后，网页会显示最终的 CSV 字符串)
+        *   (Shortcuts 会自动获取网页显示的文本)
         *   (存为变量 **FinalCSV**)
-    *   **如果** (If): 变量 **FinalCSV** 有值
+    *   **获取 URL 的内容** (Get Contents of URL):
+        *   URL: `data:text/html,` + 变量 **FinalCSV**
+        *   (这是一个Hack技巧：网页视图返回的结果虽然看起来是文本，但有时会被包装成 WebArchive。通过这个动作可以强制把它转为纯文本。)
+        *   (或者更简单：直接使用 **从输入中获取文本** (Get Text from Input) 动作，输入选 **FinalCSV**)
+        *   *修正步骤*：添加动作 **从输入中获取文本**，输入选择 **FinalCSV**。结果存为 **TrueCSVString**。
+    *   **如果** (If): 变量 **TrueCSVString** 有值
         *   **追加到文件**:
-            *   文件: 变量 **FinalCSV**
+            *   文件: 变量 **TrueCSVString**
             *   路径: `Shortcuts/ZenLedger/ZenLedger.csv`
         *   **删除照片**: 输入为“屏幕快照”。
         *   **显示通知**: "✨ 记账成功！"
