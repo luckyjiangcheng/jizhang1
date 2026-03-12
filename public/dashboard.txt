@@ -239,6 +239,16 @@
             color: var(--text-sec);
         }
 
+        .tx-notes {
+            font-size: 12px;
+            color: var(--text-sec);
+            background: var(--bg);
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
         .tx-right {
             text-align: right;
         }
@@ -301,19 +311,19 @@
 
     <!-- Main Navigation -->
     <div class="nav-bar">
-        <div class="nav-item active" onclick="switchSection('overview')">
+        <div class="nav-item active" onclick="switchSection('overview', event)">
             <span class="nav-icon">📊</span>
             <span>总览</span>
         </div>
-        <div class="nav-item" onclick="switchSection('trends')">
+        <div class="nav-item" onclick="switchSection('trends', event)">
             <span class="nav-icon">📈</span>
             <span>趋势</span>
         </div>
-        <div class="nav-item" onclick="switchSection('categories')">
+        <div class="nav-item" onclick="switchSection('categories', event)">
             <span class="nav-icon">🏷️</span>
             <span>分类</span>
         </div>
-        <div class="nav-item" onclick="switchSection('settings')">
+        <div class="nav-item" onclick="switchSection('settings', event)">
             <span class="nav-icon">⚙️</span>
             <span>设置</span>
         </div>
@@ -478,6 +488,23 @@
     }
 
     // --- Core Logic ---
+    function switchSection(section, event) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+        console.log('Switching to section:', section);
+        // Placeholder for future multi-page logic
+    }
+
+    // --- Helper Functions ---
+    const toLocalDateString = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     function setPeriod(period) {
         currentPeriod = period;
         
@@ -511,7 +538,7 @@
                 const day = todayStart.getDay() || 7; // 1=Mon, 7=Sun
                 start = new Date(todayStart);
                 start.setDate(todayStart.getDate() - day + 1); // Mon
-                end = new Date(todayStart); // Up to today? Or end of week? Let's say end of today for realistic "current week" tracking, or end of week. Usually end of week.
+                end = new Date(todayStart);
                 end.setDate(start.getDate() + 6);
                 end.setHours(23, 59, 59, 999);
 
@@ -542,8 +569,7 @@
         }
 
         // Update Label
-        const fmtDate = (d) => d.toISOString().slice(0, 10);
-        document.getElementById('current-range-label').innerText = period === 'today' ? fmtDate(start) : `${fmtDate(start)}\n~\n${fmtDate(end)}`;
+        document.getElementById('current-range-label').innerText = period === 'today' ? toLocalDateString(start) : `${toLocalDateString(start)}\n~\n${toLocalDateString(end)}`;
 
         // Filter Data
         const currentData = allData.filter(d => d.dateObj >= start && d.dateObj <= end);
@@ -652,11 +678,11 @@
             });
         } else if (granularity === 'day') {
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                const k = d.toISOString().slice(0, 10);
+                const k = toLocalDateString(d);
                 trendMap[k] = 0;
             }
             expenseData.forEach(d => {
-                const k = d.dateObj.toISOString().slice(0, 10);
+                const k = toLocalDateString(d.dateObj);
                 trendMap[k] = (trendMap[k] || 0) + d.Amount;
             });
         } else if (granularity === 'month') {
@@ -731,6 +757,13 @@
             
             const timeStr = item.dateObj.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             const dateStr = item.dateObj.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+            
+            const metaParts = [dateStr, timeStr];
+            if (item.Account) metaParts.push(item.Account);
+            if (item.Item || item.Merchant) metaParts.push(item.Item || item.Merchant);
+            
+            const metaStr = metaParts.join(' · ');
+            const notesHtml = item.Notes ? `<div class="tx-notes">${item.Notes}</div>` : '';
 
             const li = document.createElement('li');
             li.className = 'transaction-item';
@@ -739,7 +772,8 @@
                     <div class="tx-icon">${emoji}</div>
                     <div class="tx-info">
                         <span class="tx-category">${item.Category || '未分类'}</span>
-                        <span class="tx-meta">${dateStr} ${timeStr} · ${item.Item || item.Merchant || ''}</span>
+                        <span class="tx-meta">${metaStr}</span>
+                        ${notesHtml}
                     </div>
                 </div>
                 <div class="tx-right">
@@ -751,6 +785,10 @@
     }
 
     function initChart(domId, option) {
+        if (typeof echarts === 'undefined') {
+            console.warn('ECharts not loaded');
+            return;
+        }
         const dom = document.getElementById(domId);
         if (!dom) return;
         
