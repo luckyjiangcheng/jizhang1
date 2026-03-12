@@ -3,43 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>✨ 记账确认</title>
+    <title>记账确认</title>
     <style>
-        /* Fix for iOS Web View rendering issue */
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-        }
-        
-        .container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--card-bg);
-            padding: 20px;
-            overflow-y: auto;
-            border-radius: 0;
-            box-shadow: none;
-            display: block;
-        }
+        :root {
             --primary-color: #007aff;
             --bg-color: #f2f2f7;
             --card-bg: #ffffff;
-            --text-primary: #000000;
+            --text-primary: #111111;
             --text-secondary: #8e8e93;
-            --border-color: #c6c6c8;
+            --border-color: #d1d1d6;
             --danger-color: #ff3b30;
-            --radius-lg: 12px;
-            --radius-md: 8px;
-            --shadow: 0 2px 8px rgba(0,0,0,0.05);
+            --radius-lg: 14px;
+            --radius-md: 10px;
         }
-
         @media (prefers-color-scheme: dark) {
             :root {
                 --primary-color: #0a84ff;
@@ -47,313 +23,245 @@
                 --card-bg: #2c2c2e;
                 --text-primary: #ffffff;
                 --text-secondary: #aeaeb2;
-                --border-color: #38383a;
+                --border-color: #3a3a3c;
             }
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { margin: 0; width: 100%; height: 100%; background: var(--bg-color); }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
             color: var(--text-primary);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
         }
-
         .container {
             width: 100%;
-            max-width: 400px;
+            min-height: 100%;
+            padding: 16px;
+        }
+        .card {
+            width: 100%;
+            max-width: 460px;
+            margin: 0 auto;
             background: var(--card-bg);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            overflow: hidden;
+            padding: 18px;
         }
-
-        h1 {
+        .title {
+            margin: 0 0 16px;
+            text-align: center;
             font-size: 22px;
             font-weight: 700;
-            margin: 0 0 20px 0;
-            text-align: center;
-            color: var(--text-primary);
         }
-
-        .form-group {
-            margin-bottom: 16px;
+        .row {
+            display: flex;
+            gap: 10px;
         }
-
+        .group {
+            margin-bottom: 14px;
+            width: 100%;
+        }
         label {
             display: block;
+            margin-bottom: 6px;
             font-size: 14px;
             color: var(--text-secondary);
-            margin-bottom: 6px;
             font-weight: 500;
         }
-
-        input, select {
+        input {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             background: var(--card-bg);
             color: var(--text-primary);
+            padding: 12px;
+            font-size: 16px;
             outline: none;
-            transition: border-color 0.2s;
-            appearance: none;
         }
-
-        input:focus {
-            border-color: var(--primary-color);
-        }
-
-        /* Chips for Category */
-        .chips-container {
+        input:focus { border-color: var(--primary-color); }
+        .chips {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
-
         .chip {
-            padding: 8px 12px;
-            background: var(--bg-color);
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
             border: 1px solid transparent;
-            transition: all 0.2s;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 14px;
             user-select: none;
+            cursor: pointer;
         }
-
-        .chip.selected {
+        .chip.active {
             background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            font-weight: 600;
+            color: #fff;
         }
-
+        .error {
+            min-height: 18px;
+            margin-top: 2px;
+            margin-bottom: 10px;
+            color: var(--danger-color);
+            font-size: 13px;
+        }
         .actions {
             display: flex;
             gap: 12px;
-            margin-top: 24px;
         }
-
         button {
             flex: 1;
-            padding: 14px;
-            border: none;
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
+            padding: 13px 0;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.2s;
+            background: transparent;
+            color: var(--text-primary);
         }
-
-        button:active { opacity: 0.8; }
-
         .btn-primary {
             background: var(--primary-color);
-            color: white;
+            color: #fff;
+            border-color: var(--primary-color);
         }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--danger-color); /* Cancel typically red or secondary text */
-            border: 1px solid var(--border-color);
-        }
-
-        .hidden { display: none; }
     </style>
 </head>
 <body>
-
-<div class="container" id="main-container">
-    <h1>✨ 记账确认</h1>
-    <form id="expense-form" onsubmit="handleSubmit(event)">
-        <!-- Date & Time Row -->
-        <div style="display: flex; gap: 10px;">
-            <div class="form-group" style="flex: 1;">
-                <label>Date</label>
-                <input type="date" id="date" required>
+<div class="container">
+    <div class="card">
+        <h1 class="title">✨ 记账确认</h1>
+        <form id="form">
+            <div class="row">
+                <div class="group">
+                    <label>日期</label>
+                    <input id="date" type="date" required>
+                </div>
+                <div class="group">
+                    <label>时间</label>
+                    <input id="time" type="time">
+                </div>
             </div>
-            <div class="form-group" style="flex: 1;">
-                <label>Time</label>
-                <input type="time" id="time" required>
+            <div class="group">
+                <label>金额</label>
+                <input id="amount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" required>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label>Amount</label>
-            <input type="number" id="amount" step="0.01" inputmode="decimal" placeholder="0.00" required>
-        </div>
-
-        <div class="form-group">
-            <label>Category</label>
-            <div class="chips-container" id="category-chips">
-                <!-- Chips injected by JS -->
+            <div class="group">
+                <label>类目</label>
+                <div id="chips" class="chips"></div>
+                <input id="category" type="hidden" required>
             </div>
-            <input type="hidden" id="category" required>
-        </div>
-
-        <div class="form-group">
-            <label>Item</label>
-            <input type="text" id="item" placeholder="What did you buy?">
-        </div>
-
-        <div class="form-group">
-            <label>Merchant</label>
-            <input type="text" id="merchant" placeholder="Where?">
-        </div>
-
-        <div class="actions">
-            <button type="button" class="btn-secondary" onclick="handleCancel()">取消</button>
-            <button type="submit" class="btn-primary">确认记账</button>
-        </div>
-    </form>
+            <div class="group">
+                <label>事项</label>
+                <input id="item" type="text" placeholder="例如：午餐、地铁">
+            </div>
+            <div class="group">
+                <label>商户</label>
+                <input id="merchant" type="text" placeholder="例如：便利店">
+            </div>
+            <div id="error" class="error"></div>
+            <div class="actions">
+                <button id="cancelBtn" type="button">取消</button>
+                <button class="btn-primary" type="submit">确认记账</button>
+            </div>
+        </form>
+    </div>
 </div>
-
 <script>
-    // Placeholder to be replaced by Shortcut
-    let RAW_DATA = `JSON_DATA_PLACEHOLDER`;
+    let rawData = `JSON_DATA_PLACEHOLDER`;
+    const categories = ["餐饮美食","交通出行","购物消费","居家生活","休闲娱乐","人情往来","医疗健康","教育培训","金融保险","孝敬父母","其他"];
 
-    const CATEGORIES = [
-        "餐饮美食", "交通出行", "购物消费", "居家生活", "休闲娱乐",
-        "人情往来", "医疗健康", "教育培训", "金融保险", "孝敬父母", "其他"
-    ];
+    const dateEl = document.getElementById("date");
+    const timeEl = document.getElementById("time");
+    const amountEl = document.getElementById("amount");
+    const categoryEl = document.getElementById("category");
+    const itemEl = document.getElementById("item");
+    const merchantEl = document.getElementById("merchant");
+    const errorEl = document.getElementById("error");
+    const chipsEl = document.getElementById("chips");
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-        setupCategories();
-        // If placeholder is not replaced, use empty object
-        if (RAW_DATA === 'JSON_DATA_PLACEHOLDER') {
-             RAW_DATA = '{}';
-        }
-        prefillData();
-    });
-
-    function setupCategories() {
-        const container = document.getElementById('category-chips');
-        // Clear existing
-        container.innerHTML = '';
-        
-        CATEGORIES.forEach(cat => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.textContent = cat;
-            chip.onclick = () => selectCategory(cat);
-            container.appendChild(chip);
-        });
-    }
-
-    function selectCategory(cat) {
-        const chips = document.querySelectorAll('.chip');
-        const hiddenInput = document.getElementById('category');
-
-        chips.forEach(c => {
-            if (c.textContent === cat) {
-                c.classList.add('selected');
-            } else {
-                c.classList.remove('selected');
-            }
-        });
-        
-        // Update hidden input
-        if(hiddenInput) hiddenInput.value = cat;
-    }
-
-    function prefillData() {
-        let data = {};
-        
-        try {
-            data = JSON.parse(RAW_DATA);
-        } catch (e) {
-            console.error("Invalid JSON data", e);
-        }
-
-        const now = new Date();
-        
-        // Set Date
-        const dateInput = document.getElementById('date');
-        // Use data.date or today
-        if (dateInput) dateInput.value = data.date || now.toISOString().split('T')[0];
-
-        // Set Time
-        const timeInput = document.getElementById('time');
-        // Use data.time or now
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        if (timeInput) timeInput.value = data.time || `${hours}:${minutes}`;
-
-        // Set Amount
-        if (data.amount) {
-            const amtInput = document.getElementById('amount');
-            if(amtInput) amtInput.value = data.amount;
-        }
-
-        // Set Category
-        const catInput = document.getElementById('category');
-        if (data.category && CATEGORIES.includes(data.category)) {
-            selectCategory(data.category);
-            if(catInput) catInput.value = data.category;
-        }
-
-        // Set Item & Merchant
-        if (data.item) {
-             const itemInput = document.getElementById('item');
-             if(itemInput) itemInput.value = data.item;
-        }
-        if (data.merchant) {
-             const merchInput = document.getElementById('merchant');
-             if(merchInput) merchInput.value = data.merchant;
-        }
-    }
-
-    function handleCancel() {
-        // Clear body to indicate cancellation
-        document.body.innerText = "";
-    }
-
-    function handleSubmit(e) {
-        e.preventDefault(); // Prevent actual form submission
-
-        const date = document.getElementById('date').value;
-        const time = document.getElementById('time').value;
-        const amount = document.getElementById('amount').value;
-        const category = document.getElementById('category').value; // hidden input
-        const item = document.getElementById('item').value || "";
-        const merchant = document.getElementById('merchant').value || "";
-
-        if (!amount || !category) {
-            alert("请填写金额和分类。");
+    function endWith(value) {
+        if (window.completion) {
+            window.completion(value);
             return;
         }
+        document.body.innerText = value;
+    }
 
-        // CSV Format: Date,Time,Amount,Category,Item,Merchant
-        // Remove commas to prevent CSV breakage
-        const cleanItem = item.replace(/,/g, " ");
-        const cleanMerchant = merchant.replace(/,/g, " ");
+    function selectCategory(name) {
+        categoryEl.value = name;
+        const chips = chipsEl.querySelectorAll(".chip");
+        chips.forEach(chip => {
+            chip.classList.toggle("active", chip.dataset.value === name);
+        });
+    }
 
-        const csvLine = `${date},${time},${amount},${category},${cleanItem},${cleanMerchant}`;
+    function initChips() {
+        chipsEl.innerHTML = "";
+        categories.forEach(name => {
+            const chip = document.createElement("div");
+            chip.className = "chip";
+            chip.dataset.value = name;
+            chip.innerText = name;
+            chip.addEventListener("click", () => selectCategory(name));
+            chipsEl.appendChild(chip);
+        });
+    }
 
-        // Replace body content with CSV string for Shortcuts to capture
-        document.body.innerText = csvLine;
-
-        // Call Shortcuts completion handler to close the web view automatically
-        // This is the standard way to return data and close the view in iOS Shortcuts
-        if (window.completion) {
-            window.completion(csvLine);
-        } else {
-            // Fallback: If completion handler is not available, just show the text.
-            // But ideally, the user should tap "Done" in the top right if auto-close fails.
-            // Or we can try window.close()
-            window.close();
+    function parseJsonData() {
+        if (rawData === "JSON_DATA_PLACEHOLDER") return {};
+        try {
+            return JSON.parse(rawData);
+        } catch (_) {
+            return {};
         }
     }
-</script>
 
+    function fillDefaults() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mi = String(now.getMinutes()).padStart(2, "0");
+        const data = parseJsonData();
+
+        dateEl.value = data.date || `${yyyy}-${mm}-${dd}`;
+        timeEl.value = data.time || `${hh}:${mi}`;
+        if (data.amount !== undefined && data.amount !== null && data.amount !== "") {
+            amountEl.value = data.amount;
+        }
+        if (data.item) itemEl.value = data.item;
+        if (data.merchant) merchantEl.value = data.merchant;
+        if (data.category && categories.includes(data.category)) {
+            selectCategory(data.category);
+        }
+    }
+
+    function toCsvLine() {
+        const date = dateEl.value || "";
+        const time = timeEl.value || "";
+        const amount = amountEl.value || "";
+        const category = categoryEl.value || "";
+        const item = (itemEl.value || "").replace(/,/g, " ");
+        const merchant = (merchantEl.value || "").replace(/,/g, " ");
+        return `${date},${time},${amount},${category},${item},${merchant}`;
+    }
+
+    document.getElementById("cancelBtn").addEventListener("click", () => {
+        endWith("");
+    });
+
+    document.getElementById("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        errorEl.innerText = "";
+        if (!amountEl.value || !categoryEl.value) {
+            errorEl.innerText = "请填写金额并选择类目";
+            return;
+        }
+        endWith(toCsvLine());
+    });
+
+    initChips();
+    fillDefaults();
+</script>
 </body>
 </html>
