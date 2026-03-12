@@ -184,7 +184,7 @@
             window.completion(value);
             return;
         }
-        document.body.innerText = value || " ";
+        document.body.innerHTML = "";
         setTimeout(() => {
             window.close();
         }, 0);
