@@ -37,7 +37,8 @@ Specific requirements:
 
 **Critical Output Rules:**
 1. Output **ONLY** the valid JSON object. No markdown, no header, no backticks.
-2. If a field is unknown, use an empty string "" (for text) or 0 (for amount).
+2. `date` MUST NEVER be empty. If no specific date is found, use the provided `Current Date`.
+3. For other unknown text fields (`time`, `category`, `item`, `merchant`), use an empty string "". For unknown amount, use 0.
 
 **Examples:**
 

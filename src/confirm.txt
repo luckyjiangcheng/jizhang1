@@ -184,7 +184,10 @@
             window.completion(value);
             return;
         }
-        window.close();
+        document.body.innerText = value || " ";
+        setTimeout(() => {
+            window.close();
+        }, 0);
     }
 
     function selectCategory(name) {

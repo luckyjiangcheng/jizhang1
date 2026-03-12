@@ -91,6 +91,7 @@
     *   **获取当前日期**: 格式选择 `自定义: yyyy-MM-dd` (结果存为变量 `CurrentDate`)。
     *   **获取 URL 内容** (调用 API):
         *   ... (API调用部分保持不变)
+        *   **关键**: 传给模型的 user 内容必须是：`Current Date: ` + 变量 `CurrentDate` + `\nContent: ` + 听写文本
         *   (这一步获取到的结果是 AI 生成的 JSON，例如 `{"amount": 12.00, ...}`)
         *   (我们将这个结果存为变量 **AIResult**)
     *   **获取文件**:
@@ -124,6 +125,7 @@
     *   **获取当前日期**: 格式选择 `自定义: yyyy-MM-dd` (结果存为变量 `CurrentDate`)。
     *   **获取 URL 内容** (调用 API):
         *   ... (API调用部分保持不变)
+        *   **关键**: 在视觉模型 `messages[1].content` 里，文本项必须包含：`Current Date: ` + 变量 `CurrentDate`
         *   (这一步获取到的结果存为变量 **AIResult**)
     *   **获取文件**:
         *   路径: `Shortcuts/ZenLedger/confirm.txt`
