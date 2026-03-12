@@ -85,6 +85,13 @@
 
 > 最终写入必须只使用 `FinalCSVText` 变量，避免写入 JSON 或旧变量。
 
+### 2.2 confirm 页面无响应排查
+如果你点击“确认记账”或“取消”没有反应，请按下面顺序排查：
+*   先重新运行 **ZenLedger Installer**，确保本地 `Shortcuts/ZenLedger/confirm.txt` 是最新版本。
+*   在主程序中删除所有 **显示文本** 调试动作，再测试。
+*   确认“显示网页视图”后紧跟 **从输入中获取文本**，输入必须是 `FinalCSVRaw`。
+*   确认“追加到文件”使用的是 `FinalCSVText`，而不是 `AIResult` 或 `请求输入`。
+
 ### 3. 分支逻辑 A：语音记账
 5.  **在“🎙️ 语音记账”下**:
     *   **听写文本**: 语言选中文。
@@ -92,14 +99,15 @@
     *   **获取 URL 内容** (调用 API):
         *   ... (API调用部分保持不变)
         *   **关键**: 传给模型的 user 内容必须是：`Current Date: ` + 变量 `CurrentDate` + `\nContent: ` + 听写文本
-        *   (这一步获取到的结果是 AI 生成的 JSON，例如 `{"amount": 12.00, ...}`)
-        *   (我们将这个结果存为变量 **AIResult**)
+        *   **从字典中获取值**: 键名 `choices.1.message.content` (结果存为变量 **AIResult**)
+        *   **从输入中获取文本** (Get Text from Input): 输入 **AIResult**，结果存为 **AIResultText**
+        *   (这一步获取到的是纯文本 JSON，例如 `{"amount": 12.00, ...}`)
     *   **获取文件**:
         *   路径: `Shortcuts/ZenLedger/confirm.txt`
         *   (存为变量 **ConfirmTemplate**)
     *   **替换文本**:
         *   查找: `JSON_DATA_PLACEHOLDER`
-        *   替换为: 变量 **AIResult**
+        *   替换为: 变量 **AIResultText**
         *   在: 变量 **ConfirmTemplate**
         *   (存为变量 **ConfirmHTML**)
     *   **设置名称** (Set Name):
@@ -126,13 +134,14 @@
     *   **获取 URL 内容** (调用 API):
         *   ... (API调用部分保持不变)
         *   **关键**: 在视觉模型 `messages[1].content` 里，文本项必须包含：`Current Date: ` + 变量 `CurrentDate`
-        *   (这一步获取到的结果存为变量 **AIResult**)
+        *   **从字典中获取值**: 键名 `choices.1.message.content` (结果存为变量 **AIResult**)
+        *   **从输入中获取文本** (Get Text from Input): 输入 **AIResult**，结果存为 **AIResultText**
     *   **获取文件**:
         *   路径: `Shortcuts/ZenLedger/confirm.txt`
         *   (存为变量 **ConfirmTemplate**)
     *   **替换文本**:
         *   查找: `JSON_DATA_PLACEHOLDER`
-        *   替换为: 变量 **AIResult**
+        *   替换为: 变量 **AIResultText**
         *   在: 变量 **ConfirmTemplate**
         *   (存为变量 **ConfirmHTML**)
     *   **设置名称** (Set Name):
