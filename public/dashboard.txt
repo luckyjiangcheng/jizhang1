@@ -115,7 +115,7 @@
         /* Metrics Row */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -147,6 +147,13 @@
 
         .metric-value.income { color: var(--income); }
         .metric-value.expense { color: var(--expense); }
+        .metric-change {
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--text-sec);
+        }
+        .metric-change.up { color: var(--danger); }
+        .metric-change.down { color: var(--income); }
 
         /* Chart Grid */
         .chart-grid {
@@ -192,6 +199,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
+        }
+        .list-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sort-select {
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 12px;
         }
 
         .transaction-item {
@@ -302,32 +323,25 @@
             font-size: 12px;
             white-space: pre-wrap;
         }
+        @media (max-width: 640px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            .list-header-right {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 6px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="debug-log"></div>
-
-    <!-- Main Navigation -->
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="switchSection('overview', event)">
-            <span class="nav-icon">📊</span>
-            <span>总览</span>
-        </div>
-        <div class="nav-item" onclick="switchSection('trends', event)">
-            <span class="nav-icon">📈</span>
-            <span>趋势</span>
-        </div>
-        <div class="nav-item" onclick="switchSection('categories', event)">
-            <span class="nav-icon">🏷️</span>
-            <span>分类</span>
-        </div>
-        <div class="nav-item" onclick="switchSection('settings', event)">
-            <span class="nav-icon">⚙️</span>
-            <span>设置</span>
-        </div>
-    </div>
 
     <!-- Period Tabs -->
     <div class="tabs">
@@ -340,16 +354,44 @@
     <!-- Metrics Row -->
     <div class="metrics-grid">
         <div class="metric-card">
-            <span class="metric-label">收入</span>
-            <span class="metric-value income" id="val-income">¥0.00</span>
+            <span class="metric-label">当日支出</span>
+            <span class="metric-value expense" id="val-expense-day">¥0.00</span>
+            <span class="metric-change" id="val-expense-day-change">较昨天 0.00%</span>
         </div>
         <div class="metric-card">
-            <span class="metric-label">支出</span>
-            <span class="metric-value expense" id="val-expense">¥0.00</span>
+            <span class="metric-label">本周支出</span>
+            <span class="metric-value expense" id="val-expense-week">¥0.00</span>
+            <span class="metric-change" id="val-expense-week-change">较上周 0.00%</span>
         </div>
         <div class="metric-card">
-            <span class="metric-label">结余</span>
-            <span class="metric-value" id="val-balance">¥0.00</span>
+            <span class="metric-label">本月支出</span>
+            <span class="metric-value expense" id="val-expense-month">¥0.00</span>
+            <span class="metric-change" id="val-expense-month-change">较上月 0.00%</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">年度汇总</span>
+            <span class="metric-value expense" id="val-expense-year">¥0.00</span>
+            <span class="metric-change" id="val-expense-year-change">较去年 0.00%</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">当日支出笔数</span>
+            <span class="metric-value" id="val-count-day">0</span>
+            <span class="metric-change" id="val-count-day-change">较昨天 0.00%</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">本周支出笔数</span>
+            <span class="metric-value" id="val-count-week">0</span>
+            <span class="metric-change" id="val-count-week-change">较上周 0.00%</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">本月支出笔数</span>
+            <span class="metric-value" id="val-count-month">0</span>
+            <span class="metric-change" id="val-count-month-change">较上月 0.00%</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">年度支出笔数</span>
+            <span class="metric-value" id="val-count-year">0</span>
+            <span class="metric-change" id="val-count-year-change">较去年 0.00%</span>
         </div>
     </div>
 
@@ -371,7 +413,13 @@
     <div class="list-card">
         <div class="list-header">
             <span>最近交易</span>
-            <span id="current-range-label" style="font-size: 12px; color: var(--text-sec); font-weight: normal;"></span>
+            <div class="list-header-right">
+                <span id="current-range-label" style="font-size: 12px; color: var(--text-sec); font-weight: normal;"></span>
+                <select id="list-sort-select" class="sort-select">
+                    <option value="amount-desc">金额从高到低</option>
+                    <option value="amount-asc">金额从低到高</option>
+                </select>
+            </div>
         </div>
         <ul class="transaction-list" id="transaction-list">
             <!-- Items injected here -->
@@ -384,7 +432,9 @@
 <script>
     // --- State ---
     let allData = [];
+    let currentFilteredData = [];
     let currentPeriod = 'month'; // default
+    let currentListSort = 'amount-desc';
     let charts = {};
 
     // Category Emoji Mapping
@@ -434,6 +484,14 @@
 
             // Set Initial View
             setPeriod('month');
+
+            const sortEl = document.getElementById('list-sort-select');
+            if (sortEl) {
+                sortEl.addEventListener('change', (e) => {
+                    currentListSort = e.target.value || 'amount-desc';
+                    renderList(currentFilteredData);
+                });
+            }
 
             // Resize Handler
             window.addEventListener('resize', () => {
@@ -490,16 +548,6 @@
         return result;
     }
 
-    // --- Core Logic ---
-    function switchSection(section, event) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        if (event && event.currentTarget) {
-            event.currentTarget.classList.add('active');
-        }
-        console.log('Switching to section:', section);
-        // Placeholder for future multi-page logic
-    }
-
     // --- Helper Functions ---
     const toLocalDateString = (d) => {
         const year = d.getFullYear();
@@ -508,6 +556,79 @@
         return `${year}-${month}-${day}`;
     };
 
+    function buildPeriodRange(period, todayStart) {
+        let start, end, prevStart, prevEnd;
+        let granularity = 'day';
+        switch (period) {
+            case 'today':
+                start = new Date(todayStart);
+                end = new Date(todayStart);
+                end.setHours(23, 59, 59, 999);
+                prevStart = new Date(start);
+                prevStart.setDate(start.getDate() - 1);
+                prevEnd = new Date(end);
+                prevEnd.setDate(end.getDate() - 1);
+                granularity = 'hour';
+                break;
+            case 'week':
+                const day = todayStart.getDay() || 7;
+                start = new Date(todayStart);
+                start.setDate(todayStart.getDate() - day + 1);
+                end = new Date(todayStart);
+                end.setDate(start.getDate() + 6);
+                end.setHours(23, 59, 59, 999);
+                prevStart = new Date(start);
+                prevStart.setDate(start.getDate() - 7);
+                prevEnd = new Date(end);
+                prevEnd.setDate(end.getDate() - 7);
+                granularity = 'day';
+                break;
+            case 'month':
+                start = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1);
+                end = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 0, 23, 59, 59);
+                prevStart = new Date(todayStart.getFullYear(), todayStart.getMonth() - 1, 1);
+                prevEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 0, 23, 59, 59);
+                granularity = 'day';
+                break;
+            case 'year':
+                start = new Date(todayStart.getFullYear(), 0, 1);
+                end = new Date(todayStart.getFullYear(), 11, 31, 23, 59, 59);
+                prevStart = new Date(todayStart.getFullYear() - 1, 0, 1);
+                prevEnd = new Date(todayStart.getFullYear() - 1, 11, 31, 23, 59, 59);
+                granularity = 'month';
+                break;
+        }
+        return { start, end, prevStart, prevEnd, granularity };
+    }
+
+    function expenseStats(data, start, end) {
+        const items = data.filter(d => d.dateObj >= start && d.dateObj <= end && d.Category !== '收入' && d.Amount > 0);
+        return {
+            amount: items.reduce((sum, item) => sum + item.Amount, 0),
+            count: items.length
+        };
+    }
+
+    function changeText(label, current, previous) {
+        if (previous === 0) {
+            if (current === 0) return `${label} 0.00%`;
+            return `${label} 新增`;
+        }
+        const ratio = ((current - previous) / previous) * 100;
+        const sign = ratio >= 0 ? '+' : '';
+        return `${label} ${sign}${ratio.toFixed(2)}%`;
+    }
+
+    function applyChangeEl(id, label, current, previous) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerText = changeText(label, current, previous);
+        const delta = current - previous;
+        el.classList.remove('up', 'down');
+        if (delta > 0) el.classList.add('up');
+        if (delta < 0) el.classList.add('down');
+    }
+
     function setPeriod(period) {
         currentPeriod = period;
         
@@ -515,110 +636,37 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`tab-${period}`).classList.add('active');
 
-        // Calculate Date Ranges
-        const now = new Date(); // "Today" base
-        let start, end, prevStart, prevEnd;
-        let granularity = 'day';
-
-        // Reset hours to start of day for accurate comparisons
+        const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        
-        switch (period) {
-            case 'today':
-                start = new Date(todayStart);
-                end = new Date(todayStart);
-                end.setHours(23, 59, 59, 999);
-                
-                prevStart = new Date(start);
-                prevStart.setDate(start.getDate() - 1);
-                prevEnd = new Date(end);
-                prevEnd.setDate(end.getDate() - 1);
-                granularity = 'hour';
-                break;
-
-            case 'week':
-                // Current Week (Mon-Sun)
-                const day = todayStart.getDay() || 7; // 1=Mon, 7=Sun
-                start = new Date(todayStart);
-                start.setDate(todayStart.getDate() - day + 1); // Mon
-                end = new Date(todayStart);
-                end.setDate(start.getDate() + 6);
-                end.setHours(23, 59, 59, 999);
-
-                prevStart = new Date(start);
-                prevStart.setDate(start.getDate() - 7);
-                prevEnd = new Date(end);
-                prevEnd.setDate(end.getDate() - 7);
-                granularity = 'day';
-                break;
-
-            case 'month':
-                start = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1);
-                end = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 0, 23, 59, 59);
-                
-                prevStart = new Date(todayStart.getFullYear(), todayStart.getMonth() - 1, 1);
-                prevEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 0, 23, 59, 59);
-                granularity = 'day';
-                break;
-
-            case 'year':
-                start = new Date(todayStart.getFullYear(), 0, 1);
-                end = new Date(todayStart.getFullYear(), 11, 31, 23, 59, 59);
-                
-                prevStart = new Date(todayStart.getFullYear() - 1, 0, 1);
-                prevEnd = new Date(todayStart.getFullYear() - 1, 11, 31, 23, 59, 59);
-                granularity = 'month';
-                break;
-        }
+        const { start, end, granularity } = buildPeriodRange(period, todayStart);
 
         // Update Label
-        document.getElementById('current-range-label').innerText = period === 'today' ? toLocalDateString(start) : `${toLocalDateString(start)}\n~\n${toLocalDateString(end)}`;
+        document.getElementById('current-range-label').innerText = period === 'today' ? toLocalDateString(start) : `${toLocalDateString(start)} ~ ${toLocalDateString(end)}`;
 
-        // Filter Data
         const currentData = allData.filter(d => d.dateObj >= start && d.dateObj <= end);
-        const prevData = allData.filter(d => d.dateObj >= prevStart && d.dateObj <= prevEnd);
+        currentFilteredData = currentData;
 
-        renderMetrics(currentData, prevData);
+        renderMetrics(allData, todayStart);
         renderCharts(currentData, granularity, start, end);
         renderList(currentData);
     }
 
-    function switchSection(section) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        console.log('Switching to section:', section);
-        // Placeholder for future multi-page logic
-    }
-
-    function renderMetrics(curr, prev) {
-        // Calculate Income vs Expense
-        // For simplicity, we assume positive Amount is Expense, 
-        // unless Category is '收入' (case insensitive or match mapping)
-        
-        const calcTotals = (data) => {
-            let inc = 0, exp = 0;
-            data.forEach(item => {
-                if (item.Category === '收入' || item.Amount < 0) {
-                    inc += Math.abs(item.Amount);
-                } else {
-                    exp += item.Amount;
-                }
-            });
-            return { inc, exp, bal: inc - exp };
-        };
-
-        const current = calcTotals(curr);
-        
-        // Update DOM
-        const fmt = (v) => '¥' + v.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        
-        document.getElementById('val-income').innerText = fmt(current.inc);
-        document.getElementById('val-expense').innerText = fmt(current.exp);
-        document.getElementById('val-balance').innerText = fmt(current.bal);
-        
-        // Color balance
-        const balEl = document.getElementById('val-balance');
-        balEl.style.color = current.bal >= 0 ? 'var(--income)' : 'var(--expense)';
+    function renderMetrics(data, todayStart) {
+        const fmt = (v) => '¥' + v.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const periods = [
+            { key: 'day', label: '较昨天', range: buildPeriodRange('today', todayStart) },
+            { key: 'week', label: '较上周', range: buildPeriodRange('week', todayStart) },
+            { key: 'month', label: '较上月', range: buildPeriodRange('month', todayStart) },
+            { key: 'year', label: '较去年', range: buildPeriodRange('year', todayStart) }
+        ];
+        periods.forEach(({ key, label, range }) => {
+            const curr = expenseStats(data, range.start, range.end);
+            const prev = expenseStats(data, range.prevStart, range.prevEnd);
+            document.getElementById(`val-expense-${key}`).innerText = fmt(curr.amount);
+            document.getElementById(`val-count-${key}`).innerText = String(curr.count);
+            applyChangeEl(`val-expense-${key}-change`, label, curr.amount, prev.amount);
+            applyChangeEl(`val-count-${key}-change`, label, curr.count, prev.count);
+        });
     }
 
     function renderCharts(data, granularity, start, end) {
@@ -746,22 +794,27 @@
         const listEl = document.getElementById('transaction-list');
         listEl.innerHTML = '';
 
-        const sorted = [...data].sort((a, b) => b.dateObj - a.dateObj);
+        const recent = [...data].sort((a, b) => b.dateObj - a.dateObj).slice(0, 100);
+        let sorted = [...recent];
+        if (currentListSort === 'amount-asc') {
+            sorted.sort((a, b) => a.Amount - b.Amount);
+        } else {
+            sorted.sort((a, b) => b.Amount - a.Amount);
+        }
         if (sorted.length === 0) {
             listEl.innerHTML = '<li class="empty-state">本时段无交易记录</li>';
             return;
         }
 
-        sorted.slice(0, 50).forEach(item => {
+        sorted.forEach(item => {
             const isIncome = item.Category === '收入' || item.Amount < 0;
             const emoji = categoryEmojis[item.Category] || "✨";
             const amountClass = isIncome ? 'amount-income' : 'amount-expense';
             const amountPrefix = isIncome ? '+' : '-';
             
-            const timeStr = item.dateObj.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             const dateStr = item.dateObj.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
             
-            const metaParts = [dateStr, timeStr];
+            const metaParts = [dateStr];
             if (item.Account) metaParts.push(item.Account);
             if (item.Item || item.Merchant) metaParts.push(item.Item || item.Merchant);
             

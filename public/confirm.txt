@@ -38,36 +38,54 @@
         .container {
             width: 100%;
             min-height: 100%;
-            padding: 20px 16px;
+            padding: 18px 14px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         .card {
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             background: var(--card);
             border-radius: var(--radius-lg);
-            padding: 28px;
+            padding: 20px 16px 16px;
             box-shadow: var(--shadow);
         }
+        .title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .title-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.18), rgba(0, 122, 255, 0.05));
+            border: 1px solid rgba(0, 122, 255, 0.28);
+        }
         .title {
-            margin: 0 0 28px;
-            text-align: center;
-            font-size: 22px;
+            margin: 0;
+            font-size: 30px;
+            line-height: 1;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+        .title-text {
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
         }
         .amount-container {
             text-align: center;
-            margin-bottom: 24px;
-            padding: 16px;
-            background: var(--primary-bg);
-            border-radius: var(--radius-md);
+            margin-bottom: 14px;
+            padding: 18px 12px 16px;
+            background: linear-gradient(135deg, #007aff, #4f46e5);
+            border-radius: 16px;
         }
         .amount-label {
-            font-size: 14px;
-            color: var(--primary);
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.95);
             font-weight: 600;
             margin-bottom: 8px;
             display: block;
@@ -76,142 +94,144 @@
             display: flex;
             align-items: baseline;
             justify-content: center;
-            gap: 4px;
+            gap: 2px;
         }
         .amount-symbol {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
+            font-size: 34px;
+            font-weight: 800;
+            color: #ffffff;
         }
         #amount {
             width: 100%;
-            max-width: 200px;
+            max-width: 220px;
             background: transparent;
             border: none;
             text-align: center;
-            font-size: 40px;
+            font-size: 48px;
             font-weight: 800;
-            color: var(--primary);
+            color: #ffffff;
             padding: 0;
-            outline: none;
         }
-        #amount::placeholder { color: var(--primary); opacity: 0.3; }
-        #amount:focus { border: none; box-shadow: none; }
-
-        .row { display: flex; gap: 12px; margin-bottom: 16px; }
-        .group { flex: 1; min-width: 0; }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: var(--text-sec);
-            font-weight: 600;
-            padding-left: 2px;
-        }
-        input, select, textarea {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+        #amount::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .field-list {
             background: var(--card);
-            color: var(--text);
-            padding: 12px 14px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+        }
+        .field-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 52px;
+            border-bottom: 1px solid var(--border);
+            padding: 0 2px;
+        }
+        .field-row:last-child {
+            border-bottom: none;
+        }
+        .field-label {
+            flex: 0 0 94px;
+            color: var(--text-sec);
             font-size: 16px;
-            transition: all 0.2s;
+            font-weight: 600;
+            padding-left: 8px;
+        }
+        .field-control {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--primary);
+            text-align: right;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 0 8px;
+            min-height: 44px;
             appearance: none;
         }
-        textarea { resize: none; height: 80px; font-family: inherit; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-bg); }
-        
-        .chips {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 4px;
-            margin-bottom: 16px;
+        .field-control.normal {
+            font-size: 32px;
+            font-weight: 700;
         }
-        @media (max-width: 360px) {
-            .chips { grid-template-columns: repeat(2, 1fr); }
+        .field-control.text {
+            font-size: 32px;
+            font-weight: 700;
         }
-        .chip {
-            background: var(--bg);
+        .field-control.notes {
+            text-align: left;
             color: var(--text);
-            border-radius: 12px;
-            padding: 10px 4px;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 500;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            min-height: 70px;
+            padding: 12px 8px;
+            resize: none;
         }
-        .chip.active {
-            background: var(--primary);
-            color: #ffffff;
-            box-shadow: 0 4px 12px var(--primary-bg);
+        .field-control::placeholder { color: var(--text-sec); opacity: 0.9; }
+        .field-control:focus { outline: none; }
+        .hint-bar {
+            background: #fff7e6;
+            border: 1px solid #f7b500;
+            border-radius: 12px;
+            color: #a66a00;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-weight: 600;
         }
-        .chip:active { transform: scale(0.95); }
-
         .error {
             min-height: 18px;
-            margin: 12px 0;
+            margin: 8px 0;
             color: var(--danger);
             font-size: 13px;
             text-align: center;
         }
+        .chips { display: none; }
         .actions { display: none; }
-        button {
-            flex: 1;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 16px 0;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        #cancelBtn {
-            background: var(--bg);
-            color: var(--text-sec);
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: #ffffff;
-            box-shadow: 0 4px 12px var(--primary-bg);
-        }
-        button:active { transform: scale(0.98); opacity: 0.9; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
-        <h1 class="title">✨ 记账确认</h1>
+        <div class="title-wrap">
+            <div class="title-badge"></div>
+            <h1 class="title"><span class="title-text">确认账单</span></h1>
+        </div>
         <form id="form">
             <div class="amount-container">
-                <span class="amount-label">交易金额</span>
+                <span class="amount-label">消费金额</span>
                 <div class="amount-input-wrapper">
                     <span class="amount-symbol">¥</span>
                     <input id="amount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" required autofocus>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="group">
-                    <label>日期</label>
-                    <input id="date" type="date" required>
+            <div class="field-list">
+                <div class="field-row">
+                    <div class="field-label">交易日期</div>
+                    <input id="date" class="field-control normal" type="date" required>
                 </div>
-                <div class="group">
-                    <label>时间</label>
-                    <input id="time" type="time">
+                <div class="field-row">
+                    <div class="field-label">交易时间</div>
+                    <input id="time" class="field-control normal" type="time">
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="group">
-                    <label>账户</label>
-                    <select id="account">
+                <div class="field-row">
+                    <div class="field-label">金额</div>
+                    <input id="amountInline" class="field-control normal" type="number" step="0.01" inputmode="decimal" placeholder="0.00">
+                </div>
+                <div class="field-row">
+                    <div class="field-label">事项</div>
+                    <input id="item" class="field-control text" type="text" placeholder="例如：午餐">
+                </div>
+                <div class="field-row">
+                    <div class="field-label">分类</div>
+                    <select id="category" class="field-control normal" required></select>
+                </div>
+                <div class="field-row">
+                    <div class="field-label">商户</div>
+                    <input id="merchant" class="field-control text" type="text" placeholder="例如：麦当劳">
+                </div>
+                <div class="field-row">
+                    <div class="field-label">账户</div>
+                    <select id="account" class="field-control normal">
                         <option value="现金">现金</option>
                         <option value="支付宝">支付宝</option>
                         <option value="微信支付">微信支付</option>
@@ -220,31 +240,15 @@
                         <option value="其他">其他</option>
                     </select>
                 </div>
-                <div class="group">
-                    <label>类目</label>
-                    <input id="category" type="hidden" required>
+                <div class="field-row">
+                    <div class="field-label">备注</div>
+                    <textarea id="notes" class="field-control notes" placeholder="添加更多细节..."></textarea>
                 </div>
-            </div>
-
-            <div id="chips" class="chips"></div>
-
-            <div class="row">
-                <div class="group">
-                    <label>事项</label>
-                    <input id="item" type="text" placeholder="例如：午餐">
-                </div>
-                <div class="group">
-                    <label>商户</label>
-                    <input id="merchant" type="text" placeholder="例如：便利店">
-                </div>
-            </div>
-
-            <div class="group" style="margin-bottom: 16px;">
-                <label>备注</label>
-                <textarea id="notes" placeholder="添加更多细节..."></textarea>
             </div>
 
             <div id="error" class="error"></div>
+            <div class="hint-bar">已识别信息，若有疑问可直接修改</div>
+            <div id="chips" class="chips"></div>
             <div class="actions">
                 <button id="cancelBtn" type="button">取消</button>
                 <button class="btn-primary" type="submit">保存交易</button>
@@ -308,13 +312,13 @@
     const dateEl = document.getElementById("date");
     const timeEl = document.getElementById("time");
     const amountEl = document.getElementById("amount");
+    const amountInlineEl = document.getElementById("amountInline");
     const accountEl = document.getElementById("account");
     const categoryEl = document.getElementById("category");
     const itemEl = document.getElementById("item");
     const merchantEl = document.getElementById("merchant");
     const notesEl = document.getElementById("notes");
     const errorEl = document.getElementById("error");
-    const chipsEl = document.getElementById("chips");
     let clipboardLineCache = "";
     let autoSyncTimer = null;
 
@@ -412,24 +416,13 @@
         }, 1300);
     }
 
-    function selectCategory(name) {
-        categoryEl.value = name;
-        const chips = chipsEl.querySelectorAll(".chip");
-        chips.forEach(chip => {
-            chip.classList.toggle("active", chip.dataset.value === name);
-        });
-        scheduleAutoClipboardSync();
-    }
-
-    function initChips() {
-        chipsEl.innerHTML = "";
+    function initCategoryOptions() {
+        categoryEl.innerHTML = "";
         categories.forEach(name => {
-            const chip = document.createElement("div");
-            chip.className = "chip";
-            chip.dataset.value = name;
-            chip.innerText = name;
-            chip.addEventListener("click", () => selectCategory(name));
-            chipsEl.appendChild(chip);
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.innerText = name;
+            categoryEl.appendChild(opt);
         });
     }
 
@@ -455,6 +448,7 @@
         timeEl.value = data.time || `${hh}:${mi}`;
         if (data.amount !== undefined && data.amount !== null && data.amount !== "") {
             amountEl.value = data.amount;
+            amountInlineEl.value = data.amount;
         }
         if (data.item) itemEl.value = data.item;
         if (data.merchant) merchantEl.value = data.merchant;
@@ -462,9 +456,10 @@
         if (data.notes) notesEl.value = data.notes;
         
         if (data.category) {
-            // Find category matching either with or without emoji
             const match = categories.find(c => c === data.category || c.includes(data.category));
-            if (match) selectCategory(match);
+            categoryEl.value = match || data.category;
+        } else if (categories.length) {
+            categoryEl.value = categories[0];
         }
     }
 
@@ -566,13 +561,22 @@
         showErrorDialog("异步错误", msg);
     });
 
-    [dateEl, timeEl, amountEl, accountEl, itemEl, merchantEl, notesEl].forEach((el) => {
+    amountEl.addEventListener("input", () => {
+        if (amountInlineEl.value !== amountEl.value) amountInlineEl.value = amountEl.value;
+        scheduleAutoClipboardSync();
+    });
+    amountInlineEl.addEventListener("input", () => {
+        if (amountEl.value !== amountInlineEl.value) amountEl.value = amountInlineEl.value;
+        scheduleAutoClipboardSync();
+    });
+    [dateEl, timeEl, accountEl, categoryEl, itemEl, merchantEl, notesEl].forEach((el) => {
         el.addEventListener("input", scheduleAutoClipboardSync);
         el.addEventListener("change", scheduleAutoClipboardSync);
     });
 
-    initChips();
+    initCategoryOptions();
     fillDefaults();
+    if (!amountInlineEl.value && amountEl.value) amountInlineEl.value = amountEl.value;
     scheduleAutoClipboardSync();
 </script>
 </body>
