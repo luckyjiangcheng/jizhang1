@@ -319,57 +319,74 @@
     function endWith(value) {
         let lastError = "";
         const errText = (e) => (e && (e.message || String(e))) || "";
-        const callCompletion = () => {
-            try {
-                if (typeof window.completion === "function") {
-                    window.completion(value);
-                    return true;
-                }
-            } catch (e) {
-                lastError = errText(e);
-            }
-            try {
-                if (typeof completion === "function") {
-                    completion(value);
-                    return true;
-                }
-            } catch (e) {
-                lastError = errText(e);
-            }
-            try {
-                const handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.completion;
-                if (handler && typeof handler.postMessage === "function") {
-                    handler.postMessage(value);
-                    return true;
-                }
-            } catch (e) {
-                lastError = errText(e);
-            }
-            return false;
-        };
-        if (callCompletion()) return;
+        const handlerNames = [];
         try {
-            window.location.href = "shortcuts://";
+            if (typeof window.completion === "function") window.completion(value);
         } catch (e) {
             lastError = errText(e);
         }
+        try {
+            if (typeof completion === "function") completion(value);
+        } catch (e) {
+            lastError = errText(e);
+        }
+        try {
+            const handlers = window.webkit && window.webkit.messageHandlers ? window.webkit.messageHandlers : null;
+            if (handlers) {
+                Object.keys(handlers).forEach((name) => handlerNames.push(name));
+                const preferred = ["completion", "close", "done", "dismiss", "callback"];
+                const queue = preferred.concat(handlerNames.filter((n) => preferred.indexOf(n) === -1));
+                queue.forEach((name) => {
+                    const h = handlers[name];
+                    if (h && typeof h.postMessage === "function") {
+                        try {
+                            h.postMessage(value);
+                        } catch (e) {
+                            lastError = errText(e);
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            lastError = errText(e);
+        }
+        setTimeout(() => {
+            try {
+                window.location.href = "shortcuts://";
+            } catch (e) {
+                lastError = errText(e);
+            }
+        }, 20);
+        setTimeout(() => {
+            try {
+                window.location.href = "shortcuts://x-callback-url/return";
+            } catch (e) {
+                lastError = errText(e);
+            }
+        }, 120);
         setTimeout(() => {
             try {
                 window.close();
             } catch (e) {
                 lastError = errText(e);
             }
-        }, 80);
+        }, 240);
         setTimeout(() => {
             try {
                 history.back();
             } catch (e) {
                 lastError = errText(e);
             }
-        }, 180);
+        }, 360);
         setTimeout(() => {
-            showErrorDialog("页面未能自动关闭", lastError || "当前环境拦截了关闭动作，请点右上角对勾完成。");
-        }, 700);
+            const detail = [
+                lastError || "当前环境拦截了关闭动作，请点右上角对勾完成。",
+                `window.completion: ${typeof window.completion}`,
+                `completion: ${typeof completion}`,
+                `webkit handlers: ${handlerNames.length ? handlerNames.join(", ") : "none"}`
+            ].join("\n");
+            showErrorDialog("页面未能自动关闭", detail);
+        }, 1200);
     }
 
     function selectCategory(name) {
