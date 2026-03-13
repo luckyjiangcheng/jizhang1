@@ -41,19 +41,15 @@ def build_public():
         return
 
     # 4. Create CSV Prompt
-    json_structure = '''{
-  "date": "YYYY-MM-DD",
-  "time": "HH:MM",
-  "amount": 0.00,
-  "category": "String",
-  "item": "String",
-  "merchant": "String"
-}'''
-    csv_prompt = prompt_content.replace('JSON format', 'CSV format')
-    csv_prompt = csv_prompt.replace('JSON structure', 'CSV format')
-    csv_prompt = csv_prompt.replace(json_structure, 'Date,Time,Amount,Category,Item,Merchant')
-    csv_prompt = csv_prompt.replace('Output ONLY the valid JSON object', 'Output ONLY the valid CSV line')
-    csv_prompt = csv_prompt.replace('valid JSON object', 'valid CSV line')
+    csv_prompt = '''你是一个专业的交易数据提取助手，只从用户提供的小票、文字、语音内容里把消费信息提取成一行 CSV 格式，只输出 CSV，不输出任何多余内容。
+ 输出格式为 Date,Time,Amount,Category,Item,Merchant。
+ 日期格式 YYYY-MM-DD，不能为空，优先用内容明确日期，无则按今天 / 昨天 / 前天结合当前日期计算，仍无则用当前日期。
+ 时间格式 HH:MM，未知填空字符串 ""。
+ 金额为纯数字，无货币符号，未知填 0。
+ 分类必须从餐饮美食、交通出行、购物消费、居家生活、休闲娱乐、人情往来、医疗健康、教育培训、金融保险、孝敬父母、其他中选一个，未知填""。
+ 项目为简短中文描述，未知填 ""。
+ 商家为名称，未知填""。
+ 空字段用英文双引号 ""，只输出一行 CSV，不要表头、解释、JSON、符号、换行。'''
 
     # 5. Create Public Config (WITH API Key)
     config_public = {
