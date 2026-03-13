@@ -396,7 +396,7 @@
             <div class="list-header-right">
                 <span id="current-range-label" style="font-size: 12px; color: var(--text-sec); font-weight: normal;"></span>
                 <select id="list-sort-select" class="sort-select">
-                    <option value="time-desc">时间从新到旧</option>
+                    <option value="time-desc" selected>时间从新到旧</option>
                     <option value="amount-desc">金额从高到低</option>
                     <option value="amount-asc">金额从低到高</option>
                 </select>
@@ -415,7 +415,7 @@
     let allData = [];
     let currentFilteredData = [];
     let currentPeriod = 'month'; // default
-    let currentListSort = 'amount-desc';
+    let currentListSort = 'time-desc';
     let charts = {};
 
     // Category Emoji Mapping
