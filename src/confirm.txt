@@ -161,7 +161,7 @@
             font-size: 13px;
             text-align: center;
         }
-        .actions { display: flex; gap: 12px; margin-top: 8px; }
+        .actions { display: none; }
         button {
             flex: 1;
             border: none;
@@ -315,6 +315,8 @@
     const notesEl = document.getElementById("notes");
     const errorEl = document.getElementById("error");
     const chipsEl = document.getElementById("chips");
+    let clipboardLineCache = "";
+    let autoSyncTimer = null;
 
     function endWith(value) {
         let lastError = "";
@@ -416,6 +418,7 @@
         chips.forEach(chip => {
             chip.classList.toggle("active", chip.dataset.value === name);
         });
+        scheduleAutoClipboardSync();
     }
 
     function initChips() {
@@ -500,6 +503,41 @@
         navigator.clipboard.writeText(text).catch(() => {});
     }
 
+    function syncClipboardLine(line, showFailure) {
+        const copied = writeClipboardSync(line);
+        if (copied) {
+            clipboardLineCache = line;
+            return true;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(line).then(() => {
+                clipboardLineCache = line;
+            }).catch((e) => {
+                if (showFailure) {
+                    showErrorDialog("保存失败", (e && (e.message || String(e))) || "无法写入剪贴板");
+                }
+            });
+            return true;
+        }
+        if (showFailure) {
+            showErrorDialog("保存失败", "当前环境不支持剪贴板写入");
+        }
+        return false;
+    }
+
+    function scheduleAutoClipboardSync() {
+        if (autoSyncTimer) {
+            clearTimeout(autoSyncTimer);
+        }
+        autoSyncTimer = setTimeout(() => {
+            const line = toCsvLine();
+            if (line === clipboardLineCache) {
+                return;
+            }
+            syncClipboardLine(line, false);
+        }, 220);
+    }
+
     document.getElementById("cancelBtn").addEventListener("click", () => {
         endWith("");
     });
@@ -512,16 +550,7 @@
             return;
         }
         const line = toCsvLine();
-        const copied = writeClipboardSync(line);
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(line).catch((e) => {
-                if (!copied) {
-                    showErrorDialog("保存失败", (e && (e.message || String(e))) || "无法写入剪贴板");
-                }
-            });
-        }
-        if (!copied && (!navigator.clipboard || !navigator.clipboard.writeText)) {
-            showErrorDialog("保存失败", "当前环境不支持剪贴板写入");
+        if (!syncClipboardLine(line, true)) {
             return;
         }
         endWith(line);
@@ -537,8 +566,14 @@
         showErrorDialog("异步错误", msg);
     });
 
+    [dateEl, timeEl, amountEl, accountEl, itemEl, merchantEl, notesEl].forEach((el) => {
+        el.addEventListener("input", scheduleAutoClipboardSync);
+        el.addEventListener("change", scheduleAutoClipboardSync);
+    });
+
     initChips();
     fillDefaults();
+    scheduleAutoClipboardSync();
 </script>
 </body>
 </html>
