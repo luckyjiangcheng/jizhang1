@@ -14,9 +14,9 @@
 #### 第一步：安装“配置助手” (安装器)
 
 请在 iPhone 上点击此链接：
-👉 **[点击安装 记账小助手安装器](https://www.icloud.com/shortcuts/8afabbc781c34d648b8d23e4ea537634)**
-👉 **[点击安装 记账小助手](https://www.icloud.com/shortcuts/90c712c4ec4142d0a83452d19e06f1a6)**
-👉 **[点击安装 记账小助手账单](https://www.icloud.com/shortcuts/782c57c0192f454a9febb1a0cbcc97d7)**
+👉 **[点击安装 记账小助手安装器](https://www.icloud.com/shortcuts/a29c4154b8d84e0786e6a14b506ba673)**
+👉 **[点击安装 记账小助手](https://www.icloud.com/shortcuts/849053447f904ef4aaaa2eb8a380e3a9)**
+👉 **[点击安装 记账小助手账单](https://www.icloud.com/shortcuts/cfc982baaa344f578905c0d16fb14946)**
 一路允许完全访问
     
 ## 📱 功能使用 ！！！
