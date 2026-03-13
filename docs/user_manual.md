@@ -15,10 +15,9 @@
 
 请在 iPhone 上点击此链接：
 👉 **[点击安装 记账小助手安装器](https://www.icloud.com/shortcuts/8afabbc781c34d648b8d23e4ea537634)**
-
-1.  点击 **“添加快捷指令”**
-2.  运行 **`记账小助手安装器`**
-3.  一路允许完全访问
+👉 **[点击安装 记账小助手](https://www.icloud.com/shortcuts/90c712c4ec4142d0a83452d19e06f1a6)**
+👉 **[点击安装 记账小助手账单](https://www.icloud.com/shortcuts/782c57c0192f454a9febb1a0cbcc97d7)**
+一路允许完全访问
     
 ## 📱 功能使用 ！！！
 *   **设置路径**：设置 → 辅助功能 → 触控 → 轻点背面
