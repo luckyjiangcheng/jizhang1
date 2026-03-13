@@ -439,16 +439,16 @@
     
     // Default Sample Data (if placeholder not replaced)
     const SAMPLE_DATA = `Date,Time,Amount,Category,Item,Merchant
-2023-10-01,08:00,15.00,餐饮,早餐,KFC
-2023-10-02,12:30,35.00,餐饮,午餐,McDonalds
-2023-10-03,18:00,120.00,购物,鞋子,Nike
-2023-10-05,09:00,50.00,交通,打车,Uber
-2023-10-08,19:00,200.00,娱乐,电影,Cinema
-2023-10-12,10:00,80.00,日用,水果,Supermarket
-2023-10-15,14:00,45.00,餐饮,咖啡,Starbucks
-2023-11-01,09:00,60.00,日用,周购,Walmart
-2023-11-05,19:30,100.00,餐饮,晚餐,Italian Place
-2023-12-10,15:00,300.00,购物,礼物,Mall`;
+2026-03-10,08:00,15.00,餐饮美食,早餐,KFC
+2026-03-11,12:30,35.00,餐饮美食,午餐,McDonalds
+2026-03-12,18:00,120.00,购物消费,鞋子,Nike
+2026-03-13,09:00,50.00,交通出行,打车,Uber
+2026-03-08,19:00,200.00,休闲娱乐,电影,Cinema
+2026-03-05,10:00,80.00,居家生活,水果,Supermarket
+2026-03-01,14:00,45.00,餐饮美食,咖啡,Starbucks
+2026-02-15,09:00,60.00,居家生活,周购,Walmart
+2026-02-10,19:30,100.00,餐饮美食,晚餐,Italian Place
+2026-01-05,15:00,300.00,购物消费,礼物,Mall`;
 
     let csvContent = `CSV_DATA_PLACEHOLDER`;
 
@@ -802,7 +802,20 @@
             sorted.sort((a, b) => b.dateObj - a.dateObj);
         }
         if (sorted.length === 0) {
-            listEl.innerHTML = '<li class="empty-state">本时段无交易记录</li>';
+            listEl.innerHTML = `
+                <li class="empty-state">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">本时段无交易记录</div>
+                    <div style="font-size: 14px; color: var(--text-sec);">
+                        ${currentPeriod === 'today' ? '今天还没有消费记录' : 
+                          currentPeriod === 'week' ? '本周还没有消费记录' : 
+                          currentPeriod === 'month' ? '本月还没有消费记录' : '本年还没有消费记录'}
+                    </div>
+                    <div style="margin-top: 16px; font-size: 12px; color: var(--text-sec);">
+                        提示：尝试切换到其他时间段查看历史数据
+                    </div>
+                </li>
+            `;
             return;
         }
 

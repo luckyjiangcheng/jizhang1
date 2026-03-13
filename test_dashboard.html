@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>消费仪表盘</title>
+    <title>消费仪表盘 - 测试</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         :root {
@@ -450,7 +450,7 @@
 2026-02-10,19:30,100.00,餐饮美食,晚餐,Italian Place
 2026-01-05,15:00,300.00,购物消费,礼物,Mall`;
 
-    let csvContent = `CSV_DATA_PLACEHOLDER`;
+    let csvContent = SAMPLE_DATA;
 
     // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -505,19 +505,32 @@
             if (!line) continue;
             
             const row = line.split(',');
-            if (row.length < headers.length) continue;
+            if (row.length < 5) continue; // 至少需要5个字段
 
             const item = {};
-            for (let j = 0; j < headers.length; j++) {
-                item[headers[j]] = row[j] ? row[j].trim() : '';
-            }
+            
+            // 处理字段映射，确保关键字段存在
+            item.Date = row[0] ? row[0].trim() : '';
+            item.Time = row[1] ? row[1].trim() : '';
+            item.Amount = row[2] ? row[2].trim() : '0';
+            item.Category = row[3] ? row[3].trim() : '';
+            item.Item = row[4] ? row[4].trim() : '';
+            item.Merchant = row[5] ? row[5].trim() : '';
 
             // Parse Numbers
             item.Amount = parseFloat(item.Amount) || 0;
             
             // Parse Date
             if (item.Date) {
-                const timeStr = item.Time || '00:00:00';
+                let timeStr = item.Time || '00:00:00';
+                // 处理非标准时间格式
+                if (timeStr.length === 2) {
+                    // 只有小时，补充分钟
+                    timeStr = timeStr + ':00';
+                } else if (timeStr.length === 4) {
+                    // HHMM格式，转换为HH:MM
+                    timeStr = timeStr.substring(0, 2) + ':' + timeStr.substring(2);
+                }
                 // Using a faster date parsing approach: YYYY/MM/DD HH:mm:ss
                 item.dateObj = new Date(item.Date.replace(/-/g, '/') + ' ' + timeStr);
                 if (isNaN(item.dateObj.getTime())) continue;
