@@ -48,7 +48,7 @@
             max-width: 520px;
             background: var(--card);
             border-radius: var(--radius-lg);
-            padding: 20px 16px 16px;
+            padding: 16px;
             box-shadow: var(--shadow);
         }
         .title-wrap {
@@ -123,20 +123,19 @@
         .field-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            min-height: 52px;
+            gap: 16px;
+            min-height: 56px;
             border-bottom: 1px solid var(--border);
-            padding: 0 2px;
+            padding: 0 12px;
         }
         .field-row:last-child {
             border-bottom: none;
         }
         .field-label {
-            flex: 0 0 94px;
+            flex: 0 0 80px;
             color: var(--text-sec);
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            padding-left: 8px;
         }
         .field-control {
             flex: 1;
@@ -144,18 +143,18 @@
             background: transparent;
             color: var(--primary);
             text-align: right;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
-            padding: 0 8px;
-            min-height: 44px;
+            padding: 0;
+            min-height: 40px;
             appearance: none;
         }
         .field-control.normal {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
         }
         .field-control.text {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
         }
         .field-control.notes {
@@ -192,10 +191,7 @@
 <body>
 <div class="container">
     <div class="card">
-        <div class="title-wrap">
-            <div class="title-badge"></div>
-            <h1 class="title"><span class="title-text">确认账单</span></h1>
-        </div>
+
         <form id="form">
             <div class="amount-container">
                 <span class="amount-label">消费金额</span>
@@ -229,21 +225,7 @@
                     <div class="field-label">商户</div>
                     <input id="merchant" class="field-control text" type="text" placeholder="例如：麦当劳">
                 </div>
-                <div class="field-row">
-                    <div class="field-label">账户</div>
-                    <select id="account" class="field-control normal">
-                        <option value="现金">现金</option>
-                        <option value="支付宝">支付宝</option>
-                        <option value="微信支付">微信支付</option>
-                        <option value="银行卡">银行卡</option>
-                        <option value="信用卡">信用卡</option>
-                        <option value="其他">其他</option>
-                    </select>
-                </div>
-                <div class="field-row">
-                    <div class="field-label">备注</div>
-                    <textarea id="notes" class="field-control notes" placeholder="添加更多细节..."></textarea>
-                </div>
+
             </div>
 
             <div id="error" class="error"></div>
@@ -313,11 +295,9 @@
     const timeEl = document.getElementById("time");
     const amountEl = document.getElementById("amount");
     const amountInlineEl = document.getElementById("amountInline");
-    const accountEl = document.getElementById("account");
     const categoryEl = document.getElementById("category");
     const itemEl = document.getElementById("item");
     const merchantEl = document.getElementById("merchant");
-    const notesEl = document.getElementById("notes");
     const errorEl = document.getElementById("error");
     let clipboardLineCache = "";
     let autoSyncTimer = null;
@@ -452,8 +432,6 @@
         }
         if (data.item) itemEl.value = data.item;
         if (data.merchant) merchantEl.value = data.merchant;
-        if (data.account) accountEl.value = data.account;
-        if (data.notes) notesEl.value = data.notes;
         
         if (data.category) {
             const match = categories.find(c => c === data.category || c.includes(data.category));
@@ -470,9 +448,7 @@
         const category = categoryEl.value || "";
         const item = (itemEl.value || "").replace(/,/g, " ");
         const merchant = (merchantEl.value || "").replace(/,/g, " ");
-        const account = (accountEl.value || "").replace(/,/g, " ");
-        const notes = (notesEl.value || "").replace(/,/g, " ");
-        return `${date},${time},${amount},${category},${item},${merchant},${account},${notes}`;
+        return `${date},${time},${amount},${category},${item},${merchant},,`;
     }
 
     function writeClipboardSync(text) {
@@ -569,7 +545,7 @@
         if (amountEl.value !== amountInlineEl.value) amountEl.value = amountInlineEl.value;
         scheduleAutoClipboardSync();
     });
-    [dateEl, timeEl, accountEl, categoryEl, itemEl, merchantEl, notesEl].forEach((el) => {
+    [dateEl, timeEl, categoryEl, itemEl, merchantEl].forEach((el) => {
         el.addEventListener("input", scheduleAutoClipboardSync);
         el.addEventListener("change", scheduleAutoClipboardSync);
     });
