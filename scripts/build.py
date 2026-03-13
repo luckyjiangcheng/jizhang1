@@ -40,13 +40,29 @@ def build_public():
         print(f"Error: Could not read prompt.txt: {e}")
         return
 
-    # 4. Create Public Config (WITH API Key)
+    # 4. Create CSV Prompt
+    json_structure = '''{
+  "date": "YYYY-MM-DD",
+  "time": "HH:MM",
+  "amount": 0.00,
+  "category": "String",
+  "item": "String",
+  "merchant": "String"
+}'''
+    csv_prompt = prompt_content.replace('JSON format', 'CSV format')
+    csv_prompt = csv_prompt.replace('JSON structure', 'CSV format')
+    csv_prompt = csv_prompt.replace(json_structure, 'Date,Time,Amount,Category,Item,Merchant')
+    csv_prompt = csv_prompt.replace('Output ONLY the valid JSON object', 'Output ONLY the valid CSV line')
+    csv_prompt = csv_prompt.replace('valid JSON object', 'valid CSV line')
+
+    # 5. Create Public Config (WITH API Key)
     config_public = {
         "api_key": api_key,
         "api_base": "https://api.siliconflow.cn/v1",
         "text_model": text_model,
         "vision_model": vision_model,
-        "system_prompt": prompt_content
+        "system_prompt": prompt_content,
+        "jj_prompt": csv_prompt
     }
     
     with open(public_dir / "config.json", "w", encoding="utf-8") as f:

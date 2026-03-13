@@ -352,46 +352,26 @@
     </div>
 
     <!-- Metrics Row -->
-    <div class="metrics-grid">
+    <div class="metrics-grid" id="metrics-grid">
         <div class="metric-card">
-            <span class="metric-label">当日支出</span>
-            <span class="metric-value expense" id="val-expense-day">¥0.00</span>
-            <span class="metric-change" id="val-expense-day-change">较昨天 0.00%</span>
+            <span class="metric-label" id="metric-label-amount">支出金额</span>
+            <span class="metric-value expense" id="val-expense-current">¥0.00</span>
+            <span class="metric-change" id="val-expense-change">较上期 0.00%</span>
         </div>
         <div class="metric-card">
-            <span class="metric-label">本周支出</span>
-            <span class="metric-value expense" id="val-expense-week">¥0.00</span>
-            <span class="metric-change" id="val-expense-week-change">较上周 0.00%</span>
+            <span class="metric-label">支出笔数</span>
+            <span class="metric-value" id="val-count-current">0</span>
+            <span class="metric-change" id="val-count-change">较上期 0.00%</span>
         </div>
         <div class="metric-card">
-            <span class="metric-label">本月支出</span>
-            <span class="metric-value expense" id="val-expense-month">¥0.00</span>
-            <span class="metric-change" id="val-expense-month-change">较上月 0.00%</span>
+            <span class="metric-label">平均每笔</span>
+            <span class="metric-value expense" id="val-average-current">¥0.00</span>
+            <span class="metric-change" id="val-average-change">较上期 0.00%</span>
         </div>
         <div class="metric-card">
-            <span class="metric-label">年度汇总</span>
-            <span class="metric-value expense" id="val-expense-year">¥0.00</span>
-            <span class="metric-change" id="val-expense-year-change">较去年 0.00%</span>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">当日支出笔数</span>
-            <span class="metric-value" id="val-count-day">0</span>
-            <span class="metric-change" id="val-count-day-change">较昨天 0.00%</span>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">本周支出笔数</span>
-            <span class="metric-value" id="val-count-week">0</span>
-            <span class="metric-change" id="val-count-week-change">较上周 0.00%</span>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">本月支出笔数</span>
-            <span class="metric-value" id="val-count-month">0</span>
-            <span class="metric-change" id="val-count-month-change">较上月 0.00%</span>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">年度支出笔数</span>
-            <span class="metric-value" id="val-count-year">0</span>
-            <span class="metric-change" id="val-count-year-change">较去年 0.00%</span>
+            <span class="metric-label">最高支出</span>
+            <span class="metric-value expense" id="val-max-current">¥0.00</span>
+            <span class="metric-change">-</span>
         </div>
     </div>
 
@@ -416,6 +396,7 @@
             <div class="list-header-right">
                 <span id="current-range-label" style="font-size: 12px; color: var(--text-sec); font-weight: normal;"></span>
                 <select id="list-sort-select" class="sort-select">
+                    <option value="time-desc">时间从新到旧</option>
                     <option value="amount-desc">金额从高到低</option>
                     <option value="amount-asc">金额从低到高</option>
                 </select>
@@ -653,20 +634,37 @@
 
     function renderMetrics(data, todayStart) {
         const fmt = (v) => '¥' + v.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const periods = [
-            { key: 'day', label: '较昨天', range: buildPeriodRange('today', todayStart) },
-            { key: 'week', label: '较上周', range: buildPeriodRange('week', todayStart) },
-            { key: 'month', label: '较上月', range: buildPeriodRange('month', todayStart) },
-            { key: 'year', label: '较去年', range: buildPeriodRange('year', todayStart) }
-        ];
-        periods.forEach(({ key, label, range }) => {
-            const curr = expenseStats(data, range.start, range.end);
-            const prev = expenseStats(data, range.prevStart, range.prevEnd);
-            document.getElementById(`val-expense-${key}`).innerText = fmt(curr.amount);
-            document.getElementById(`val-count-${key}`).innerText = String(curr.count);
-            applyChangeEl(`val-expense-${key}-change`, label, curr.amount, prev.amount);
-            applyChangeEl(`val-count-${key}-change`, label, curr.count, prev.count);
-        });
+        const periodMap = {
+            'today': { label: '当日', prevLabel: '较昨天', range: buildPeriodRange('today', todayStart) },
+            'week': { label: '本周', prevLabel: '较上周', range: buildPeriodRange('week', todayStart) },
+            'month': { label: '本月', prevLabel: '较上月', range: buildPeriodRange('month', todayStart) },
+            'year': { label: '本年', prevLabel: '较去年', range: buildPeriodRange('year', todayStart) }
+        };
+        
+        const period = periodMap[currentPeriod];
+        if (!period) return;
+        
+        const curr = expenseStats(data, period.range.start, period.range.end);
+        const prev = expenseStats(data, period.range.prevStart, period.range.prevEnd);
+        
+        // 计算平均值和最大值
+        const expenseItems = data.filter(d => d.dateObj >= period.range.start && d.dateObj <= period.range.end && d.Category !== '收入' && d.Amount > 0);
+        const average = curr.count > 0 ? curr.amount / curr.count : 0;
+        const max = expenseItems.length > 0 ? Math.max(...expenseItems.map(item => item.Amount)) : 0;
+        
+        // 更新UI
+        document.getElementById('metric-label-amount').innerText = `${period.label}支出`;
+        document.getElementById('val-expense-current').innerText = fmt(curr.amount);
+        document.getElementById('val-count-current').innerText = String(curr.count);
+        document.getElementById('val-average-current').innerText = fmt(average);
+        document.getElementById('val-max-current').innerText = fmt(max);
+        
+        applyChangeEl('val-expense-change', period.prevLabel, curr.amount, prev.amount);
+        applyChangeEl('val-count-change', period.prevLabel, curr.count, prev.count);
+        
+        // 计算平均值变化
+        const prevAverage = prev.count > 0 ? prev.amount / prev.count : 0;
+        applyChangeEl('val-average-change', period.prevLabel, average, prevAverage);
     }
 
     function renderCharts(data, granularity, start, end) {
@@ -798,8 +796,10 @@
         let sorted = [...recent];
         if (currentListSort === 'amount-asc') {
             sorted.sort((a, b) => a.Amount - b.Amount);
-        } else {
+        } else if (currentListSort === 'amount-desc') {
             sorted.sort((a, b) => b.Amount - a.Amount);
+        } else if (currentListSort === 'time-desc') {
+            sorted.sort((a, b) => b.dateObj - a.dateObj);
         }
         if (sorted.length === 0) {
             listEl.innerHTML = '<li class="empty-state">本时段无交易记录</li>';
@@ -813,8 +813,9 @@
             const amountPrefix = isIncome ? '+' : '-';
             
             const dateStr = item.dateObj.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+            const timeStr = item.dateObj.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             
-            const metaParts = [dateStr];
+            const metaParts = [dateStr, timeStr];
             if (item.Account) metaParts.push(item.Account);
             if (item.Item || item.Merchant) metaParts.push(item.Item || item.Merchant);
             

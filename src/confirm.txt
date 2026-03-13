@@ -38,7 +38,7 @@
         .container {
             width: 100%;
             min-height: 100%;
-            padding: 18px 14px 24px;
+            padding: 24px 16px 32px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -48,8 +48,8 @@
             max-width: 520px;
             background: var(--card);
             border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: var(--shadow);
+            padding: 24px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
         }
         .title-wrap {
             display: flex;
@@ -78,27 +78,29 @@
         }
         .amount-container {
             text-align: center;
-            margin-bottom: 14px;
-            padding: 18px 12px 16px;
-            background: linear-gradient(135deg, #007aff, #4f46e5);
-            border-radius: 16px;
+            margin-bottom: 24px;
+            padding: 24px 16px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
         }
         .amount-label {
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.95);
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 12px;
             display: block;
+            letter-spacing: 0.5px;
         }
         .amount-input-wrapper {
             display: flex;
             align-items: baseline;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
         }
         .amount-symbol {
-            font-size: 34px;
-            font-weight: 800;
+            font-size: 28px;
+            font-weight: 700;
             color: #ffffff;
         }
         #amount {
@@ -107,26 +109,28 @@
             background: transparent;
             border: none;
             text-align: center;
-            font-size: 48px;
-            font-weight: 800;
+            font-size: 44px;
+            font-weight: 700;
             color: #ffffff;
             padding: 0;
+            letter-spacing: -0.5px;
         }
         #amount::placeholder { color: rgba(255, 255, 255, 0.5); }
         .field-list {
             background: var(--card);
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
             border: 1px solid var(--border);
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
         .field-row {
             display: flex;
             align-items: center;
-            gap: 16px;
-            min-height: 56px;
+            gap: 20px;
+            min-height: 60px;
             border-bottom: 1px solid var(--border);
-            padding: 0 12px;
+            padding: 0 16px;
         }
         .field-row:last-child {
             border-bottom: none;
@@ -134,28 +138,30 @@
         .field-label {
             flex: 0 0 80px;
             color: var(--text-sec);
-            font-size: 15px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
         .field-control {
             flex: 1;
             border: none;
             background: transparent;
-            color: var(--primary);
+            color: var(--text);
             text-align: right;
-            font-size: 24px;
-            font-weight: 700;
-            padding: 0;
-            min-height: 40px;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 8px 0;
+            min-height: 48px;
             appearance: none;
+            transition: all 0.2s ease;
         }
         .field-control.normal {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 500;
         }
         .field-control.text {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 500;
         }
         .field-control.notes {
             text-align: left;
@@ -166,16 +172,25 @@
             padding: 12px 8px;
             resize: none;
         }
-        .field-control::placeholder { color: var(--text-sec); opacity: 0.9; }
-        .field-control:focus { outline: none; }
+        .field-control::placeholder { color: var(--text-sec); opacity: 0.7; }
+        .field-control:focus {
+            outline: none;
+            color: var(--primary);
+        }
+        .field-control[type="date"],
+        .field-control[type="time"],
+        .field-control[select] {
+            cursor: pointer;
+        }
         .hint-bar {
-            background: #fff7e6;
-            border: 1px solid #f7b500;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
             border-radius: 12px;
-            color: #a66a00;
-            padding: 10px 12px;
+            color: #d97706;
+            padding: 12px 16px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
+            line-height: 1.4;
         }
         .error {
             min-height: 18px;
