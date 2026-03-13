@@ -509,7 +509,10 @@
 
             const item = {};
             for (let j = 0; j < headers.length; j++) {
-                item[headers[j]] = row[j] ? row[j].trim() : '';
+                let value = row[j] ? row[j].trim() : '';
+                // 移除可能存在的引号
+                value = value.replace(/^"|"$/g, '');
+                item[headers[j]] = value;
             }
 
             // Parse Numbers
@@ -517,7 +520,15 @@
             
             // Parse Date
             if (item.Date) {
-                const timeStr = item.Time || '00:00:00';
+                let timeStr = item.Time || '00:00:00';
+                // 处理非标准时间格式
+                if (timeStr.length === 2) {
+                    // 只有小时，补充分钟
+                    timeStr = timeStr + ':00';
+                } else if (timeStr.length === 4) {
+                    // HHMM格式，转换为HH:MM
+                    timeStr = timeStr.substring(0, 2) + ':' + timeStr.substring(2);
+                }
                 // Using a faster date parsing approach: YYYY/MM/DD HH:mm:ss
                 item.dateObj = new Date(item.Date.replace(/-/g, '/') + ' ' + timeStr);
                 if (isNaN(item.dateObj.getTime())) continue;

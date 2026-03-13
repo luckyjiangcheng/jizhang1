@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Parsing Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-input { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+        .test-result { margin: 10px 0; padding: 10px; background: #e8f4f8; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>CSV Parsing Test</h1>
+    
+    <div class="test-case">
+        <h2>测试用例 1: 带双引号的CSV数据</h2>
+        <div class="test-input">
+            2026-03-13,,"50",购物消费,"西瓜","",""
+        </div>
+        <div class="test-result" id="result1"></div>
+    </div>
+    
+    <div class="test-case">
+        <h2>测试用例 2: 不带双引号的CSV数据</h2>
+        <div class="test-input">
+            2026-03-13,,50,购物消费,西瓜,,
+        </div>
+        <div class="test-result" id="result2"></div>
+    </div>
+    
+    <div class="test-case">
+        <h2>测试用例 3: 混合格式的CSV数据</h2>
+        <div class="test-input">
+            2026-03-10,08:00,15.00,餐饮美食,早餐,KFC
+            2026-03-11,12:30,35.00,餐饮美食,午餐,McDonalds
+            2026-03-12,,120,购物消费,鞋子,Nike
+        </div>
+        <div class="test-result" id="result3"></div>
+    </div>
+
+    <script>
+        // 复制修改后的parseCSV函数
+        function parseCSV(csv) {
+            if (!csv || csv.length < 10) return [];
+            const lines = csv.split(/\r?\n/);
+            if (lines.length < 2) return [];
+
+            const headers = lines[0].split(',').map(h => h.trim());
+            const result = [];
+            
+            for (let i = lines.length - 1; i >= 1; i--) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const row = line.split(',');
+                if (row.length < headers.length) continue;
+
+                const item = {};
+                for (let j = 0; j < headers.length; j++) {
+                    let value = row[j] ? row[j].trim() : '';
+                    // 移除可能存在的引号
+                    value = value.replace(/^"|"$/g, '');
+                    item[headers[j]] = value;
+                }
+
+                // Parse Numbers
+                item.Amount = parseFloat(item.Amount) || 0;
+                
+                // Parse Date
+                if (item.Date) {
+                    let timeStr = item.Time || '00:00:00';
+                    // 处理非标准时间格式
+                    if (timeStr.length === 2) {
+                        // 只有小时，补充分钟
+                        timeStr = timeStr + ':00';
+                    } else if (timeStr.length === 4) {
+                        // HHMM格式，转换为HH:MM
+                        timeStr = timeStr.substring(0, 2) + ':' + timeStr.substring(2);
+                    }
+                    // Using a faster date parsing approach: YYYY/MM/DD HH:mm:ss
+                    item.dateObj = new Date(item.Date.replace(/-/g, '/') + ' ' + timeStr);
+                    if (isNaN(item.dateObj.getTime())) continue;
+                } else {
+                    continue;
+                }
+                result.push(item);
+            }
+            return result;
+        }
+
+        // 测试数据
+        const testData1 = `Date,Time,Amount,Category,Item,Merchant
+2026-03-13,,"50",购物消费,"西瓜","",""`;
+        
+        const testData2 = `Date,Time,Amount,Category,Item,Merchant
+2026-03-13,,50,购物消费,西瓜,,`;
+        
+        const testData3 = `Date,Time,Amount,Category,Item,Merchant
+2026-03-10,08:00,15.00,餐饮美食,早餐,KFC
+2026-03-11,12:30,35.00,餐饮美食,午餐,McDonalds
+2026-03-12,,120,购物消费,鞋子,Nike`;
+
+        // 运行测试
+        function runTest(data, resultElementId) {
+            try {
+                const result = parseCSV(data);
+                const element = document.getElementById(resultElementId);
+                if (result.length > 0) {
+                    element.innerHTML = `<span class="success">✓ 解析成功！</span><br>解析结果: ${JSON.stringify(result, null, 2)}`;
+                } else {
+                    element.innerHTML = `<span class="error">✗ 解析失败，没有数据</span>`;
+                }
+            } catch (e) {
+                document.getElementById(resultElementId).innerHTML = `<span class="error">✗ 解析错误: ${e.message}</span>`;
+            }
+        }
+
+        // 执行测试
+        runTest(testData1, 'result1');
+        runTest(testData2, 'result2');
+        runTest(testData3, 'result3');
+    </script>
+</body>
+</html>
