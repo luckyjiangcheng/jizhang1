@@ -320,6 +320,32 @@
         let lastError = "";
         const errText = (e) => (e && (e.message || String(e))) || "";
         const handlerNames = [];
+        let handoffTriggered = false;
+        const launchShortcutsNow = (url) => {
+            try {
+                const a = document.createElement("a");
+                a.href = url;
+                a.style.display = "none";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                handoffTriggered = true;
+            } catch (e) {
+                lastError = errText(e);
+            }
+            try {
+                window.location.assign(url);
+                handoffTriggered = true;
+            } catch (e) {
+                lastError = errText(e);
+            }
+            try {
+                window.location.href = url;
+                handoffTriggered = true;
+            } catch (e) {
+                lastError = errText(e);
+            }
+        };
         try {
             if (typeof window.completion === "function") window.completion(value);
         } catch (e) {
@@ -350,43 +376,38 @@
         } catch (e) {
             lastError = errText(e);
         }
+        launchShortcutsNow("shortcuts://");
+        launchShortcutsNow("shortcuts://x-callback-url/return");
         setTimeout(() => {
-            try {
-                window.location.href = "shortcuts://";
-            } catch (e) {
-                lastError = errText(e);
-            }
-        }, 20);
+            launchShortcutsNow("shortcuts://");
+        }, 80);
         setTimeout(() => {
-            try {
-                window.location.href = "shortcuts://x-callback-url/return";
-            } catch (e) {
-                lastError = errText(e);
-            }
-        }, 120);
+            launchShortcutsNow("shortcuts://x-callback-url/return");
+        }, 180);
         setTimeout(() => {
             try {
                 window.close();
             } catch (e) {
                 lastError = errText(e);
             }
-        }, 240);
+        }, 320);
         setTimeout(() => {
             try {
                 history.back();
             } catch (e) {
                 lastError = errText(e);
             }
-        }, 360);
+        }, 460);
         setTimeout(() => {
             const detail = [
                 lastError || "当前环境拦截了关闭动作，请点右上角对勾完成。",
                 `window.completion: ${typeof window.completion}`,
                 `completion: ${typeof completion}`,
-                `webkit handlers: ${handlerNames.length ? handlerNames.join(", ") : "none"}`
+                `webkit handlers: ${handlerNames.length ? handlerNames.join(", ") : "none"}`,
+                `shortcuts handoff: ${handoffTriggered ? "attempted" : "not-triggered"}`
             ].join("\n");
             showErrorDialog("页面未能自动关闭", detail);
-        }, 1200);
+        }, 1300);
     }
 
     function selectCategory(name) {
