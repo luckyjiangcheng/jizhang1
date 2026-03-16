@@ -1,0 +1,3419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="记账小助手">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
+    <title>记账小助手</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('Service Worker注册成功:', registration);
+                }).catch(error => {
+                    console.log('Service Worker注册失败:', error);
+                });
+            });
+        }
+    </script>
+    <style>
+        :root {
+            /* V3 Design System - Indigo/Violet */
+            --primary-50: #f5f3ff;
+            --primary-100: #ede9fe;
+            --primary-200: #ddd6fe;
+            --primary-300: #c4b5fd;
+            --primary-400: #a78bfa;
+            --primary-500: #8b5cf6;
+            --primary-600: #7c3aed;
+            --primary-700: #6d28d9;
+            --primary-800: #5b21b6;
+            --primary-900: #4c1d95;
+            
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+
+            /* Semantic Surface Colors */
+            --surface-1: #ffffff;
+            --surface-2: #f8fafc;
+            --surface-3: #f1f5f9;
+
+            /* Semantic Tokens */
+            --primary: #5b6cff;
+            --primary-hover: #4c5bf0;
+            --primary-bg: #eef1ff;
+            --primary-light: var(--primary-100);
+            
+            --bg-body: var(--slate-50);
+            --bg-card: var(--surface-1);
+            --bg-sidebar: var(--surface-1);
+            --text-main: var(--slate-900);
+            --text-sec: var(--slate-500);
+            --border: var(--slate-200);
+            
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-soft: 0 6px 20px rgba(15, 23, 42, 0.06);
+            --shadow-primary: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+
+            /* Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1.5rem;
+            --radius-xl: 2rem;
+            --radius-full: 9999px;
+
+            /* Transitions */
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: var(--primary-500);
+                --primary-hover: var(--primary-400);
+                --primary-bg: rgba(139, 92, 246, 0.15);
+                --primary-light: rgba(139, 92, 246, 0.2);
+                
+                --surface-1: var(--slate-800);
+                --surface-2: var(--slate-900);
+                --surface-3: var(--slate-700);
+
+                --bg-body: var(--slate-900);
+                --bg-card: var(--slate-800);
+                --bg-sidebar: var(--slate-900);
+                --text-main: var(--slate-100);
+                --text-sec: var(--slate-400);
+                --border: var(--slate-700);
+                
+                --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+                --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+                --shadow-soft: 0 8px 30px rgba(0,0,0,0.2);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,96%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,96%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,96%,1) 0, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-image: none;
+            }
+        }
+
+        /* Layout Structure */
+        .app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Sidebar (Desktop) */
+        .sidebar {
+            width: 236px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: none; /* Hidden on mobile by default */
+            flex-direction: column;
+            padding: 20px;
+            z-index: 50;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 28px;
+        }
+
+        .sidebar-logo span {
+            font-size: 24px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-full);
+            color: var(--text-sec);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-bg);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary-bg);
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: none;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-bottom: 100px; /* Space for bottom nav */
+            width: 100%;
+        }
+
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            padding-bottom: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: none;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 16px 12px;
+            z-index: 100;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text-sec);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 60px;
+            transition: all var(--transition);
+        }
+
+        .bottom-nav-item svg {
+            width: 24px;
+            height: 24px;
+            transition: transform var(--transition);
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+        }
+
+        .bottom-nav-item.active svg {
+            transform: translateY(-4px) scale(1.1);
+            filter: drop-shadow(0 4px 6px rgba(124, 58, 237, 0.25));
+        }
+
+        /* FAB */
+        .fab-container {
+            position: relative;
+            top: -24px;
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .fab svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        /* Desktop Adjustments */
+        @media (min-width: 768px) {
+            .sidebar {
+                display: flex;
+                top: 16px;
+                left: 16px;
+                height: calc(100vh - 32px);
+                border-radius: 24px;
+                background: rgba(255, 255, 255, 0.8);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+                border-right: none;
+            }
+
+            .bottom-nav {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 268px;
+                padding: 28px;
+                padding-top: 28px;
+            }
+
+            .fab-container {
+                display: none; /* Hide bottom nav FAB on desktop */
+            }
+            
+            /* Show a desktop FAB or Add button if needed, but sidebar usually handles navigation */
+        }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--slate-100) 25%, var(--slate-200) 50%, var(--slate-100) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .skeleton {
+                background: linear-gradient(90deg, var(--slate-800) 25%, var(--slate-700) 50%, var(--slate-800) 75%);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .glass {
+                background: rgba(15, 23, 42, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .glass-panel {
+                background: rgba(15, 23, 42, 0.4);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            /* V3 Dark Mode Overrides */
+            .sidebar {
+                 background: rgba(15, 23, 42, 0.8);
+                 border: 1px solid rgba(255, 255, 255, 0.05);
+                 box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            }
+            .bottom-nav {
+                 background: rgba(15, 23, 42, 0.85);
+            }
+            .bottom-nav-item.active svg {
+                 filter: drop-shadow(0 4px 6px rgba(139, 92, 246, 0.4));
+            }
+        }
+
+        /* Components */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: var(--shadow-soft);
+            border: none;
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-main);
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 2px solid transparent;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-main);
+            font-size: 0.92rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: #fff;
+            border-color: rgba(0,0,0,0.05);
+            border-bottom-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .form-input {
+                background: rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255,255,255,0.05);
+            }
+            .form-input:focus {
+                background: rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            color: white;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3), 0 2px 4px -1px rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.01em;
+            height: 42px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4), 0 4px 6px -2px rgba(99, 102, 241, 0.2);
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-body);
+            border-color: var(--text-sec);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-sec);
+            box-shadow: none;
+        }
+
+        /* Specific Views */
+        .hidden { display: none !important; }
+        .role-hidden { display: none !important; }
+
+        .view-transition {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .classic-list-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .classic-list-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .classic-date-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 16px 8px;
+            color: var(--text-sec);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .classic-transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            gap: 10px;
+        }
+
+        .classic-transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .classic-tx-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .classic-tx-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .classic-tx-info {
+            min-width: 0;
+        }
+
+        .classic-tx-category {
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .classic-tx-meta {
+            color: var(--text-sec);
+            font-size: 12px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .classic-tx-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .classic-tx-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .tx-compact-meta {
+            color: var(--text-sec);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .tx-pager {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-body);
+            color: var(--text-sec);
+            font-size: 12px;
+        }
+
+        .tx-pager-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .table-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 680px;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .action-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .admin-table th {
+            color: var(--text-sec);
+            font-weight: 600;
+            background: var(--bg-body);
+        }
+
+        .admin-table td {
+            color: var(--text-main);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--radius-full);
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pill.unused {
+            color: var(--success);
+            background: color-mix(in srgb, var(--success) 12%, transparent);
+        }
+
+        .status-pill.used {
+            color: var(--primary);
+            background: var(--primary-bg);
+        }
+
+        .status-pill.disabled {
+            color: var(--danger);
+            background: color-mix(in srgb, var(--danger) 12%, transparent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Immersive Glass Auth */
+        .auth-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 20px;
+            background: radial-gradient(at 0% 0%, hsla(253,16%,96%,1) 0, transparent 50%), 
+                        radial-gradient(at 50% 0%, hsla(225,39%,96%,1) 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, hsla(339,49%,96%,1) 0, transparent 50%);
+            background-color: #eef2ff;
+            overflow: hidden;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .auth-container {
+                background: radial-gradient(at 0% 0%, hsla(253,16%,10%,1) 0, transparent 50%), 
+                            radial-gradient(at 50% 0%, hsla(225,39%,10%,1) 0, transparent 50%), 
+                            radial-gradient(at 100% 0%, hsla(339,49%,10%,1) 0, transparent 50%);
+                background-color: #0f172a;
+            }
+        }
+
+        /* Floating Shapes */
+        .shape {
+            position: absolute;
+            filter: blur(60px);
+            z-index: 0;
+            animation: float 20s infinite;
+        }
+
+        .shape-1 {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #8b5cf6, #c4b5fd);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            opacity: 0.5;
+        }
+
+        .shape-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            opacity: 0.4;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            top: 40%;
+            left: 40%;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            opacity: 0.3;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -50px) rotate(10deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
+        }
+
+        .auth-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            padding: 40px 32px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .auth-card {
+                background: rgba(30, 41, 59, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        .brand-logo svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .brand-logo span {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            font-size: 14px;
+            color: var(--text-sec);
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.9rem;
+            color: var(--text-sec);
+        }
+
+        .auth-link a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .auth-link a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        /* Section Headers */
+        h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-sec);
+            margin: 32px 0 16px;
+            font-weight: 700;
+            padding-left: 4px;
+        }
+
+        /* Transaction List */
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: none;
+            transition: all var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .transaction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: var(--bg-card);
+        }
+
+        .transaction-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px; /* Squircle */
+            background: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 16px;
+            flex-shrink: 0;
+            color: var(--primary);
+        }
+
+        .transaction-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+
+        .transaction-meta {
+            font-size: 13px;
+            color: var(--text-sec);
+            opacity: 0.8;
+            display: flex;
+            gap: 8px;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .transaction-delete {
+            background: none;
+            border: none;
+            color: var(--text-sec);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+
+        .transaction-item:hover .transaction-delete {
+            opacity: 1;
+        }
+
+        .transaction-delete:hover {
+            color: var(--danger);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Stats */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-sec);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        
+        .stat-value.expense { color: var(--danger); }
+        .stat-value.income { color: var(--success); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -40%);
+            width: 90%;
+            max-width: 400px;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal.show, .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal.show {
+            transform: translate(-50%, -50%);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            text-transform: none;
+            letter-spacing: normal;
+            color: var(--text-main);
+            margin-top: 0;
+            padding-left: 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 2000;
+            border: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success { color: var(--success); }
+        .toast.error { color: var(--danger); }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .loading-overlay { background: rgba(15, 23, 42, 0.3); }
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* New Optimizations */
+        .date-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 4px 8px;
+            color: var(--text-sec);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .overview-card {
+            background: radial-gradient(circle at 0% 0%, #8b5cf6 0%, transparent 50%), 
+                        radial-gradient(circle at 100% 0%, #ec4899 0%, transparent 50%), 
+                        radial-gradient(circle at 100% 100%, #3b82f6 0%, transparent 50%),
+                        #6366f1;
+            color: white;
+            padding: 24px;
+            border-radius: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.4), 0 8px 10px -6px rgba(79, 70, 229, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+        }
+
+        .overview-card .label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .overview-card .amount {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: auto;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .budget-progress {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 4px;
+            height: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .budget-bar {
+            background: #ffffff;
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .budget-bar.warning { background: #fbbf24; }
+        .budget-bar.danger { background: #ef4444; }
+
+        .budget-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .budget-warning-banner {
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            border: 1px solid #fecaca;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-add-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .quick-add-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Segmented Control */
+        .segmented-control {
+            display: flex;
+            background: var(--slate-100);
+            padding: 4px;
+            border-radius: var(--radius-full);
+            margin-bottom: 24px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .segmented-control { background: var(--slate-800); }
+        }
+
+        .segment-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: none;
+            color: var(--text-sec);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .segment-btn.active {
+            background: var(--bg-card);
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            font-weight: 600;
+        }
+
+        /* Progress Card */
+        .progress-card {
+            background: var(--bg-card);
+            border-radius: 24px; /* Squircle */
+            padding: 24px;
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .progress-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .progress-card.over-budget {
+            background: #fff1f2;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar-bg {
+            height: 12px;
+            background: var(--slate-100);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .progress-bar-bg { background: var(--slate-700); }
+            .progress-card.over-budget { background: rgba(239, 68, 68, 0.1); }
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            background: linear-gradient(90deg, var(--primary-400), var(--primary-600));
+        }
+
+        /* List Group */
+        .list-group {
+            background: var(--bg-card);
+            border-radius: 16px; /* Rounded */
+            border: none; /* Detached */
+            overflow: hidden;
+            box-shadow: var(--shadow-sm); /* Inset Grouped style often has shadow */
+            margin-bottom: 20px;
+        }
+
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--slate-100);
+            background: var(--bg-card);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .list-group-item { border-bottom-color: var(--slate-700); }
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-group-item:hover {
+            background: var(--bg-body);
+        }
+
+        .list-group-item-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--primary-bg);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+        }
+
+        .list-group-item-content {
+            flex: 1;
+        }
+
+        .list-group-item-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .list-group-item-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-sec);
+        }
+
+        .list-group-item-arrow {
+            color: var(--text-sec);
+            opacity: 0.5;
+        }
+
+        /* Settings Group */
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group-title {
+            font-size: 0.875rem;
+            color: var(--text-sec);
+            margin-bottom: 8px;
+            padding-left: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Views Wrapper -->
+    <div id="auth-wrapper" class="auth-container hidden">
+        <!-- Floating Shapes -->
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+
+        <div id="login-view" class="auth-card hidden view-transition">
+            <div class="auth-header">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    <span>记账小助手</span>
+                </div>
+                <h2 class="auth-title">欢迎回来</h2>
+                <p class="auth-subtitle">请登录您的账号以继续</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">账号（手机号或root邮箱）</label>
+                <input type="text" id="login-phone" class="form-input" placeholder="用户输手机号，root输邮箱" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">密码</label>
+                <input type="password" id="login-password" class="form-input" placeholder="请输入密码" required>
+            </div>
+            <button class="btn" onclick="login()">
+                登录
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            </button>
+            <div class="auth-link">
+                还没有账号？<a href="#" onclick="showRegisterView()">立即注册</a>
+            </div>
+            <div style="margin-top: 8px; text-align: center; color: var(--text-sec); font-size: 12px;">root 管理端请使用邮箱登录</div>
+            <div style="margin-top: 24px; text-align: center;">
+                 <details>
+                     <summary style="font-size: 0.8rem; color: var(--text-sec); cursor: pointer; list-style: none;">⚙️ 服务器设置</summary>
+                     <div class="form-group" style="margin-top: 12px; text-align: left;">
+                         <label class="form-label" style="font-size: 0.8rem;">API 地址</label>
+                         <input type="url" id="api-url" class="form-input" placeholder="http://localhost:8000" onblur="saveSettings()" style="font-size: 0.9rem; padding: 10px;">
+                     </div>
+                 </details>
+            </div>
+        </div>
+
+        <div id="register-view" class="auth-card hidden view-transition">
+            <div class="auth-header">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    <span>记账小助手</span>
+                </div>
+                <h2 class="auth-title">创建账号</h2>
+                <p class="auth-subtitle">开启您的理财之旅</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">用户名</label>
+                <input type="text" id="register-username" class="form-input" placeholder="请输入用户名" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">邮箱</label>
+                <input type="email" id="register-email" class="form-input" placeholder="name@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">密码</label>
+                <input type="password" id="register-password" class="form-input" placeholder="请输入密码（至少6位）" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">确认密码</label>
+                <input type="password" id="register-confirm-password" class="form-input" placeholder="请再次输入密码" required>
+            </div>
+            <button class="btn" onclick="register()">注册</button>
+            <div class="auth-link">
+                已有账号？<a href="#" onclick="showLoginView()">立即登录</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Wrapper -->
+    <div id="app-wrapper" class="app-container hidden">
+        <!-- Desktop Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <span>💰</span> 记账小助手
+            </div>
+            <div class="nav-links">
+                <button class="nav-item active role-user-only" onclick="switchTab('transactions')" data-tab="transactions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    首页
+                </button>
+                <button class="nav-item role-user-only" onclick="switchTab('stats')" data-tab="stats">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                    统计分析
+                </button>
+                <button class="nav-item role-user-only" onclick="switchTab('budget')" data-tab="budget">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    预算管理
+                </button>
+                <button class="nav-item role-user-only" onclick="switchTab('user-licenses')" data-tab="user-licenses">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/><circle cx="12" cy="14" r="1"/></svg>
+                    我的授权码
+                </button>
+                <button class="nav-item role-root-only hidden" onclick="switchTab('root-users')" data-tab="root-users">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H4a4 4 0 0 0-4 4v2"/><circle cx="8" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+                    用户管理
+                </button>
+                <button class="nav-item role-root-only hidden" onclick="switchTab('root-licenses')" data-tab="root-licenses">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11V7a2 2 0 0 1 2-2h3l2-2 2 2h7a2 2 0 0 1 2 2v4"/><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 15h6"/></svg>
+                    授权码管理
+                </button>
+                <button class="nav-item role-root-only hidden" onclick="switchTab('root-transactions')" data-tab="root-transactions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h5"/></svg>
+                    账单管理
+                </button>
+            </div>
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border);">
+                <button class="btn btn-outline" onclick="logout()" style="width: 100%; justify-content: flex-start;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    退出登录
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div id="transactions-view" class="view-transition">
+                <div class="overview-card">
+                    <button class="quick-add-btn" onclick="showQuickAdd()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="label">本月支出</div>
+                    <div class="amount" id="overview-total">¥0.00</div>
+                    
+                    <div class="budget-progress">
+                        <div class="budget-bar" id="overview-budget-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="budget-info">
+                        <span id="overview-budget-text">预算剩余 ¥0</span>
+                        <span id="overview-budget-percent">0%</span>
+                    </div>
+                </div>
+                <!-- Budget Warning Banner -->
+                <div id="budget-warning-container"></div>
+
+                <div class="classic-list-card">
+                    <div class="classic-list-header">
+                        <span>账单明细</span>
+                    </div>
+                    <div id="transactions-container"></div>
+                </div>
+            </div>
+
+            <div id="stats-view" class="view-transition hidden">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                         <h2 style="margin: 0;">📊 统计分析</h2>
+                    </div>
+                    
+                    <div class="segmented-control">
+                        <button class="segment-btn active" onclick="switchStatsPeriod('week', this)">本周</button>
+                        <button class="segment-btn" onclick="switchStatsPeriod('month', this)">本月</button>
+                        <button class="segment-btn" onclick="switchStatsPeriod('year', this)">全年</button>
+                    </div>
+
+                    <div id="stats-content">
+                        <!-- Stats Charts -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="budget-view" class="view-transition hidden">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">💰 预算管理</h2>
+                        <button class="btn btn-secondary" onclick="showBudgetModal()" style="width: auto;">设置预算</button>
+                    </div>
+                    <div id="budget-content">
+                        <!-- Budget List -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="family-view" class="view-transition hidden">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">🏠 家庭成员</h2>
+                        <button class="btn btn-secondary" onclick="openModal('invite-member-modal')" style="width: auto;">新增成员</button>
+                    </div>
+                    <div id="family-content">
+                        <!-- Family List -->
+                    </div>
+                    <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px;">
+                        <div class="settings-group">
+                            <div class="settings-group-title">账号信息</div>
+                            <div class="list-group">
+                                <div class="list-group-item">
+                                    <div class="list-group-item-content">
+                                        <div class="list-group-item-title" id="setting-username">--</div>
+                                        <div class="list-group-item-subtitle" id="setting-phone">--</div>
+                                        <div class="list-group-item-subtitle" id="setting-account-type">--</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user-licenses-view" class="view-transition hidden">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">🔐 我的授权码</h2>
+                        <button class="btn btn-secondary" onclick="loadMyLicenseCodes()" style="width: auto;">刷新</button>
+                    </div>
+                    <div id="user-license-summary" style="color: var(--text-sec); font-size: 13px; margin-bottom: 14px;">--</div>
+                    <div id="user-license-container"></div>
+                </div>
+            </div>
+
+            <div id="root-users-view" class="view-transition hidden">
+                <div class="card">
+                    <h2 style="margin-bottom: 16px;">👥 用户管理</h2>
+                    <div class="toolbar-row">
+                        <input id="root-user-phone-filter" class="form-input" placeholder="按手机号查询">
+                        <select id="root-user-account-type-filter" class="form-input">
+                            <option value="">全部账号类型</option>
+                            <option value="personal">个人账号</option>
+                            <option value="family">家庭账号</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="loadRootUsers()" style="width: 100%;">查询用户</button>
+                        <button class="btn" onclick="openRootCreateUserModal()" style="width: 100%;">新增用户</button>
+                    </div>
+                    <div id="root-users-container"></div>
+                </div>
+            </div>
+
+            <div id="root-licenses-view" class="view-transition hidden">
+                <div class="card">
+                    <h2 style="margin-bottom: 16px;">🪪 授权码管理</h2>
+                    <div class="toolbar-row">
+                        <input id="root-license-phone-filter" class="form-input" placeholder="按用户手机号查询（支持模糊）" onkeydown="handleRootLicenseSearchKeydown(event)">
+                        <input id="root-license-code-filter" class="form-input" placeholder="按授权码查询（支持模糊）" onkeydown="handleRootLicenseSearchKeydown(event)">
+                        <button class="btn btn-secondary" onclick="loadRootLicenseCodes()" style="width: 100%;">查询</button>
+                        <button class="btn" onclick="openRootIssueLicenseModal()" style="width: 100%;">新增授权码</button>
+                    </div>
+                    <div id="root-license-container"></div>
+                </div>
+            </div>
+
+            <div id="root-transactions-view" class="view-transition hidden">
+                <div class="card">
+                    <h2 style="margin-bottom: 16px;">📄 root账单管理</h2>
+                    <div class="toolbar-row">
+                        <input id="root-tx-phone-filter" class="form-input" placeholder="按用户手机号查询（支持模糊）">
+                        <input id="root-tx-license-filter" class="form-input" placeholder="按授权码筛选">
+                        <button class="btn btn-secondary" onclick="loadRootTransactions()" style="width: 100%;">查询账单</button>
+                    </div>
+                    <div id="root-transactions-container"></div>
+                </div>
+            </div>
+
+
+        </main>
+
+        <nav id="user-bottom-nav" class="bottom-nav role-user-only">
+            <button class="bottom-nav-item active" onclick="switchTab('transactions')" data-tab="transactions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                首页
+            </button>
+            <button class="bottom-nav-item" onclick="switchTab('budget')" data-tab="budget">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                预算
+            </button>
+            
+            <div class="fab-container">
+                <button class="fab" onclick="showQuickAdd()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+            </div>
+
+            <button class="bottom-nav-item" onclick="switchTab('stats')" data-tab="stats">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                统计
+            </button>
+            <button class="bottom-nav-item" onclick="switchTab('user-licenses')" data-tab="user-licenses">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/><circle cx="12" cy="14" r="1"/></svg>
+                授权码
+            </button>
+        </nav>
+
+        <nav id="root-bottom-nav" class="bottom-nav role-root-only hidden">
+            <button class="bottom-nav-item active" onclick="switchTab('root-users')" data-tab="root-users">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H4a4 4 0 0 0-4 4v2"/><circle cx="8" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+                用户
+            </button>
+            <button class="bottom-nav-item" onclick="switchTab('root-licenses')" data-tab="root-licenses">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11V7a2 2 0 0 1 2-2h3l2-2 2 2h7a2 2 0 0 1 2 2v4"/><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 15h6"/></svg>
+                授权码
+            </button>
+            <button class="bottom-nav-item" onclick="switchTab('root-transactions')" data-tab="root-transactions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h5"/></svg>
+                账单
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modals & Overlays -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()"></div>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    <div id="toast" class="toast"></div>
+
+    <div id="add-transaction-modal" class="modal">
+        <h3>📝 添加交易</h3>
+        <div class="form-group">
+            <label class="form-label">金额</label>
+            <input type="number" id="tx-amount" class="form-input" placeholder="0.00" step="0.01" style="font-size: 24px; font-weight: 700;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+                <label class="form-label">日期</label>
+                <input type="date" id="tx-date" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">分类</label>
+                <select id="tx-category" class="form-input">
+                    <option value="">选择分类</option>
+                    <option value="餐饮美食">🍜 餐饮美食</option>
+                    <option value="交通出行">🚗 交通出行</option>
+                    <option value="购物消费">🛒 购物消费</option>
+                    <option value="居家生活">🏠 居家生活</option>
+                    <option value="休闲娱乐">🎮 休闲娱乐</option>
+                    <option value="人情往来">🎁 人情往来</option>
+                    <option value="医疗健康">💊 医疗健康</option>
+                    <option value="教育培训">📚 教育培训</option>
+                    <option value="金融贷款">💳 金融贷款</option>
+                    <option value="其他支出">📝 其他支出</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">备注</label>
+            <input type="text" id="tx-notes" class="form-input" placeholder="添加备注...">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="addTransaction()">确认添加</button>
+        </div>
+    </div>
+
+    <div id="create-family-modal" class="modal">
+        <h3>创建家庭</h3>
+        <div class="form-group">
+            <label class="form-label">家庭名称</label>
+            <input type="text" id="family-name-input" class="form-input" placeholder="请输入家庭名称">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="confirmCreateFamily()">确认创建</button>
+        </div>
+    </div>
+
+    <div id="invite-member-modal" class="modal">
+        <h3>邀请成员</h3>
+        <div class="form-group">
+            <label class="form-label">成员邮箱</label>
+            <input type="text" id="invite-phone-input" class="form-input" placeholder="请输入11位手机号">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="confirmInviteMember()">发送邀请</button>
+        </div>
+    </div>
+
+    <div id="budget-modal" class="modal">
+        <h3>设置预算</h3>
+        <div class="form-group">
+            <label class="form-label">预算类型</label>
+            <select id="budget-category" class="form-input">
+                <option value="">总预算</option>
+                <option value="餐饮美食">🍜 餐饮美食</option>
+                <option value="交通出行">🚗 交通出行</option>
+                <option value="购物消费">🛒 购物消费</option>
+                <option value="居家生活">🏠 居家生活</option>
+                <option value="休闲娱乐">🎮 休闲娱乐</option>
+                <option value="人情往来">🎁 人情往来</option>
+                <option value="医疗健康">💊 医疗健康</option>
+                <option value="教育培训">📚 教育培训</option>
+                <option value="金融贷款">💳 金融贷款</option>
+                <option value="其他支出">📝 其他支出</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">预算金额</label>
+            <input type="number" id="budget-amount" class="form-input" placeholder="请输入预算金额" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+            <label class="form-label">月份</label>
+            <input type="month" id="budget-month" class="form-input">
+        </div>
+        <div class="form-group" style="margin-top: -4px;">
+            <label style="display:flex; align-items:center; gap:8px; color: var(--text-sec); font-size: 13px;">
+                <input type="checkbox" id="budget-default-toggle">
+                <span>设为默认月预算（当月未设置预算时自动填充）</span>
+            </label>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="saveBudget()">保存</button>
+        </div>
+    </div>
+
+    <div id="root-create-user-modal" class="modal">
+        <h3>新增用户</h3>
+        <div class="form-group">
+            <label class="form-label">手机号</label>
+            <input id="root-create-phone" class="form-input" placeholder="请输入11位手机号">
+        </div>
+        <div class="form-group">
+            <label class="form-label">账号类型</label>
+            <select id="root-create-account-type" class="form-input">
+                <option value="personal">个人账号</option>
+                <option value="family">家庭账号</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="createRootUser()">确认新增并发码</button>
+        </div>
+    </div>
+
+    <div id="root-issue-license-modal" class="modal">
+        <h3>新增授权码</h3>
+        <div class="form-group">
+            <label class="form-label">用户手机号</label>
+            <input id="root-issue-phone" class="form-input" placeholder="请输入11位手机号" onkeydown="if(event.key==='Enter'){event.preventDefault();issueRootLicenseCodes();}">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="issueRootLicenseCodes()">确认新增</button>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const CATEGORY_ICONS = {
+            '餐饮美食': '🍜', '交通出行': '🚗', '购物消费': '🛒', '居家生活': '🏠',
+            '休闲娱乐': '🎮', '人情往来': '🎁', '医疗健康': '💊', '教育培训': '📚',
+            '金融贷款': '💳', '孝敬父母': '❤️', '工作商务': '💼', '其他支出': '📝'
+        };
+
+        const CATEGORY_COLORS = {
+            '餐饮美食': '#f97316', '交通出行': '#3b82f6', '购物消费': '#ec4899',
+            '居家生活': '#8b5cf6', '休闲娱乐': '#10b981', '人情往来': '#f59e0b',
+            '医疗健康': '#ef4444', '教育培训': '#06b6d4', '金融贷款': '#6366f1',
+            '孝敬父母': '#f43f5e', '工作商务': '#84cc16', '其他支出': '#64748b'
+        };
+
+        // State
+        let API_BASE_URL = localStorage.getItem('api_url') || '';
+        let AUTH_TOKEN = localStorage.getItem('auth_token') || '';
+        let CURRENT_FAMILY_ID = localStorage.getItem('family_id') || '';
+        let ACTIVE_LICENSE_CODE = localStorage.getItem('active_license_code') || '';
+        let LAST_LICENSE_SYNC_AT = 0;
+        let TRANSACTIONS = [];
+        const TX_PAGE_SIZE = 50;
+        let TX_CURRENT_PAGE = 1;
+        let trendChart = null;
+        let pieChart = null;
+        let licenseDistChart = null;
+        let STATS_PERIOD = 'week';
+        let deferredPrompt;
+        let CURRENT_USER = null;
+        let CURRENT_ROLE = 'user';
+        let ROOT_USERS = [];
+        let ROOT_TRANSACTIONS = [];
+        const ROOT_TX_PAGE_SIZE = 50;
+        let ROOT_TX_CURRENT_PAGE = 1;
+
+        // Helpers
+        function getCssVar(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        async function parseResponseData(res) {
+            const text = await res.text();
+            if (!text) return null;
+            try {
+                return JSON.parse(text);
+            } catch (_) {
+                return { message: text, detail: text };
+            }
+        }
+
+        function getErrorMessage(payload, fallback = '请求失败') {
+            if (!payload) return fallback;
+            const candidate = payload.message ?? payload.detail ?? payload.error ?? fallback;
+            if (Array.isArray(candidate)) {
+                return candidate.map(item => item?.msg || item?.message || JSON.stringify(item)).join('；');
+            }
+            if (typeof candidate === 'object') {
+                return JSON.stringify(candidate);
+            }
+            return String(candidate || fallback);
+        }
+
+        async function ensureWriteSuccess(res, actionText) {
+            const payload = await parseResponseData(res);
+            if (!res.ok) {
+                throw new Error(getErrorMessage(payload, `${actionText}失败`));
+            }
+            return payload;
+        }
+
+        function showWriteError(actionText, error) {
+            const message = error?.message || '请稍后重试';
+            showToast(`${actionText}失败：${message}`, 'error');
+        }
+
+        function setActiveLicenseCode(code) {
+            ACTIVE_LICENSE_CODE = code ? code.trim() : '';
+            if (ACTIVE_LICENSE_CODE) {
+                localStorage.setItem('active_license_code', ACTIVE_LICENSE_CODE);
+                return;
+            }
+            localStorage.removeItem('active_license_code');
+        }
+
+        function getAuthHeaders(json = false) {
+            const headers = { 'Authorization': `Bearer ${AUTH_TOKEN}` };
+            if (json) headers['Content-Type'] = 'application/json';
+            return headers;
+        }
+
+        function getV2Headers(json = false) {
+            const headers = getAuthHeaders(json);
+            if (ACTIVE_LICENSE_CODE) headers['X-License-Code'] = ACTIVE_LICENSE_CODE;
+            return headers;
+        }
+
+        async function ensureActiveLicenseCode(force = false) {
+            const now = Date.now();
+            if (!force && ACTIVE_LICENSE_CODE && now - LAST_LICENSE_SYNC_AT < 10000) {
+                return true;
+            }
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/license-codes`, { headers: getAuthHeaders() });
+                if (!res.ok) return !!ACTIVE_LICENSE_CODE;
+                const codes = await res.json();
+                const activeItem = codes.find(c => c.code === ACTIVE_LICENSE_CODE);
+                if (activeItem && activeItem.status === 'used') {
+                    LAST_LICENSE_SYNC_AT = now;
+                    return true;
+                }
+                const used = codes.find(c => c.status === 'used');
+                setActiveLicenseCode(used?.code || '');
+                LAST_LICENSE_SYNC_AT = now;
+                return !!used;
+            } catch (_) {
+                return !!ACTIVE_LICENSE_CODE;
+            }
+        }
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('api-url').value = API_BASE_URL;
+            document.getElementById('tx-date').valueAsDate = new Date();
+            
+            // PWA Install Prompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const installBtn = document.getElementById('install-app-btn');
+                if (installBtn) installBtn.classList.remove('hidden');
+            });
+            
+            // Theme listener
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                 setTimeout(() => {
+                     loadCharts();
+                 }, 200);
+            });
+
+            checkAuth();
+        });
+
+        // Auth Logic
+        async function checkAuth() {
+            if (AUTH_TOKEN) {
+                await showMainView();
+            } else {
+                showLoginView();
+            }
+        }
+
+        function showLoginView() {
+            document.getElementById('auth-wrapper').classList.remove('hidden');
+            document.getElementById('app-wrapper').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('register-view').classList.add('hidden');
+        }
+
+        function showRegisterView() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('register-view').classList.remove('hidden');
+        }
+
+        async function showMainView() {
+            document.getElementById('auth-wrapper').classList.add('hidden');
+            document.getElementById('app-wrapper').classList.remove('hidden');
+            const user = await loadUserProfile();
+            CURRENT_USER = user;
+            CURRENT_ROLE = await detectRole();
+            applyRoleLayout();
+            const defaultTab = CURRENT_ROLE === 'root' ? 'root-users' : 'transactions';
+            switchTab(defaultTab);
+            if (CURRENT_ROLE === 'root') {
+                await loadRootUsers();
+                await loadRootLicenseCodes();
+                await loadRootTransactions();
+                return;
+            }
+            await loadMyLicenseCodes();
+            await ensureActiveLicenseCode(true);
+            loadStatsData();
+            loadTransactions();
+            loadBudgetStatus();
+            checkBudgetWarnings();
+        }
+
+        function logout() {
+            AUTH_TOKEN = '';
+            CURRENT_USER = null;
+            CURRENT_ROLE = 'user';
+            setActiveLicenseCode('');
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('family_id');
+            showLoginView();
+        }
+
+        async function login() {
+            const account = document.getElementById('login-phone').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!account || !password) return showToast('请填写完整', 'error');
+            const isPhone = /^1\d{10}$/.test(account);
+            const isEmail = account.includes('@');
+            if (!isPhone && !isEmail) return showToast('手机号格式错误，请输入11位手机号', 'error');
+            
+            showLoading(true);
+            try {
+                let data = null;
+                if (isPhone) {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone: account, password })
+                    });
+                    data = await ensureWriteSuccess(res, '登录');
+                } else {
+                    const adminRes = await fetch(`${API_BASE_URL}/api/admin/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: account, password })
+                    });
+                    data = await ensureWriteSuccess(adminRes, '登录');
+                }
+                AUTH_TOKEN = data.access_token;
+                localStorage.setItem('auth_token', AUTH_TOKEN);
+                showToast('登录成功', 'success');
+                await showMainView();
+            } catch (e) {
+                showWriteError('登录', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm-password').value;
+            
+            if (password !== confirm) return showToast('密码不一致', 'error');
+            
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                await ensureWriteSuccess(res, '注册');
+                showToast('注册成功，请登录', 'success');
+                showLoginView();
+            } catch (e) {
+                showWriteError('注册', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Navigation
+        function switchTab(tabName) {
+            if (tabName === 'fab') return;
+            const userViews = ['transactions', 'stats', 'budget', 'user-licenses'];
+            const rootViews = ['root-users', 'root-licenses', 'root-transactions'];
+            const views = CURRENT_ROLE === 'root' ? rootViews : userViews;
+            if (!views.includes(tabName)) {
+                tabName = CURRENT_ROLE === 'root' ? 'root-users' : 'transactions';
+            }
+            document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => {
+                if (el.dataset.tab === tabName) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+            [...userViews, ...rootViews].forEach(view => {
+                const el = document.getElementById(`${view}-view`);
+                if (!el) return;
+                if (view === tabName) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+            if (tabName === 'stats') {
+                setTimeout(() => {
+                    if (trendChart) trendChart.resize();
+                    if (pieChart) pieChart.resize();
+                    if (licenseDistChart) licenseDistChart.resize();
+                }, 100);
+            }
+            if (tabName === 'budget') {
+                loadBudgetStatus();
+            }
+            if (tabName === 'user-licenses') {
+                loadMyLicenseCodes();
+            }
+            if (tabName === 'root-users') {
+                loadRootUsers();
+            }
+            if (tabName === 'root-licenses') {
+                loadRootLicenseCodes();
+            }
+            if (tabName === 'root-transactions') {
+                loadRootTransactions();
+            }
+        }
+
+        function applyRoleLayout() {
+            const isRoot = CURRENT_ROLE === 'root';
+            document.querySelectorAll('.role-root-only').forEach(el => {
+                el.classList.toggle('hidden', !isRoot);
+            });
+            document.querySelectorAll('.role-user-only').forEach(el => {
+                el.classList.toggle('hidden', isRoot);
+            });
+            const addModalBtn = document.querySelector('#transactions-view .quick-add-btn');
+            if (addModalBtn) addModalBtn.classList.toggle('hidden', isRoot);
+        }
+
+        async function detectRole() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/users`, {
+                    headers: { 'Authorization': `Bearer ${AUTH_TOKEN}` }
+                });
+                if (res.ok) return 'root';
+            } catch (_) {}
+            return 'user';
+        }
+
+        function showQuickAdd() {
+            openModal('add-transaction-modal');
+            setTimeout(() => document.getElementById('tx-amount').focus(), 100);
+        }
+
+        // Transactions
+        async function addTransaction() {
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const dateStr = document.getElementById('tx-date').value;
+            const category = document.getElementById('tx-category').value;
+            const notes = document.getElementById('tx-notes').value;
+            
+            if (isNaN(amount) || amount <= 0) return showToast('请输入有效金额', 'error');
+            if (!dateStr) return showToast('请选择日期', 'error');
+            if (!category) return showToast('请选择分类', 'error');
+            
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v2/transactions`, {
+                    method: 'POST',
+                    headers: getV2Headers(true),
+                    body: JSON.stringify({
+                        amount, category, notes,
+                        date: new Date(dateStr).toISOString(),
+                        time: timeStr
+                    })
+                });
+                await ensureWriteSuccess(res, '添加交易');
+                showToast('添加成功', 'success');
+                document.getElementById('tx-amount').value = '';
+                document.getElementById('tx-notes').value = '';
+                document.getElementById('tx-category').value = '';
+                closeModal();
+                loadTransactions();
+                loadStatsData();
+                loadBudgetStatus();
+            } catch (e) {
+                showWriteError('添加交易', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadTransactions() {
+            await ensureActiveLicenseCode();
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v2/transactions`, {
+                    headers: getV2Headers()
+                });
+                
+                if (res.ok) {
+                    TRANSACTIONS = await res.json();
+                    TX_CURRENT_PAGE = 1;
+                    renderTransactions();
+                    return;
+                }
+                TRANSACTIONS = [];
+                TX_CURRENT_PAGE = 1;
+                renderTransactions();
+            } catch (e) {
+                TRANSACTIONS = [];
+                TX_CURRENT_PAGE = 1;
+                renderTransactions();
+                showWriteError('加载账单', e);
+            }
+        }
+
+        function renderTransactions() {
+            const container = document.getElementById('transactions-container');
+            if (!TRANSACTIONS.length) {
+                container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-sec);">暂无交易记录</div>';
+                return;
+            }
+            
+            const sorted = [...TRANSACTIONS].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const totalCount = sorted.length;
+            const totalPages = Math.max(1, Math.ceil(totalCount / TX_PAGE_SIZE));
+            if (TX_CURRENT_PAGE > totalPages) TX_CURRENT_PAGE = totalPages;
+            const start = (TX_CURRENT_PAGE - 1) * TX_PAGE_SIZE;
+            const pageRows = sorted.slice(start, start + TX_PAGE_SIZE);
+            const html = `
+                <div class="table-card" style="margin-top: 0;">
+                    <div class="table-scroll">
+                        <table class="admin-table" style="min-width: 560px;">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>分类</th>
+                                    <th>备注</th>
+                                    <th>金额</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${pageRows.map(tx => `
+                                    <tr>
+                                        <td class="tx-compact-meta">${formatDateTime(tx.date)}</td>
+                                        <td>${CATEGORY_ICONS[tx.category] || '💰'} ${tx.category || '--'}</td>
+                                        <td title="${(tx.notes || tx.item || tx.merchant || '').replace(/"/g, '&quot;')}">${tx.notes || tx.item || tx.merchant || '--'}</td>
+                                        <td style="font-weight:700;">-¥${Number(tx.amount || 0).toFixed(2)}</td>
+                                        <td><button class="btn btn-danger" style="width:auto; height:30px; padding:0 10px;" onclick="deleteTransaction('${tx.id}')">删除</button></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tx-pager">
+                        <span>共 ${totalCount} 条，每页 ${TX_PAGE_SIZE} 条</span>
+                        <div class="tx-pager-actions">
+                            <button class="btn btn-outline" style="width:auto; height:30px; padding:0 10px;" ${TX_CURRENT_PAGE <= 1 ? 'disabled' : ''} onclick="changeTransactionsPage(-1)">上一页</button>
+                            <span>${TX_CURRENT_PAGE} / ${totalPages}</span>
+                            <button class="btn btn-outline" style="width:auto; height:30px; padding:0 10px;" ${TX_CURRENT_PAGE >= totalPages ? 'disabled' : ''} onclick="changeTransactionsPage(1)">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function changeTransactionsPage(step) {
+            TX_CURRENT_PAGE = Math.max(1, TX_CURRENT_PAGE + step);
+            renderTransactions();
+        }
+
+        async function deleteTransaction(id) {
+            if (!confirm('确认删除?')) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v2/transactions/${id}`, {
+                    method: 'DELETE',
+                    headers: getV2Headers()
+                });
+                await ensureWriteSuccess(res, '删除交易');
+                showToast('删除成功', 'success');
+                loadTransactions();
+                loadStatsData();
+                loadBudgetStatus();
+            } catch (e) {
+                showWriteError('删除交易', e);
+            }
+        }
+
+        // Stats & Charts
+        function getDatesForPeriod(period) {
+            const now = new Date();
+            let start = new Date();
+            let end = new Date();
+            
+            if (period === 'week') {
+                const day = now.getDay() || 7; // 1-7
+                start.setDate(now.getDate() - day + 1);
+                start.setHours(0,0,0,0);
+                end.setHours(23,59,59,999);
+            } else if (period === 'month') {
+                start.setDate(1);
+                start.setHours(0,0,0,0);
+                end.setHours(23,59,59,999);
+            } else if (period === 'year') {
+                start.setMonth(0, 1);
+                start.setHours(0,0,0,0);
+                end.setHours(23,59,59,999);
+            }
+            return { 
+                start: start.toISOString(), 
+                end: end.toISOString() 
+            };
+        }
+
+        function switchStatsPeriod(period, btn) {
+            STATS_PERIOD = period;
+            document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            else {
+                // If called without btn (e.g. init), find the button
+                const buttons = document.querySelectorAll('.segment-btn');
+                if (period === 'week') buttons[0]?.classList.add('active');
+                if (period === 'month') buttons[1]?.classList.add('active');
+                if (period === 'year') buttons[2]?.classList.add('active');
+            }
+            loadStatsData();
+            loadCharts(); // Will use global STATS_PERIOD
+        }
+
+        async function loadStatsData() {
+            await ensureActiveLicenseCode();
+            try {
+                const { start, end } = getDatesForPeriod(STATS_PERIOD);
+                let url = `${API_BASE_URL}/api/v2/stats/summary?start_date=${start}&end_date=${end}`;
+                const res = await fetch(url, { headers: getV2Headers() });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderStats(data);
+                    await loadCharts();
+                } else {
+                    const payload = await parseResponseData(res);
+                    throw new Error(getErrorMessage(payload, '统计数据加载失败'));
+                }
+            } catch (e) {
+                const content = document.getElementById('stats-content');
+                if (content) content.innerHTML = '<div style="text-align:center; color:var(--text-sec); padding: 24px;">暂无统计数据，请先添加交易并确认授权码激活。</div>';
+                showWriteError('加载统计', e);
+            }
+            loadHomeOverview();
+        }
+
+        async function loadHomeOverview() {
+             await ensureActiveLicenseCode();
+             try {
+                const { start, end } = getDatesForPeriod('month');
+                let url = `${API_BASE_URL}/api/v2/stats/summary?start_date=${start}&end_date=${end}`;
+                const res = await fetch(url, { headers: getV2Headers() });
+                if (res.ok) {
+                    const data = await res.json();
+                    const overviewTotal = document.getElementById('overview-total');
+                    if (overviewTotal) overviewTotal.textContent = `¥${data.total_expense.toFixed(2)}`;
+                }
+             } catch(e) {}
+        }
+
+        function renderStats(data) {
+            const html = `
+                <div class="stats-summary">
+                    <div class="stat-box">
+                        <div class="stat-label">总支出</div>
+                        <div class="stat-value expense">¥${data.total_expense.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">交易笔数</div>
+                        <div class="stat-value">${data.transaction_count}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">平均每笔</div>
+                        <div class="stat-value">¥${data.average_amount.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">最大单笔</div>
+                        <div class="stat-value">¥${data.max_amount.toFixed(2)}</div>
+                    </div>
+                </div>
+                <div style="height: 300px; width: 100%; margin-bottom: 24px;" id="trend-chart"></div>
+                <div style="height: 300px; width: 100%; margin-bottom: 24px;" id="pie-chart"></div>
+                <div class="table-card" style="padding: 14px 14px 0;">
+                    <div style="font-size: 13px; color: var(--text-sec); margin-bottom: 8px;">不同激活码分布</div>
+                    <div style="height: 280px; width: 100%;" id="license-dist-chart"></div>
+                </div>
+            `;
+            document.getElementById('stats-content').innerHTML = html;
+        }
+
+        async function loadCharts() {
+            try {
+                let trendUrl = `${API_BASE_URL}/api/v2/stats/trend?period=${STATS_PERIOD}`;
+                const trendRes = await fetch(trendUrl, { headers: getV2Headers() });
+                if (trendRes.ok) {
+                    const rawData = await trendRes.json();
+                    const data = {
+                        dates: rawData.map(item => item.date),
+                        expenses: rawData.map(item => item.amount)
+                    };
+                    initTrendChart(data);
+                }
+
+                const { start, end } = getDatesForPeriod(STATS_PERIOD);
+                let pieUrl = `${API_BASE_URL}/api/v2/stats/category?start_date=${start}&end_date=${end}`;
+                const pieRes = await fetch(pieUrl, { headers: getV2Headers() });
+                if (pieRes.ok) {
+                    const rawData = await pieRes.json();
+                    const data = {
+                        categories: rawData
+                    };
+                    initPieChart(data);
+                }
+
+                let distUrl = `${API_BASE_URL}/api/v2/stats/license-distribution?start_date=${start}&end_date=${end}`;
+                const distRes = await fetch(distUrl, { headers: getV2Headers() });
+                if (distRes.ok) {
+                    const rawData = await distRes.json();
+                    initLicenseDistChart(rawData || []);
+                }
+            } catch (_) {}
+        }
+
+        function initTrendChart(data) {
+            const el = document.getElementById('trend-chart');
+            if (!el) return;
+            if (trendChart) trendChart.dispose();
+            
+            const textColor = getCssVar('--text-sec');
+            const splitLineColor = getCssVar('--border');
+            const primaryColor = getCssVar('--primary');
+            const tooltipBg = getCssVar('--bg-card');
+            const tooltipText = getCssVar('--text-main');
+
+            trendChart = echarts.init(el);
+            
+            trendChart.setOption({
+                tooltip: { 
+                    trigger: 'axis',
+                    backgroundColor: tooltipBg,
+                    borderColor: splitLineColor,
+                    textStyle: { color: tooltipText }
+                },
+                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                xAxis: { 
+                    type: 'category', 
+                    data: data.dates || [],
+                    axisLine: { lineStyle: { color: splitLineColor } },
+                    axisLabel: { color: textColor }
+                },
+                yAxis: { 
+                    type: 'value',
+                    splitLine: { lineStyle: { color: splitLineColor } },
+                    axisLabel: { color: textColor }
+                },
+                series: [{
+                    data: data.expenses || [],
+                    type: 'line',
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: { width: 3, color: primaryColor },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: primaryColor },
+                            { offset: 1, color: 'rgba(99, 102, 241, 0.0)' }
+                        ])
+                    },
+                    itemStyle: { color: primaryColor }
+                }]
+            });
+        }
+
+        function initPieChart(data) {
+            const el = document.getElementById('pie-chart');
+            if (!el) return;
+            if (pieChart) pieChart.dispose();
+            
+            const tooltipBg = getCssVar('--bg-card');
+            const tooltipText = getCssVar('--text-main');
+            const borderColor = getCssVar('--bg-card');
+
+            pieChart = echarts.init(el);
+            
+            const pieData = (data.categories || []).map(item => ({
+                value: item.amount,
+                name: item.category
+            }));
+
+            pieChart.setOption({
+                tooltip: { 
+                    trigger: 'item',
+                    backgroundColor: tooltipBg,
+                    textStyle: { color: tooltipText }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    itemStyle: { borderRadius: 10, borderColor: borderColor, borderWidth: 2 },
+                    label: { color: getCssVar('--text-sec') },
+                    data: pieData
+                }]
+            });
+        }
+
+        function initLicenseDistChart(rows) {
+            const el = document.getElementById('license-dist-chart');
+            if (!el) return;
+            if (licenseDistChart) licenseDistChart.dispose();
+            licenseDistChart = echarts.init(el);
+            const data = (rows || []).map(item => ({
+                name: item.license_code,
+                value: Number(item.amount || 0),
+                count: Number(item.count || 0)
+            }));
+            const textColor = getCssVar('--text-sec');
+            const splitLineColor = getCssVar('--border');
+            const tooltipBg = getCssVar('--bg-card');
+            const tooltipText = getCssVar('--text-main');
+            licenseDistChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: tooltipBg,
+                    borderColor: splitLineColor,
+                    textStyle: { color: tooltipText },
+                    formatter: params => {
+                        const item = params?.[0]?.data;
+                        if (!item) return '';
+                        return `${item.name}<br/>总金额：¥${item.value.toFixed(2)}<br/>交易笔数：${item.count}`;
+                    }
+                },
+                grid: { left: '4%', right: '4%', bottom: '5%', containLabel: true },
+                xAxis: {
+                    type: 'value',
+                    axisLabel: { color: textColor },
+                    splitLine: { lineStyle: { color: splitLineColor } }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: data.map(item => item.name),
+                    axisLabel: {
+                        color: textColor,
+                        formatter: value => value.length > 12 ? `${value.slice(0, 12)}...` : value
+                    },
+                    axisLine: { lineStyle: { color: splitLineColor } }
+                },
+                series: [{
+                    type: 'bar',
+                    data,
+                    barWidth: 18,
+                    itemStyle: {
+                        borderRadius: 6,
+                        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                            { offset: 0, color: '#60a5fa' },
+                            { offset: 1, color: '#6366f1' }
+                        ])
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: textColor,
+                        formatter: p => `¥${Number(p.value.value || 0).toFixed(0)}`
+                    }
+                }]
+            });
+        }
+
+        // Budget & Family (Simplified for brevity but functional)
+        function showBudgetModal() {
+            document.getElementById('budget-amount').value = '';
+            document.getElementById('budget-category').value = '';
+            document.getElementById('budget-default-toggle').checked = false;
+            const now = new Date();
+            const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            document.getElementById('budget-month').value = monthStr;
+            openModal('budget-modal');
+        }
+
+        async function loadBudgetStatus() {
+            await ensureActiveLicenseCode();
+            const now = new Date();
+            let url = `${API_BASE_URL}/api/v2/budgets/status?year=${now.getFullYear()}&month=${now.getMonth()+1}`;
+            
+            try {
+                const res = await fetch(url, { headers: getV2Headers() });
+                if (!res.ok) return;
+                const budgets = await res.json();
+                const totalBudget = budgets.find(b => !b.category) || budgets.find(b => b.category === '总预算');
+                const bar = document.getElementById('overview-budget-bar');
+                const text = document.getElementById('overview-budget-text');
+                const percentText = document.getElementById('overview-budget-percent');
+                if (totalBudget && bar) {
+                    const percent = Math.min(totalBudget.percentage, 100);
+                    bar.style.width = `${percent}%`;
+                    bar.className = 'budget-bar';
+                    if (totalBudget.is_over_budget) bar.classList.add('danger');
+                    else if (totalBudget.percentage > 80) bar.classList.add('warning');
+                    if (text) text.textContent = `${totalBudget.is_over_budget ? '超支' : '剩余'} ¥${Math.abs(totalBudget.remaining_amount).toFixed(0)}`;
+                    if (percentText) percentText.textContent = `${totalBudget.percentage.toFixed(0)}%`;
+                } else if (bar) {
+                    bar.className = 'budget-bar';
+                    bar.style.width = '0%';
+                    if (text) text.textContent = '未设置总预算';
+                    if (percentText) percentText.textContent = '--';
+                }
+                const cardsHtml = budgets.map(b => {
+                    const budgetAmount = Number(b.budget_amount ?? b.amount ?? 0);
+                    return `
+                    <div class="progress-card ${b.is_over_budget ? 'over-budget' : ''}">
+                        <div class="progress-header">
+                            <div class="progress-title">
+                                <span>${CATEGORY_ICONS[b.category] || '💰'}</span>
+                                <span>${b.category || '总预算'}</span>
+                            </div>
+                            <div class="progress-amount" style="color: ${b.is_over_budget ? 'var(--danger)' : 'var(--text-main)'}">
+                                ${b.is_over_budget ? '-' : ''}¥${Math.abs(b.remaining_amount).toFixed(2)}
+                            </div>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${Math.min(b.percentage, 100)}%; background: ${b.is_over_budget ? 'var(--danger)' : 'var(--success)'}"></div>
+                        </div>
+                        <div style="margin-top: 12px; display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-sec);">
+                            <span>已用 ¥${b.spent_amount.toFixed(2)} / ¥${budgetAmount.toFixed(2)}</span>
+                            <span onclick="deleteBudget('${b.budget_id}')" style="cursor: pointer; color: var(--text-sec);">🗑️</span>
+                        </div>
+                    </div>
+                `;
+                }).join('');
+                const year = now.getFullYear();
+                const monthlyRes = await fetch(`${API_BASE_URL}/api/v2/budgets/monthly-status?year=${year}`, { headers: getV2Headers() });
+                const monthly = monthlyRes.ok ? await monthlyRes.json() : [];
+                const tableHtml = `
+                    <div class="table-card" style="margin-top: 14px;">
+                        <div style="padding: 12px 14px; color: var(--text-sec); font-size: 13px;">${year}年每月预算</div>
+                        <div class="table-scroll">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>月份</th>
+                                        <th>月预算</th>
+                                        <th>已用</th>
+                                        <th>剩余</th>
+                                        <th>使用率</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${monthly.map(m => `
+                                        <tr>
+                                            <td>${m.month}月</td>
+                                            <td>¥${Number(m.budget_amount || 0).toFixed(2)}</td>
+                                            <td>¥${Number(m.spent_amount || 0).toFixed(2)}</td>
+                                            <td style="color:${m.is_over_budget ? 'var(--danger)' : 'var(--text-main)'}">${m.is_over_budget ? '-' : ''}¥${Math.abs(Number(m.remaining_amount || 0)).toFixed(2)}</td>
+                                            <td>${Number(m.percentage || 0).toFixed(1)}%</td>
+                                            <td>${m.is_over_budget ? '超支' : '正常'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                const budgetContent = document.getElementById('budget-content');
+                if (budgetContent) budgetContent.innerHTML = (cardsHtml || '<div style="text-align:center; color:var(--text-sec); padding: 20px;">暂无预算设置</div>') + tableHtml;
+            } catch (e) { console.error(e); }
+        }
+
+        async function saveBudget() {
+            await ensureActiveLicenseCode();
+            const amount = parseFloat(document.getElementById('budget-amount').value);
+            const category = document.getElementById('budget-category').value;
+            const monthStr = document.getElementById('budget-month').value;
+            const isDefault = document.getElementById('budget-default-toggle').checked;
+            
+            if (!amount) return showToast('请填写预算金额', 'error');
+            if (isDefault && category) return showToast('默认预算仅支持总预算', 'error');
+            if (!isDefault && !monthStr) return showToast('请填写月份', 'error');
+            const now = new Date();
+            const [year, month] = monthStr ? monthStr.split('-').map(Number) : [now.getFullYear(), null];
+            
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v2/budgets`, {
+                    method: 'POST',
+                    headers: getV2Headers(true),
+                    body: JSON.stringify({
+                        category: isDefault ? null : (category || null),
+                        amount, period: 'monthly', year, month: isDefault ? null : month
+                    })
+                });
+                await ensureWriteSuccess(res, '设置预算');
+                showToast('设置成功', 'success');
+                closeModal();
+                loadBudgetStatus();
+            } catch (e) {
+                showWriteError('设置预算', e);
+            }
+        }
+
+        async function deleteBudget(id) {
+            if(!confirm('确认删除?')) return;
+            await ensureActiveLicenseCode();
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v2/budgets/${id}`, { method: 'DELETE', headers: getV2Headers() });
+                await ensureWriteSuccess(res, '删除预算');
+                showToast('删除成功', 'success');
+                loadBudgetStatus();
+            } catch (e) {
+                showWriteError('删除预算', e);
+            }
+        }
+
+        // Family
+        async function loadFamilyData() {
+            if (CURRENT_ROLE !== 'user') return;
+            if (CURRENT_USER?.account_type !== 'family') {
+                const el = document.getElementById('family-content');
+                if (el) {
+                    el.innerHTML = '<div style="text-align:center; color:var(--text-sec); padding: 24px;">升级到家庭版才可使用家庭成员管理</div>';
+                }
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/families/`, { headers: { 'Authorization': `Bearer ${AUTH_TOKEN}` }});
+                if (res.ok) {
+                    const families = await res.json();
+                    if (families.length > 0) {
+                        CURRENT_FAMILY_ID = families[0].id;
+                        localStorage.setItem('family_id', CURRENT_FAMILY_ID);
+                        loadFamilyMembers(CURRENT_FAMILY_ID);
+                    } else {
+                         document.getElementById('family-content').innerHTML = '<p style="text-align:center; color:var(--text-sec);">暂无家庭</p>';
+                    }
+                }
+            } catch (e) {}
+        }
+
+        async function loadFamilyMembers(id) {
+             const res = await fetch(`${API_BASE_URL}/api/families/${id}/members`, { headers: { 'Authorization': `Bearer ${AUTH_TOKEN}` }});
+             if (res.ok) {
+                 const members = await res.json();
+                 const html = `
+                    <div class="list-group">
+                        ${members.map(m => `
+                            <div class="list-group-item">
+                                <div class="list-group-item-icon" style="background: var(--primary-bg); color: var(--primary);">
+                                    ${m.username[0].toUpperCase()}
+                                </div>
+                                <div class="list-group-item-content">
+                                    <div class="list-group-item-title">${m.username}</div>
+                                    <div class="list-group-item-subtitle">${m.phone || '--'}</div>
+                                </div>
+                                <button class="btn btn-danger" style="width:auto; height:30px; padding:0 10px;" onclick="deleteFamilyMember('${m.id}')">删除</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                 `;
+                 document.getElementById('family-content').innerHTML = html;
+             }
+        }
+
+        function createFamily() {
+            openModal('create-family-modal');
+        }
+
+        async function confirmCreateFamily() {
+            const name = document.getElementById('family-name-input').value;
+            if (!name) return showToast('请输入家庭名称', 'error');
+            
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/families/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` },
+                    body: JSON.stringify({ name })
+                });
+                await ensureWriteSuccess(res, '创建家庭');
+                showToast('创建成功', 'success');
+                closeModal();
+                loadFamilyData();
+            } catch (e) {
+                showWriteError('创建家庭', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function confirmInviteMember() {
+            const phone = document.getElementById('invite-phone-input').value.trim();
+            if (!/^1\d{10}$/.test(phone)) return showToast('请输入11位手机号', 'error');
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/families/${CURRENT_FAMILY_ID}/invite`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` },
+                    body: JSON.stringify({ phone })
+                });
+                await ensureWriteSuccess(res, '邀请成员');
+                showToast('新增成员成功', 'success');
+                closeModal();
+                loadFamilyMembers(CURRENT_FAMILY_ID);
+            } catch (e) {
+                showWriteError('邀请成员', e);
+            }
+        }
+
+        async function deleteFamilyMember(memberId) {
+            if (!CURRENT_FAMILY_ID) return;
+            if (!confirm('确认删除该成员?')) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/families/${CURRENT_FAMILY_ID}/members/${memberId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${AUTH_TOKEN}` }
+                });
+                await ensureWriteSuccess(res, '删除成员');
+                showToast('删除成功', 'success');
+                loadFamilyMembers(CURRENT_FAMILY_ID);
+            } catch (e) {
+                showWriteError('删除成员', e);
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/me`, { headers: { 'Authorization': `Bearer ${AUTH_TOKEN}` }});
+                if (!res.ok) return null;
+                const user = await res.json();
+                const nameEl = document.getElementById('setting-username');
+                const phoneEl = document.getElementById('setting-phone');
+                const accountTypeEl = document.getElementById('setting-account-type');
+                if (nameEl) nameEl.textContent = user.username || '--';
+                if (phoneEl) phoneEl.textContent = user.phone ? `手机号：${user.phone}` : '手机号：--';
+                if (accountTypeEl) accountTypeEl.textContent = `账号类型：${user.account_type === 'family' ? '家庭版' : '个人版'}`;
+                return user;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function formatDateTime(value) {
+            if (!value) return '--';
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return '--';
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const h = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${day} ${h}:${mm}`;
+        }
+
+        function statusText(status) {
+            if (status === 'unused') return '未使用';
+            if (status === 'used') return '已使用';
+            if (status === 'disabled') return '已禁用';
+            return status || '--';
+        }
+
+        function renderRootUsers(users) {
+            const container = document.getElementById('root-users-container');
+            if (!container) return;
+            if (!users.length) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sec);">暂无用户</div>';
+                return;
+            }
+            container.innerHTML = `
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>用户名</th>
+                                    <th>手机号</th>
+                                    <th>账号类型</th>
+                                    <th>创建时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${users.map(u => `
+                                    <tr>
+                                        <td>${u.username}</td>
+                                        <td>${u.phone || '--'}</td>
+                                        <td>${u.account_type === 'family' ? '家庭' : '个人'}</td>
+                                        <td>${formatDateTime(u.created_at)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openRootCreateUserModal() {
+            const phoneEl = document.getElementById('root-create-phone');
+            const accountTypeEl = document.getElementById('root-create-account-type');
+            if (phoneEl) phoneEl.value = '';
+            if (accountTypeEl) accountTypeEl.value = 'personal';
+            openModal('root-create-user-modal');
+            setTimeout(() => phoneEl?.focus(), 100);
+        }
+
+        function openRootIssueLicenseModal() {
+            const phoneEl = document.getElementById('root-issue-phone');
+            if (phoneEl) phoneEl.value = '';
+            openModal('root-issue-license-modal');
+            setTimeout(() => phoneEl?.focus(), 100);
+        }
+
+        async function loadRootUsers() {
+            if (CURRENT_ROLE !== 'root') return;
+            const phone = document.getElementById('root-user-phone-filter')?.value.trim() || '';
+            const accountType = document.getElementById('root-user-account-type-filter')?.value || '';
+            const params = new URLSearchParams();
+            if (phone) params.set('phone', phone);
+            if (accountType) params.set('account_type', accountType);
+            const query = params.toString();
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/users${query ? `?${query}` : ''}`, { headers: getAuthHeaders() });
+                if (!res.ok) return;
+                ROOT_USERS = await res.json();
+                renderRootUsers(ROOT_USERS);
+            } catch (_) {}
+        }
+
+        async function createRootUser() {
+            const phone = document.getElementById('root-create-phone').value.trim();
+            const accountType = document.getElementById('root-create-account-type').value;
+            if (!phone) return showToast('请填写手机号', 'error');
+            if (!/^1\d{10}$/.test(phone)) return showToast('手机号格式错误，请输入11位手机号', 'error');
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/users`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify({ phone, account_type: accountType })
+                });
+                const data = await ensureWriteSuccess(res, '创建用户');
+                showToast(`创建成功，默认密码：${data.initial_password}，已自动发放${data.issued_license_count}个授权码`, 'success');
+                document.getElementById('root-create-phone').value = '';
+                closeModal();
+                await loadRootUsers();
+                await loadRootLicenseCodes();
+            } catch (e) {
+                showWriteError('创建用户', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadRootLicenseCodes() {
+            if (CURRENT_ROLE !== 'root') return;
+            const phone = document.getElementById('root-license-phone-filter')?.value.trim() || '';
+            const code = document.getElementById('root-license-code-filter')?.value.trim() || '';
+            const params = new URLSearchParams();
+            if (phone) params.set('phone', phone);
+            if (code) params.set('code', code);
+            const query = params.toString();
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/license-codes${query ? `?${query}` : ''}`, { headers: getAuthHeaders() });
+                if (!res.ok) return;
+                const codes = await res.json();
+                renderRootLicenseCodes(codes);
+            } catch (_) {}
+        }
+
+        function renderRootLicenseCodes(codes) {
+            const container = document.getElementById('root-license-container');
+            if (!container) return;
+            if (!codes.length) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sec);">暂无授权码</div>';
+                return;
+            }
+            container.innerHTML = `
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>手机号</th>
+                                    <th>授权码</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${codes.map(c => `
+                                    <tr>
+                                        <td>${c.phone || '--'}</td>
+                                        <td>${c.code}</td>
+                                        <td><span class="status-pill ${c.status}">${statusText(c.status)}</span></td>
+                                        <td>${formatDateTime(c.created_at)}</td>
+                                        <td class="action-row">
+                                            <button class="btn btn-outline" style="width:auto; height:32px; padding:0 10px;" onclick="copyLicenseCode('${c.code}')">复制</button>
+                                            <button class="btn btn-secondary" style="width:auto; height:32px; padding:0 10px;" onclick="resetRootLicenseCode('${c.id}')">启用</button>
+                                            <button class="btn btn-outline" style="width:auto; height:32px; padding:0 10px;" onclick="toggleRootLicenseCode('${c.id}', true)">禁用</button>
+                                            <button class="btn btn-danger" style="width:auto; height:32px; padding:0 10px;" onclick="deleteRootLicenseCode('${c.id}')">删除</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function copyLicenseCode(code) {
+            try {
+                await navigator.clipboard.writeText(code);
+                showToast('授权码已复制', 'success');
+            } catch (_) {
+                showToast(`授权码：${code}`, 'success');
+            }
+        }
+
+        function handleRootLicenseSearchKeydown(event) {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+            loadRootLicenseCodes();
+        }
+
+        async function issueRootLicenseCodes() {
+            const phone = document.getElementById('root-issue-phone').value.trim();
+            if (!/^1\d{10}$/.test(phone)) return showToast('新增授权码需要输入11位手机号', 'error');
+            const body = { phone };
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/license-codes/issue`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify(body)
+                });
+                await ensureWriteSuccess(res, '发放授权码');
+                showToast('发放授权码成功', 'success');
+                document.getElementById('root-issue-phone').value = '';
+                closeModal();
+                await loadRootLicenseCodes();
+            } catch (e) {
+                showWriteError('发放授权码', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function toggleRootLicenseCode(id, shouldDisable) {
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/license-codes/${id}`, {
+                    method: 'PATCH',
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify({ disabled: shouldDisable })
+                });
+                await ensureWriteSuccess(res, '更新授权码状态');
+                showToast('授权码状态已更新', 'success');
+                await loadRootLicenseCodes();
+            } catch (e) {
+                showWriteError('更新授权码状态', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function resetRootLicenseCode(id) {
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/license-codes/${id}`, {
+                    method: 'PATCH',
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify({ disabled: false })
+                });
+                await ensureWriteSuccess(res, '启用授权码');
+                showToast('授权码已启用', 'success');
+                await loadRootLicenseCodes();
+            } catch (e) {
+                showWriteError('启用授权码', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function deleteRootLicenseCode(id) {
+            if (!confirm('确认删除授权码?')) return;
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/license-codes/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                await ensureWriteSuccess(res, '删除授权码');
+                showToast('授权码已删除', 'success');
+                await loadRootLicenseCodes();
+            } catch (e) {
+                showWriteError('删除授权码', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadRootTransactions() {
+            if (CURRENT_ROLE !== 'root') return;
+            const phone = document.getElementById('root-tx-phone-filter')?.value.trim() || '';
+            const code = document.getElementById('root-tx-license-filter')?.value.trim() || '';
+            const params = new URLSearchParams();
+            if (phone) params.set('phone', phone);
+            if (code) params.set('license_code', code);
+            const query = params.toString();
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/transactions${query ? `?${query}` : ''}`, { headers: getAuthHeaders() });
+                if (!res.ok) return;
+                ROOT_TRANSACTIONS = await res.json();
+                ROOT_TX_CURRENT_PAGE = 1;
+                renderRootTransactions(ROOT_TRANSACTIONS);
+            } catch (_) {}
+        }
+
+        function renderRootTransactions(rows) {
+            const container = document.getElementById('root-transactions-container');
+            if (!container) return;
+            if (!rows.length) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sec);">暂无账单</div>';
+                return;
+            }
+            const totalCount = rows.length;
+            const totalPages = Math.max(1, Math.ceil(totalCount / ROOT_TX_PAGE_SIZE));
+            if (ROOT_TX_CURRENT_PAGE > totalPages) ROOT_TX_CURRENT_PAGE = totalPages;
+            const start = (ROOT_TX_CURRENT_PAGE - 1) * ROOT_TX_PAGE_SIZE;
+            const pageRows = rows.slice(start, start + ROOT_TX_PAGE_SIZE);
+            container.innerHTML = `
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>手机号</th>
+                                    <th>授权码</th>
+                                    <th>金额</th>
+                                    <th>分类</th>
+                                    <th>备注</th>
+                                    <th>日期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${pageRows.map(r => `
+                                    <tr>
+                                        <td>${r.phone || '--'}</td>
+                                        <td>${r.license_code || '--'}</td>
+                                        <td>¥${Number(r.amount || 0).toFixed(2)}</td>
+                                        <td>${r.category || '--'}</td>
+                                        <td>${r.notes || r.item || '--'}</td>
+                                        <td>${formatDateTime(r.date)}</td>
+                                        <td><button class="btn btn-danger" style="width:auto; height:32px; padding:0 10px;" onclick="deleteRootTransaction('${r.id}')">删除</button></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tx-pager">
+                        <span>共 ${totalCount} 条，每页 ${ROOT_TX_PAGE_SIZE} 条</span>
+                        <div class="tx-pager-actions">
+                            <button class="btn btn-outline" style="width:auto; height:30px; padding:0 10px;" ${ROOT_TX_CURRENT_PAGE <= 1 ? 'disabled' : ''} onclick="changeRootTransactionsPage(-1)">上一页</button>
+                            <span>${ROOT_TX_CURRENT_PAGE} / ${totalPages}</span>
+                            <button class="btn btn-outline" style="width:auto; height:30px; padding:0 10px;" ${ROOT_TX_CURRENT_PAGE >= totalPages ? 'disabled' : ''} onclick="changeRootTransactionsPage(1)">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function changeRootTransactionsPage(step) {
+            ROOT_TX_CURRENT_PAGE = Math.max(1, ROOT_TX_CURRENT_PAGE + step);
+            renderRootTransactions(ROOT_TRANSACTIONS);
+        }
+
+        async function deleteRootTransaction(id) {
+            if (!confirm('确认删除账单?')) return;
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/transactions/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                await ensureWriteSuccess(res, '删除账单');
+                showToast('账单已删除', 'success');
+                await loadRootTransactions();
+            } catch (e) {
+                showWriteError('删除账单', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadMyLicenseCodes() {
+            if (CURRENT_ROLE !== 'user') return;
+            const container = document.getElementById('user-license-container');
+            const summary = document.getElementById('user-license-summary');
+            if (!container || !summary) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/auth/license-codes`, { headers: getAuthHeaders() });
+                if (!res.ok) {
+                    const payload = await parseResponseData(res);
+                    const msg = getErrorMessage(payload, '授权码加载失败');
+                    if (res.status === 401) {
+                        summary.textContent = '登录已失效';
+                        container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sec);">登录已失效，请重新登录</div>';
+                        showToast('登录已失效，请重新登录', 'error');
+                        logout();
+                        return;
+                    }
+                    container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-sec);">${msg}</div>`;
+                    summary.textContent = '授权码加载失败';
+                    return;
+                }
+                const data = await res.json();
+                const codes = Array.isArray(data) ? data : [];
+                const activeItem = codes.find(c => c.code === ACTIVE_LICENSE_CODE);
+                const hasCallableActive = !!activeItem && activeItem.status === 'used';
+                if (!hasCallableActive) {
+                    const preferred = codes.find(c => c.status === 'used');
+                    setActiveLicenseCode(preferred?.code || '');
+                }
+                LAST_LICENSE_SYNC_AT = Date.now();
+                summary.textContent = ACTIVE_LICENSE_CODE
+                    ? `共 ${codes.length} 个授权码，当前授权码：${ACTIVE_LICENSE_CODE}`
+                    : `共 ${codes.length} 个授权码（未检测到已激活授权码）`;
+                if (!codes.length) {
+                    container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sec);">暂无授权码</div>';
+                    return;
+                }
+                container.innerHTML = `
+                    <div class="table-card">
+                        <div class="table-scroll">
+                            <table class="admin-table" style="min-width: 560px;">
+                                <thead>
+                                    <tr>
+                                        <th>授权码</th>
+                                        <th>状态</th>
+                                        <th>创建时间</th>
+                                        <th>使用时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${codes.map(c => `
+                                        <tr>
+                                            <td>${c.code}</td>
+                                            <td><span class="status-pill ${c.status}">${statusText(c.status)}</span></td>
+                                            <td>${formatDateTime(c.created_at)}</td>
+                                            <td>${formatDateTime(c.used_at)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                summary.textContent = '授权码加载失败';
+                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-sec);">${e?.message || '请稍后重试'}</div>`;
+            }
+        }
+
+        async function activateUserLicense(code) {
+            if (!code) return showToast('授权码为空', 'error');
+            showLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v2/install/verify`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify({ code })
+                });
+                await ensureWriteSuccess(res, '激活授权码');
+                setActiveLicenseCode(code);
+                showToast('授权码已激活，V2 通道可用', 'success');
+                await loadMyLicenseCodes();
+                loadTransactions();
+                loadStatsData();
+                loadBudgetStatus();
+            } catch (e) {
+                showWriteError('激活授权码', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function installPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            deferredPrompt = null;
+            document.getElementById('install-app-btn').classList.add('hidden');
+        }
+
+        // Utils
+        function showToast(msg, type = 'success') {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = `toast ${type} show`;
+            setTimeout(() => el.className = 'toast', 3000);
+        }
+        
+        function showLoading(show) {
+            const el = document.getElementById('loading-overlay');
+            if (show) el.classList.add('show');
+            else el.classList.remove('show');
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal, .modal-overlay').forEach(el => el.classList.remove('show'));
+        }
+
+        function openModal(id) {
+            document.getElementById('modal-overlay').classList.add('show');
+            document.getElementById(id).classList.add('show');
+        }
+
+        function saveSettings() {
+             const url = document.getElementById('api-url').value;
+             if (url) {
+                 localStorage.setItem('api_url', url);
+                 API_BASE_URL = url;
+                 showToast('保存成功', 'success');
+             }
+        }
+        
+        async function checkBudgetWarnings() {
+            try {
+                const now = new Date();
+                let url = `${API_BASE_URL}/api/v2/budgets/status?year=${now.getFullYear()}&month=${now.getMonth()+1}`;
+                const res = await fetch(url, { headers: getV2Headers() });
+                if (res.ok) {
+                    const budgets = await res.json();
+                    const over = budgets.filter(b => b.is_over_budget);
+                    const container = document.getElementById('budget-warning-container');
+                    
+                    if (over.length > 0 && container) {
+                        const msg = over.map(b => `${b.category||'总预算'}超支¥${Math.abs(b.remaining_amount).toFixed(0)}`).join(', ');
+                        container.innerHTML = `
+                            <div class="budget-warning-banner">
+                                <span>⚠️ <strong>警告:</strong> ${msg}</span>
+                            </div>
+                        `;
+                    } else if (container) {
+                        container.innerHTML = '';
+                    }
+                }
+            } catch (e) { console.error(e); }
+        }
+
+    </script>
+</body>
+</html>

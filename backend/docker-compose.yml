@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: jizhang_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: jizhang_db
+      MYSQL_USER: jizhang_user
+      MYSQL_PASSWORD: jizhang_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: jizhang_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: jizhang_backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: mysql+aiomysql://jizhang_user:jizhang_password@mysql:3306/jizhang_db
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: your-secret-key-here-change-in-production
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+      - ../public/config.json:/app/config.json:ro
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    container_name: jizhang_frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ../frontend:/usr/share/nginx/html
+      - ../frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:

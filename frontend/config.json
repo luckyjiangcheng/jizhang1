@@ -1,0 +1,44 @@
+{
+  "api_base_url": "",
+  "api_timeout": 30000,
+  "version": "1.0.0",
+  "features": {
+    "family_sharing": true,
+    "ai_recognition": true,
+    "offline_mode": true,
+    "data_export": true
+  },
+  "endpoints": {
+    "auth": {
+      "register": "/api/auth/register",
+      "login": "/api/auth/login",
+      "me": "/api/auth/me"
+    },
+    "families": {
+      "create": "/api/families/",
+      "list": "/api/families/",
+      "invite": "/api/families/{family_id}/invite",
+      "members": "/api/families/{family_id}/members"
+    },
+    "transactions": {
+      "create": "/api/transactions/",
+      "list": "/api/transactions/",
+      "update": "/api/transactions/{transaction_id}",
+      "delete": "/api/transactions/{transaction_id}"
+    },
+    "stats": {
+      "summary": "/api/stats/summary",
+      "category": "/api/stats/category",
+      "trend": "/api/stats/trend"
+    },
+    "ai": {
+      "extract": "/api/ai/extract"
+    },
+    "version": {
+      "migrate": "/api/version/migrate-to-server",
+      "export": "/api/version/export-csv",
+      "switch": "/api/version/switch-version",
+      "status": "/api/version/version-status"
+    }
+  }
+}
