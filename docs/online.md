@@ -4,8 +4,8 @@
 
 ## 1. 部署目标
 
-- 前端访问地址：`http://<你的服务器公网IP>/`
-- 后端接口地址：`http://<你的服务器公网IP>:8000`
+- 前端访问地址：`http://39.107.253.44/`
+- 后端接口地址：`http://39.107.253.44:8000`
 - 关键接口：
   - `POST /api/v2/shortcut/transactions`
   - `GET /api/v2/shortcut/transactions/dashboardforcsv`
@@ -16,7 +16,7 @@
 
 - 地域：就近（如华东/华北）
 - 规格：建议至少 `2核4G`
-- 系统：Ubuntu 22.04 LTS
+- 系统：CentOS 7/8/Stream（你当前为 CentOS）
 - 系统盘：建议 40G+
 
 ### 2.2 安全组放行
@@ -33,27 +33,60 @@
 
 ## 3. 服务器初始化
 
-SSH 登录 ECS 后执行：
+SSH 登录 ECS 后执行（CentOS）：
 
 ```bash
-sudo apt update
-sudo apt install -y ca-certificates curl gnupg git
+sudo yum update -y
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2 git curl
 ```
 
-安装 Docker：
+安装 Docker 与 Docker Compose：
 
 ```bash
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo $VERSION_CODENAME) stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo systemctl enable docker
 sudo systemctl start docker
+docker --version
+docker compose version
+```
+
+安装阶段建议固定配置 Docker 镜像加速器（阿里云 ECS 强烈建议），避免后续 `docker pull` 或 `docker compose up` 因 Docker Hub 超时失败：
+
+```bash
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json > /dev/null <<'EOF'
+{
+  "registry-mirrors": [
+    "https://mirrors.aliyun.com",
+    "https://docker.m.daocloud.io"
+  ]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+docker info | grep -A 3 "Registry Mirrors"
+```
+
+说明：
+
+- 这是安装步骤的一部分，不是故障后再处理。
+- 目标是确保 `mysql:8.0`、`redis:7-alpine`、`nginx:alpine` 这些基础镜像可稳定拉取。
+
+安装完成后，先测试镜像拉取：
+
+```bash
+docker pull mysql:8.0
+docker pull redis:7-alpine
+docker pull nginx:alpine
+```
+
+如果你的 CentOS 环境没有 `docker compose` 子命令，可改用 `docker-compose`：
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
 ```
 
 ## 4. 上传项目代码
@@ -61,14 +94,14 @@ sudo systemctl start docker
 方式一（推荐）：
 
 ```bash
-git clone <你的仓库地址> jizhang1
+git clone https://github.com/luckyjiangcheng/jizhang1.git jizhang1
 cd jizhang1
 ```
 
 方式二（本地打包上传）：
 
 - 本地压缩项目上传到服务器
-- 解压到如 `/opt/jizhang1`
+- 解压到如 `/root/jizhang1`
 
 ## 5. 部署前配置检查（重点）
 
@@ -96,7 +129,7 @@ cd jizhang1
 在服务器执行：
 
 ```bash
-cd /opt/jizhang1/backend
+cd /root/jizhang1/backend
 docker compose down
 docker compose up -d --build
 ```
@@ -133,14 +166,14 @@ curl http://127.0.0.1:8000/health
 在你本地电脑执行：
 
 ```bash
-curl http://<公网IP>:8000/health
-curl -I http://<公网IP>/
+curl http://39.107.253.44:8000/health
+curl -I http://39.107.253.44/
 ```
 
 ### 7.3 关键接口检查
 
 ```bash
-curl -X POST "http://<公网IP>:8000/api/v2/shortcut/transactions" \
+curl -X POST "http://39.107.253.44:8000/api/v2/shortcut/transactions" \
   -H "Content-Type: application/json" \
   -d '{
     "license_code":"LC-你的授权码",
@@ -151,7 +184,7 @@ curl -X POST "http://<公网IP>:8000/api/v2/shortcut/transactions" \
 CSV：
 
 ```bash
-curl -G "http://<公网IP>:8000/api/v2/shortcut/transactions/dashboardforcsv" \
+curl -G "http://39.107.253.44:8000/api/v2/shortcut/transactions/dashboardforcsv" \
   --data-urlencode "license_code=LC-你的授权码"
 ```
 
@@ -159,8 +192,8 @@ curl -G "http://<公网IP>:8000/api/v2/shortcut/transactions/dashboardforcsv" \
 
 把快捷指令中的接口域名统一改为公网地址：
 
-- 写入接口：`http://<公网IP>:8000/api/v2/shortcut/transactions`
-- CSV 接口：`http://<公网IP>:8000/api/v2/shortcut/transactions/dashboardforcsv?license_code=...`
+- 写入接口：`http://39.107.253.44:8000/api/v2/shortcut/transactions`
+- CSV 接口：`http://39.107.253.44:8000/api/v2/shortcut/transactions/dashboardforcsv?license_code=...`
 
 注意：
 
@@ -173,7 +206,7 @@ curl -G "http://<公网IP>:8000/api/v2/shortcut/transactions/dashboardforcsv" \
 查看日志：
 
 ```bash
-cd /opt/jizhang1/backend
+cd /root/jizhang1/backend
 docker compose logs -f backend
 docker compose logs -f frontend
 ```
@@ -188,7 +221,7 @@ docker restart jizhang_frontend
 仅重建后端：
 
 ```bash
-cd /opt/jizhang1/backend
+cd /root/jizhang1/backend
 docker compose up -d --build backend
 ```
 
@@ -224,4 +257,3 @@ docker logs --tail 200 jizhang_backend
 - 关闭公网 3306/6379
 - 定期备份 MySQL 数据卷
 - 增加应用监控与日志轮转
-

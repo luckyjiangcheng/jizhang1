@@ -3,7 +3,10 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # 安装系统依赖
-RUN apt-get update && apt-get install -y \
+RUN if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
+    sed -i 's|http://deb.debian.org/debian|https://mirrors.aliyun.com/debian|g; s|http://deb.debian.org/debian-security|https://mirrors.aliyun.com/debian-security|g' /etc/apt/sources.list.d/debian.sources; \
+    fi && \
+    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 update && apt-get install -y \
     gcc \
     default-libmysqlclient-dev \
     pkg-config \
