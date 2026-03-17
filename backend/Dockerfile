@@ -16,8 +16,28 @@ RUN if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
 # 复制依赖文件
 COPY requirements.txt .
 
-# 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt
+# 安装Python依赖（多镜像兜底，避免网络抖动导致构建失败）
+RUN set -eux; \
+    for index_url in \
+      https://mirrors.aliyun.com/pypi/simple \
+      https://pypi.tuna.tsinghua.edu.cn/simple \
+      https://pypi.org/simple; do \
+      echo "Try pip index: ${index_url}"; \
+      pip install --no-cache-dir \
+        --disable-pip-version-check \
+        --default-timeout=180 \
+        --retries 20 \
+        --trusted-host mirrors.aliyun.com \
+        --trusted-host pypi.tuna.tsinghua.edu.cn \
+        --trusted-host pypi.org \
+        --trusted-host files.pythonhosted.org \
+        -i "${index_url}" \
+        -r requirements.txt && exit 0 || true; \
+      echo "pip install failed on ${index_url}, fallback to next mirror..."; \
+      sleep 3; \
+    done; \
+    echo "pip install failed on all mirrors"; \
+    exit 1
 
 # 复制应用代码
 COPY . .
