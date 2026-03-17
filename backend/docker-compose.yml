@@ -9,8 +9,6 @@ services:
       MYSQL_DATABASE: jizhang_db
       MYSQL_USER: jizhang_user
       MYSQL_PASSWORD: jizhang_password
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
@@ -19,8 +17,6 @@ services:
   redis:
     image: redis:7-alpine
     container_name: jizhang_redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
