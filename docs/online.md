@@ -124,6 +124,31 @@ cd jizhang1
 - `backend/docker-compose.yml` 中数据库密码
 - `backend/.env`（若使用）中的 `SECRET_KEY`
 
+### 5.3 生产版端口策略（必须做）
+
+为避免宿主机端口冲突（如本机已有 Redis 占用 `6379`）并降低暴露面，建议在生产环境中：
+
+- `mysql` 不映射 `3306` 到宿主机
+- `redis` 不映射 `6379` 到宿主机
+- 仅保留前端 `80`（以及后端 `8000`，若你需要直连 API）
+
+请在 `backend/docker-compose.yml` 中删除或注释：
+
+```yaml
+mysql:
+  # ports:
+  #   - "3306:3306"
+
+redis:
+  # ports:
+  #   - "6379:6379"
+```
+
+说明：
+
+- 应用容器之间通过 Docker 内部网络互通，不依赖宿主机端口映射。
+- 这一步放在启动前执行，可避免 `bind: address already in use` 启动失败。
+
 ## 6. 启动服务
 
 在服务器执行：
