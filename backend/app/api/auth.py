@@ -48,7 +48,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     return new_user
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     # 查找用户（支持账号或用户名登录）
     result = await db.execute(
@@ -80,7 +80,46 @@ async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
         data={"sub": user.id}, expires_delta=access_token_expires
     )
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    # 获取同一账号下的所有用户
+    user_ids = [user.id]
+    if user.phone:
+        users_result = await db.execute(
+            select(User.id).where(
+                and_(
+                    User.phone == user.phone,
+                    User.system_role == SystemRole.USER
+                )
+            )
+        )
+        ids = [item for item in users_result.scalars().all()]
+        if ids:
+            user_ids = ids
+    
+    # 获取这些用户的所有授权码
+    license_codes_result = await db.execute(
+        select(LicenseCode)
+        .where(LicenseCode.user_id.in_(user_ids))
+        .order_by(LicenseCode.created_at.desc())
+    )
+    license_codes = license_codes_result.scalars().all()
+    
+    # 构建授权码响应
+    license_codes_response = []
+    for code in license_codes:
+        license_codes_response.append({
+            "id": code.id,
+            "code": code.code,
+            "status": code.status,
+            "user_id": code.user_id,
+            "expires_at": code.expires_at,
+            "created_at": code.created_at
+        })
+    
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "license_codes": license_codes_response
+    }
 
 
 @router.get("/me", response_model=UserResponse)

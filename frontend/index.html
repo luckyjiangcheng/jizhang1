@@ -2098,6 +2098,10 @@
                 }
                 AUTH_TOKEN = data.access_token;
                 localStorage.setItem('auth_token', AUTH_TOKEN);
+                // 保存授权码信息（如果有）
+                if (data.license_codes) {
+                    localStorage.setItem('license_codes', JSON.stringify(data.license_codes));
+                }
                 showToast('登录成功', 'success');
                 await showMainView();
             } catch (e) {
@@ -3264,23 +3268,39 @@
             const summary = document.getElementById('user-license-summary');
             if (!container || !summary) return;
             try {
-                const res = await fetch(`${API_BASE_URL}/api/auth/license-codes`, { headers: getAuthHeaders() });
-                if (!res.ok) {
-                    const payload = await parseResponseData(res);
-                    const msg = getErrorMessage(payload, '授权码加载失败');
-                    if (res.status === 401) {
-                        summary.textContent = '登录已失效';
-                        container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sec);">登录已失效，请重新登录</div>';
-                        showToast('登录已失效，请重新登录', 'error');
-                        logout();
+                // 优先使用本地存储的授权码信息
+                let codes = [];
+                const savedLicenseCodes = localStorage.getItem('license_codes');
+                if (savedLicenseCodes) {
+                    try {
+                        codes = JSON.parse(savedLicenseCodes);
+                    } catch (e) {
+                        console.error('解析授权码信息失败', e);
+                    }
+                }
+                
+                // 如果本地没有，从API获取
+                if (!codes.length) {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/license-codes`, { headers: getAuthHeaders() });
+                    if (!res.ok) {
+                        const payload = await parseResponseData(res);
+                        const msg = getErrorMessage(payload, '授权码加载失败');
+                        if (res.status === 401) {
+                            summary.textContent = '登录已失效';
+                            container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sec);">登录已失效，请重新登录</div>';
+                            showToast('登录已失效，请重新登录', 'error');
+                            logout();
+                            return;
+                        }
+                        container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-sec);">${msg}</div>`;
+                        summary.textContent = '授权码加载失败';
                         return;
                     }
-                    container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-sec);">${msg}</div>`;
-                    summary.textContent = '授权码加载失败';
-                    return;
+                    const data = await res.json();
+                    codes = Array.isArray(data) ? data : [];
+                    // 保存到本地存储
+                    localStorage.setItem('license_codes', JSON.stringify(codes));
                 }
-                const data = await res.json();
-                const codes = Array.isArray(data) ? data : [];
                 const activeItem = codes.find(c => c.code === ACTIVE_LICENSE_CODE);
                 const hasCallableActive = !!activeItem && activeItem.status === 'used';
                 if (!hasCallableActive) {
