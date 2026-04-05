@@ -226,7 +226,61 @@ curl -G "http://39.107.253.44:8000/api/v2/shortcut/transactions/dashboardforcsv"
 - 不要在 URL 字段里混入多行文本或字典对象
 - 手机若使用 5G，不能访问内网 IP（10.x/192.168.x），必须公网地址或 VPN
 
-## 9. 常用运维命令
+## 9. 一键重启部署脚本
+
+项目根目录提供了 `restart.sh` 一键重启脚本，支持以下操作：
+
+### 9.1 使用方法
+
+```bash
+cd /root/jizhang1
+bash restart.sh [选项]
+```
+
+### 9.2 可用选项
+
+| 选项 | 说明 | 示例 |
+|------|------|------|
+| `-a, --all` | 完整重启（拉取代码 + 重建所有服务）**（默认）** | `bash restart.sh -a` |
+| `-b, --backend` | 仅重启后端服务 | `bash restart.sh -b` |
+| `-f, --frontend` | 仅重启前端服务 | `bash restart.sh -f` |
+| `-c, --code` | 仅拉取最新代码（不重启） | `bash restart.sh -c` |
+| `-s, --status` | 查看服务状态 | `bash restart.sh -s` |
+| `-l, --logs` | 查看后端日志（Ctrl+C 退出） | `bash restart.sh -l` |
+| `-h, --help` | 显示帮助信息 | `bash restart.sh -h` |
+
+### 9.3 常用场景
+
+**场景一：日常更新代码后重启**
+```bash
+bash restart.sh
+```
+
+**场景二：仅修改了后端代码**
+```bash
+bash restart.sh -b
+```
+
+**场景三：仅修改了前端代码**
+```bash
+bash restart.sh -f
+```
+
+**场景四：查看服务状态和日志**
+```bash
+bash restart.sh -s   # 查看状态
+bash restart.sh -l   # 查看日志
+```
+
+### 9.4 脚本功能说明
+
+- ✅ 自动拉取最新 Git 代码
+- ✅ 自动停止旧容器并重建
+- ✅ 自动执行健康检查
+- ✅ 显示服务状态信息
+- ✅ 支持单独重启前后端
+
+## 10. 常用运维命令
 
 查看日志：
 
