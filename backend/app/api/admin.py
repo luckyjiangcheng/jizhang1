@@ -141,9 +141,9 @@ async def create_user(
     _ = current_root_user
     result = await db.execute(select(User).where(User.phone == user_data.phone))
     if result.scalar_one_or_none():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="手机号已被使用")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="账号已被使用")
     if not is_valid_phone(user_data.phone):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="手机号格式错误")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="账号格式错误")
 
     account_type = AccountType(user_data.account_type)
     initial_password = build_initial_password(user_data.phone)

@@ -50,7 +50,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
-    # 查找用户（支持手机号或用户名登录）
+    # 查找用户（支持账号或用户名登录）
     result = await db.execute(
         select(User).where(
             or_(
