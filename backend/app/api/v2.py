@@ -63,6 +63,25 @@ def _build_transaction_response(
     )
 
 
+async def _get_account_user_and_license_ids(db: AsyncSession, current_user: User) -> tuple[list[str], list[str]]:
+    """获取同一账号下的所有用户ID和授权码ID"""
+    user_ids = [current_user.id]
+    if current_user.phone:
+        users_result = await db.execute(
+            select(User.id).where(User.phone == current_user.phone)
+        )
+        ids = [item for item in users_result.scalars().all()]
+        if ids:
+            user_ids = ids
+    
+    license_codes_result = await db.execute(
+        select(LicenseCode.id).where(LicenseCode.user_id.in_(user_ids))
+    )
+    license_code_ids = [item for item in license_codes_result.scalars().all()]
+    
+    return user_ids, license_code_ids
+
+
 async def _activate_install_code(
     request: InstallVerifyRequest,
     db: AsyncSession
@@ -479,12 +498,14 @@ async def get_transactions_v2(
     license_code: LicenseCode = Depends(get_bound_license_code),
     db: AsyncSession = Depends(get_db)
 ):
+    user_ids, license_code_ids = await _get_account_user_and_license_ids(db, current_user)
+    
     query = (
         select(Transaction)
         .where(
             and_(
-                Transaction.user_id == current_user.id,
-                Transaction.license_code_id == license_code.id,
+                Transaction.user_id.in_(user_ids),
+                Transaction.license_code_id.in_(license_code_ids),
                 Transaction.deleted_at.is_(None)
             )
         )
@@ -492,6 +513,22 @@ async def get_transactions_v2(
     )
     result = await db.execute(query)
     rows = result.scalars().all()
+    
+    if rows:
+        tx_ids = [r.id for r in rows]
+        lc_result = await db.execute(
+            select(Transaction.id, LicenseCode.code, User.phone)
+            .join(LicenseCode, LicenseCode.id == Transaction.license_code_id)
+            .join(User, User.id == Transaction.user_id)
+            .where(Transaction.id.in_(tx_ids))
+        )
+        lc_map = {row[0]: (row[1], row[2]) for row in lc_result.all()}
+        
+        return [
+            _build_transaction_response(item, *lc_map.get(item.id, (current_user.phone, license_code.code)))
+            for item in rows
+        ]
+    
     return [_build_transaction_response(item, current_user.phone, license_code.code) for item in rows]
 
 
@@ -536,9 +573,11 @@ async def get_stats_summary_v2(
     if not end_date:
         end_date = datetime.now()
 
+    user_ids, license_code_ids = await _get_account_user_and_license_ids(db, current_user)
+    
     conditions = [
-        Transaction.user_id == current_user.id,
-        Transaction.license_code_id == license_code.id,
+        Transaction.user_id.in_(user_ids),
+        Transaction.license_code_id.in_(license_code_ids),
         Transaction.deleted_at.is_(None),
         Transaction.amount > 0,
         Transaction.date >= start_date,
@@ -575,9 +614,11 @@ async def get_stats_category_v2(
     if not end_date:
         end_date = datetime.now()
 
+    user_ids, license_code_ids = await _get_account_user_and_license_ids(db, current_user)
+    
     conditions = [
-        Transaction.user_id == current_user.id,
-        Transaction.license_code_id == license_code.id,
+        Transaction.user_id.in_(user_ids),
+        Transaction.license_code_id.in_(license_code_ids),
         Transaction.deleted_at.is_(None),
         Transaction.amount > 0,
         Transaction.date >= start_date,
@@ -607,9 +648,11 @@ async def get_stats_trend_v2(
     db: AsyncSession = Depends(get_db)
 ):
     now = datetime.now()
+    user_ids, license_code_ids = await _get_account_user_and_license_ids(db, current_user)
+    
     base = [
-        Transaction.user_id == current_user.id,
-        Transaction.license_code_id == license_code.id,
+        Transaction.user_id.in_(user_ids),
+        Transaction.license_code_id.in_(license_code_ids),
         Transaction.deleted_at.is_(None),
         Transaction.amount > 0
     ]
@@ -665,6 +708,9 @@ async def get_stats_license_distribution_v2(
         start_date = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     if not end_date:
         end_date = datetime.now()
+    
+    user_ids, _ = await _get_account_user_and_license_ids(db, current_user)
+    
     result = await db.execute(
         select(
             LicenseCode.code.label("license_code"),
@@ -674,7 +720,7 @@ async def get_stats_license_distribution_v2(
         .join(LicenseCode, LicenseCode.id == Transaction.license_code_id)
         .where(
             and_(
-                Transaction.user_id == current_user.id,
+                Transaction.user_id.in_(user_ids),
                 Transaction.deleted_at.is_(None),
                 Transaction.amount > 0,
                 Transaction.date >= start_date,

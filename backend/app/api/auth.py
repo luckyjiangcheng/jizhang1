@@ -106,10 +106,10 @@ async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
         license_codes_response.append({
             "id": code.id,
             "code": code.code,
-            "status": code.status,
+            "status": str(code.status.value) if hasattr(code.status, 'value') else str(code.status),
             "user_id": code.user_id,
-            "expires_at": code.expires_at,
-            "created_at": code.created_at
+            "expires_at": None,
+            "created_at": code.created_at.isoformat() if code.created_at else None
         })
     
     return {
