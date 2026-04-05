@@ -2894,7 +2894,7 @@
                 const phoneEl = document.getElementById('setting-phone');
                 const accountTypeEl = document.getElementById('setting-account-type');
                 if (nameEl) nameEl.textContent = user.username || '--';
-                if (phoneEl) phoneEl.textContent = user.phone ? `手机号：${user.phone}` : '手机号：--';
+                if (phoneEl) phoneEl.textContent = user.phone ? `账号：${user.phone}` : '账号：--';
                 if (accountTypeEl) accountTypeEl.textContent = `账号类型：${user.account_type === 'family' ? '家庭版' : '个人版'}`;
                 return user;
             } catch (_) {
@@ -2935,7 +2935,7 @@
                             <thead>
                                 <tr>
                                     <th>用户名</th>
-                                    <th>手机号</th>
+                                    <th>账号</th>
                                     <th>账号类型</th>
                                     <th>创建时间</th>
                                 </tr>
@@ -3042,7 +3042,7 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
-                                    <th>手机号</th>
+                                    <th>账号</th>
                                     <th>授权码</th>
                                     <th>状态</th>
                                     <th>创建时间</th>
@@ -3199,7 +3199,7 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
-                                    <th>手机号</th>
+                                    <th>账号</th>
                                     <th>授权码</th>
                                     <th>金额</th>
                                     <th>分类</th>
