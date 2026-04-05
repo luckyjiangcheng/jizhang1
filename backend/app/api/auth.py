@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, and_
 from datetime import timedelta
 import uuid
 from app.database import get_db
@@ -85,10 +85,7 @@ async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     if user.phone:
         users_result = await db.execute(
             select(User.id).where(
-                and_(
-                    User.phone == user.phone,
-                    User.system_role == SystemRole.USER
-                )
+                User.phone == user.phone
             )
         )
         ids = [item for item in users_result.scalars().all()]
