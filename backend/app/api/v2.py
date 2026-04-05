@@ -125,7 +125,7 @@ async def _resolve_license_and_user(
 
 
 async def _load_shortcut_dashboard_rows(db: AsyncSession, code_value: str) -> list[ShortcutTransactionItem]:
-    _, user = await _resolve_license_and_user(db, code_value, require_used=True)
+    license_code, user = await _resolve_license_and_user(db, code_value, require_used=True)
     user_ids = [user.id]
     if user.phone:
         users_result = await db.execute(
@@ -139,6 +139,13 @@ async def _load_shortcut_dashboard_rows(db: AsyncSession, code_value: str) -> li
         ids = [item for item in users_result.scalars().all()]
         if ids:
             user_ids = ids
+    # 获取同一账号下的所有授权码
+    license_codes_result = await db.execute(
+        select(LicenseCode.id).where(
+            LicenseCode.user_id.in_(user_ids)
+        )
+    )
+    license_code_ids = [item for item in license_codes_result.scalars().all()]
     tx_result = await db.execute(
         select(Transaction, LicenseCode.code, User.phone)
         .join(LicenseCode, LicenseCode.id == Transaction.license_code_id, isouter=True)
@@ -146,6 +153,7 @@ async def _load_shortcut_dashboard_rows(db: AsyncSession, code_value: str) -> li
         .where(
             and_(
                 Transaction.user_id.in_(user_ids),
+                Transaction.license_code_id.in_(license_code_ids),
                 Transaction.deleted_at.is_(None)
             )
         )
