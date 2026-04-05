@@ -1447,7 +1447,7 @@
 
             <div class="form-group">
                 <label class="form-label">账号（手机号或root邮箱）</label>
-                <input type="text" id="login-phone" class="form-input" placeholder="用户输手机号，root输邮箱" required>
+                <input type="text" id="login-phone" class="form-input" placeholder="请输入账号（支持数字、中文、英文）" required>
             </div>
             <div class="form-group">
                 <label class="form-label">密码</label>
@@ -2075,27 +2075,26 @@
             const password = document.getElementById('login-password').value;
             
             if (!account || !password) return showToast('请填写完整', 'error');
-            const isPhone = /^1\d{10}$/.test(account);
+            if (account.length > 100) return showToast('账号长度不能超过100个字符', 'error');
             const isEmail = account.includes('@');
-            if (!isPhone && !isEmail) return showToast('手机号格式错误，请输入11位手机号', 'error');
             
             showLoading(true);
             try {
                 let data = null;
-                if (isPhone) {
-                    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ phone: account, password })
-                    });
-                    data = await ensureWriteSuccess(res, '登录');
-                } else {
+                if (isEmail) {
                     const adminRes = await fetch(`${API_BASE_URL}/api/admin/auth/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email: account, password })
                     });
                     data = await ensureWriteSuccess(adminRes, '登录');
+                } else {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone: account, password })
+                    });
+                    data = await ensureWriteSuccess(res, '登录');
                 }
                 AUTH_TOKEN = data.access_token;
                 localStorage.setItem('auth_token', AUTH_TOKEN);
