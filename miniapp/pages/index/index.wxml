@@ -1,0 +1,81 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 顶部状态栏 -->
+  <view class="status-bar">
+    <view class="status-left">
+      <text class="status-title">AI记账小助手</text>
+      <text class="status-subtitle">智能记账 · 轻松理财</text>
+    </view>
+    <view class="status-right" bindtap="handleUserTap">
+      <block wx:if="{{isLoggedIn}}">
+        <view class="avatar">{{userInfo.username[0]}}</view>
+      </block>
+      <block wx:else>
+        <view class="login-btn" bindtap="goToLogin">登录</view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-actions">
+    <view class="action-item" bindtap="goToAnalysis">
+      <view class="action-icon">📊</view>
+      <text class="action-text">账单分析</text>
+    </view>
+    <view class="action-item" bindtap="goToProduct">
+      <view class="action-icon">📱</view>
+      <text class="action-text">产品介绍</text>
+    </view>
+    <view class="action-item" bindtap="goToGuide">
+      <view class="action-icon">📖</view>
+      <text class="action-text">使用指南</text>
+    </view>
+    <view class="action-item" bindtap="contactCustomerService">
+      <view class="action-icon">💬</view>
+      <text class="action-text">联系客服</text>
+    </view>
+  </view>
+
+  <!-- 最近交易 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">最近交易</text>
+      <text class="card-more" bindtap="goToAnalysis">查看全部</text>
+    </view>
+    <view class="transaction-list">
+      <block wx:for="{{recentTransactions}}" wx:key="id">
+        <view class="transaction-item">
+          <view class="transaction-icon">{{item.icon}}</view>
+          <view class="transaction-info">
+            <text class="transaction-name">{{item.item || item.category}}</text>
+            <text class="transaction-date">{{item.date}}</text>
+          </view>
+          <text class="transaction-amount">-¥{{item.amount}}</text>
+        </view>
+      </block>
+      <view class="empty-state" wx:if="{{recentTransactions.length === 0}}">
+        <text class="empty-icon">📝</text>
+        <text class="empty-text">暂无交易记录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 体验版提示 -->
+  <view class="trial-banner" wx:if="{{!isLoggedIn}}">
+    <view class="trial-icon">🎉</view>
+    <view class="trial-content">
+      <text class="trial-title">体验模式</text>
+      <text class="trial-desc">当前展示虚拟数据，登录查看真实账单</text>
+    </view>
+    <view class="trial-btn" bindtap="goToLogin">登录</view>
+  </view>
+
+  <!-- 语音记账按钮 -->
+  <view class="voice-button-section">
+    <view class="voice-button" bindlongpress="startRecording" bindtouchend="stopRecording">
+      <text class="voice-icon">🎤</text>
+      <text class="voice-text">语音记账</text>
+    </view>
+  </view>
+  <tab-bar></tab-bar>
+</view>

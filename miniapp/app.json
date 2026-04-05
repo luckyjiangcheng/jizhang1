@@ -1,0 +1,21 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/analysis/analysis",
+    "pages/product/product",
+    "pages/voice/voice",
+    "pages/guide/guide",
+    "pages/login/login",
+    "pages/contact/contact",
+    "pages/webview/webview"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#6366f1",
+    "navigationBarTitleText": "AI记账小助手",
+    "navigationBarTextStyle": "white"
+  },
+
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

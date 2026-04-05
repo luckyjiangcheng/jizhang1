@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "产品介绍",
+  "usingComponents": {
+    "tab-bar": "../../components/tabBar/tabBar"
+  }
+}

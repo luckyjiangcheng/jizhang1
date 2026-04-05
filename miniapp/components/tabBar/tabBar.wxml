@@ -1,0 +1,27 @@
+<view class="tab-bar">
+  <view class="tab-item" bindtap="switchTab" data-index="0" data-path="/pages/analysis/analysis">
+    <view class="tab-icon">📊</view>
+    <text class="tab-text">分析</text>
+  </view>
+  
+  <view class="tab-item" bindtap="switchTab" data-index="1" data-path="/pages/product/product">
+    <view class="tab-icon">📱</view>
+    <text class="tab-text">产品介绍</text>
+  </view>
+  
+  <view class="voice-container">
+    <view class="voice-button" bindlongpress="startVoice" bindtouchend="stopVoice">
+      <view class="voice-icon">🎤</view>
+    </view>
+  </view>
+  
+  <view class="tab-item" bindtap="switchTab" data-index="2" data-path="/pages/guide/guide">
+    <view class="tab-icon">📖</view>
+    <text class="tab-text">指南</text>
+  </view>
+  
+  <view class="tab-item" bindtap="switchTab" data-index="3" data-path="/pages/index/index">
+    <view class="tab-icon">👤</view>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     AI_VISION_MODEL: str = "Qwen/Qwen2-VL-72B-Instruct"
     
     # 应用配置
-    APP_NAME: str = "记账小助手"
+    APP_NAME: str = "AI记账小助手"
     APP_VERSION: str = "1.0.0"
     ENABLE_V1_PUBLIC_API: bool = False
     

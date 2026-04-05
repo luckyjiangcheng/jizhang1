@@ -1,0 +1,70 @@
+<!-- pages/voice/voice.wxml -->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <text class="page-title">语音记账</text>
+    <text class="page-subtitle">长按麦克风开始录音</text>
+  </view>
+
+  <!-- 识别结果 -->
+  <view class="result-section" wx:if="{{recognitionResult}}">
+    <view class="result-card">
+      <view class="result-header">
+        <text class="result-title">识别结果</text>
+      </view>
+      <view class="result-content">
+        <text class="result-text">{{recognitionResult}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 记账信息 -->
+  <view class="info-section" wx:if="{{recognitionResult}}">
+    <view class="info-card">
+      <view class="info-header">
+        <text class="info-title">记账信息</text>
+      </view>
+      <view class="info-form">
+        <view class="form-item">
+          <text class="form-label">金额</text>
+          <input class="form-input" type="number" value="{{transaction.amount}}" bindinput="bindAmountInput" placeholder="请输入金额" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">分类</text>
+          <picker class="form-picker" range="{{categories}}" bindchange="bindCategoryChange" value="{{selectedCategoryIndex}}">
+            <view class="picker-text">{{categories[selectedCategoryIndex]}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <input class="form-input" value="{{transaction.note}}" bindinput="bindNoteInput" placeholder="请输入备注" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section" wx:if="{{recognitionResult}}">
+    <button class="action-btn confirm-btn" bindtap="confirmTransaction">确认记账</button>
+    <button class="action-btn cancel-btn" bindtap="cancelTransaction">重新录音</button>
+  </view>
+
+  <!-- 录音提示 -->
+  <view class="recording-section" wx:if="{{isRecording}}">
+    <view class="recording-card">
+      <view class="recording-animation">
+        <view class="recording-circle"></view>
+        <text class="recording-text">正在录音...</text>
+      </view>
+      <text class="recording-tip">松开发送</text>
+    </view>
+  </view>
+
+  <!-- 语音记账按钮 -->
+  <view class="voice-button-section">
+    <view class="voice-button" bindlongpress="startRecording" bindtouchend="stopRecording">
+      <text class="voice-icon">🎤</text>
+      <text class="voice-text">语音记账</text>
+    </view>
+  </view>
+</view>

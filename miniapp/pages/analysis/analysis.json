@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "账单分析",
+  "usingComponents": {
+    "tab-bar": "../../components/tabBar/tabBar"
+  }
+}

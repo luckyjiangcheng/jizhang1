@@ -1,0 +1,166 @@
+<!-- pages/guide/guide.wxml -->
+<view class="container">
+  <!-- 指南头部 -->
+  <view class="guide-header">
+    <view class="header-bg"></view>
+    <view class="header-content">
+      <text class="guide-icon">📖</text>
+      <text class="guide-title">AI记账小助手使用指南</text>
+      <text class="guide-subtitle">快捷记账 · 智能分析</text>
+    </view>
+  </view>
+
+  <!-- 快捷指令指南 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">快捷指令使用</text>
+      <text class="section-desc">通过快捷指令，一键完成记账操作</text>
+    </view>
+    <view class="guide-card">
+      <view class="step-item">
+        <view class="step-number">1</view>
+        <view class="step-content">
+          <text class="step-title">获取授权码</text>
+          <text class="step-desc">联系客服获取专属授权码，用于快捷指令登录</text>
+        </view>
+        <view class="step-icon">🔐</view>
+      </view>
+      <view class="step-divider"></view>
+      <view class="step-item">
+        <view class="step-number">2</view>
+        <view class="step-content">
+          <text class="step-title">安装快捷指令</text>
+          <text class="step-desc">点击下方按钮安装快捷指令到您的设备</text>
+        </view>
+        <view class="step-icon">📲</view>
+      </view>
+      <view class="step-divider"></view>
+      <view class="step-item">
+        <view class="step-number">3</view>
+        <view class="step-content">
+          <text class="step-title">配置授权码</text>
+          <text class="step-desc">首次使用时输入您的授权码完成配置</text>
+        </view>
+        <view class="step-icon">⚙️</view>
+      </view>
+      <view class="step-divider"></view>
+      <view class="step-item">
+        <view class="step-number">4</view>
+        <view class="step-content">
+          <text class="step-title">开始使用</text>
+          <text class="step-desc">通过快捷指令一键添加交易，自动同步到云端</text>
+        </view>
+        <view class="step-icon">🚀</view>
+      </view>
+    </view>
+    
+    <view class="action-buttons">
+      <button class="install-btn" bindtap="installShortcut">
+        <text class="btn-icon">📲</text>
+        <text class="btn-text">安装快捷指令</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 常见问题 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">常见问题</text>
+      <text class="section-desc">解答您可能遇到的问题</text>
+    </view>
+    <view class="faq-list">
+      <view class="faq-item" bindtap="toggleFaq" data-index="0">
+        <view class="faq-header">
+          <text class="faq-icon">❓</text>
+          <text class="faq-question">快捷指令是什么？</text>
+          <text class="faq-arrow">{{expanded[0] ? '▼' : '▶'}}</text>
+        </view>
+        <view class="faq-answer" wx:if="{{expanded[0]}}">
+          <text>快捷指令是iOS设备上的自动化工具，可以帮助您快速完成重复任务。记账小助手的快捷指令可以让您通过语音或文字快速添加交易记录。</text>
+        </view>
+      </view>
+      <view class="faq-item" bindtap="toggleFaq" data-index="1">
+        <view class="faq-header">
+          <text class="faq-icon">🔐</text>
+          <text class="faq-question">为什么需要授权码？</text>
+          <text class="faq-arrow">{{expanded[1] ? '▼' : '▶'}}</text>
+        </view>
+        <view class="faq-answer" wx:if="{{expanded[1]}}">
+          <text>授权码是用于识别您的账号身份，确保只有您可以通过快捷指令操作您的账本数据，保障数据安全。</text>
+        </view>
+      </view>
+      <view class="faq-item" bindtap="toggleFaq" data-index="2">
+        <view class="faq-header">
+          <text class="faq-icon">🤖</text>
+          <text class="faq-question">快捷指令如何识别交易信息？</text>
+          <text class="faq-arrow">{{expanded[2] ? '▼' : '▶'}}</text>
+        </view>
+        <view class="faq-answer" wx:if="{{expanded[2]}}">
+          <text>快捷指令会分析您输入的文本，自动提取金额、分类、商家等信息。例如："今天吃饭花了88元"会自动识别为餐饮支出。</text>
+        </view>
+      </view>
+      <view class="faq-item" bindtap="toggleFaq" data-index="3">
+        <view class="faq-header">
+          <text class="faq-icon">☁️</text>
+          <text class="faq-question">数据会自动同步吗？</text>
+          <text class="faq-arrow">{{expanded[3] ? '▼' : '▶'}}</text>
+        </view>
+        <view class="faq-answer" wx:if="{{expanded[3]}}">
+          <text>是的，通过快捷指令添加的交易会自动同步到云端，您可以在小程序和Web端看到实时更新的账单数据。</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系客服 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">需要帮助？</text>
+      <text class="section-desc">随时联系我们获取支持</text>
+    </view>
+    <view class="contact-card">
+      <view class="contact-item">
+        <text class="contact-icon">💬</text>
+        <view class="contact-info">
+          <text class="contact-label">企业微信客服</text>
+          <text class="contact-value">AI自动账客服</text>
+        </view>
+        <button class="contact-btn" bindtap="copyWechat">复制</button>
+      </view>
+      <view class="contact-item">
+        <text class="contact-icon">📧</text>
+        <view class="contact-info">
+          <text class="contact-label">邮箱</text>
+          <text class="contact-value">support@jizhang.com</text>
+        </view>
+        <button class="contact-btn" bindtap="copyEmail">复制</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="bottom-tip">
+    <text class="tip-text">✓ 无需强制安装快捷指令</text>
+    <text class="tip-text">✓ 所有操作均需您主动触发</text>
+    <text class="tip-text">✓ 数据安全有保障</text>
+  </view>
+
+  <!-- 体验版提示 -->
+  <view class="trial-banner" wx:if="{{!isLoggedIn}}">
+    <view class="trial-icon">🎉</view>
+    <view class="trial-content">
+      <text class="trial-title">体验模式</text>
+      <text class="trial-desc">当前展示虚拟数据，登录查看真实账单</text>
+    </view>
+    <view class="trial-btn" bindtap="goToLogin">登录</view>
+  </view>
+
+  <!-- 语音记账按钮 -->
+  <view class="voice-button-section">
+    <view class="voice-button" bindlongpress="startRecording" bindtouchend="stopRecording">
+      <text class="voice-icon">🎤</text>
+      <text class="voice-text">语音记账</text>
+    </view>
+  </view>
+  <tab-bar></tab-bar>
+</view>

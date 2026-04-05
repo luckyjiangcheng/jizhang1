@@ -254,7 +254,7 @@ docker compose up -d --build backend
 
 ### 10.1 502 Bad Gateway
 
-表现：前端能打开，接口 502  
+表现：前端能打开，接口 502\
 排查：
 
 ```bash
@@ -282,3 +282,4 @@ docker logs --tail 200 jizhang_backend
 - 关闭公网 3306/6379
 - 定期备份 MySQL 数据卷
 - 增加应用监控与日志轮转
+

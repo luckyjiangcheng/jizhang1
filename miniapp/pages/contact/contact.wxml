@@ -1,0 +1,73 @@
+<!-- pages/contact/contact.wxml -->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <text class="page-title">联系客服</text>
+  </view>
+
+  <!-- 客服信息 -->
+  <view class="contact-section">
+    <view class="contact-card">
+      <view class="contact-header">
+        <view class="contact-icon">💬</view>
+        <view class="contact-title">
+          <text class="title-text">AI自动账客服</text>
+          <text class="subtitle-text">企业微信</text>
+        </view>
+      </view>
+      <view class="contact-content">
+        <text class="content-text">添加企业微信，获取账号和授权码</text>
+      </view>
+      <button class="contact-btn" bindtap="openCustomerLink">
+        <text class="btn-icon">📱</text>
+        <text class="btn-text">添加企业微信</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 联系说明 -->
+  <view class="info-section">
+    <view class="info-card">
+      <view class="info-header">
+        <text class="info-title">联系客服可以获取：</text>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-icon">✓</text>
+          <text class="info-text">账号注册与激活</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">✓</text>
+          <text class="info-text">授权码申请</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">✓</text>
+          <text class="info-text">使用问题解答</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">✓</text>
+          <text class="info-text">功能使用指导</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 其他联系方式 -->
+  <view class="other-section">
+    <view class="other-card">
+      <view class="other-header">
+        <text class="other-title">其他联系方式</text>
+      </view>
+      <view class="other-list">
+        <view class="other-item">
+          <text class="other-icon">📧</text>
+          <view class="other-info">
+            <text class="other-label">邮箱</text>
+            <text class="other-value">support@jizhang.com</text>
+          </view>
+          <button class="copy-btn" bindtap="copyEmail">复制</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

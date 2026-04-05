@@ -50,21 +50,28 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
-    # 查找用户
-    result = await db.execute(select(User).where(User.phone == user_data.phone))
+    # 查找用户（支持手机号或用户名登录）
+    result = await db.execute(
+        select(User).where(
+            or_(
+                User.phone == user_data.phone,
+                User.username == user_data.phone
+            )
+        )
+    )
     user = result.scalar_one_or_none()
     
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="手机号或密码错误"
+            detail="用户不存在，请联系客服申请"
         )
     
     # 验证密码
     if not verify_password(user_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="手机号或密码错误"
+            detail="密码错误"
         )
     
     # 创建访问令牌

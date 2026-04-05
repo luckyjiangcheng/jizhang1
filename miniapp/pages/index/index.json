@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "记账小助手",
+  "usingComponents": {
+    "tab-bar": "../../components/tabBar/tabBar"
+  }
+}

@@ -1,0 +1,112 @@
+<!-- pages/analysis/analysis.wxml -->
+<view class="container">
+  <!-- 时间选择器 -->
+  <view class="time-selector">
+    <view class="time-option {{currentPeriod === 'month' ? 'active' : ''}}" bindtap="switchPeriod" data-period="month">本月</view>
+    <view class="time-option {{currentPeriod === 'quarter' ? 'active' : ''}}" bindtap="switchPeriod" data-period="quarter">本季度</view>
+    <view class="time-option {{currentPeriod === 'year' ? 'active' : ''}}" bindtap="switchPeriod" data-period="year">本年</view>
+  </view>
+
+  <!-- 汇总卡片 -->
+  <view class="summary-card">
+    <view class="summary-header">
+      <text class="summary-title">收支概览</text>
+      <text class="summary-period">{{periodText}}</text>
+    </view>
+    <view class="summary-grid">
+      <view class="summary-item">
+        <text class="summary-label">总支出</text>
+        <text class="summary-value expense">¥{{summary.totalExpense}}</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-label">总收入</text>
+        <text class="summary-value income">¥{{summary.totalIncome}}</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-label">交易笔数</text>
+        <text class="summary-value">{{summary.transactionCount}}</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-label">平均每笔</text>
+        <text class="summary-value">¥{{summary.averageAmount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类统计 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">分类统计</text>
+    </view>
+    <view class="category-list">
+      <view class="category-item" wx:for="{{categoryStats}}" wx:key="category">
+        <view class="category-left">
+          <view class="category-icon">{{item.icon}}</view>
+          <view class="category-info">
+            <text class="category-name">{{item.category}}</text>
+            <text class="category-count">{{item.count}}笔</text>
+          </view>
+        </view>
+        <view class="category-right">
+          <text class="category-amount">¥{{item.amount}}</text>
+          <view class="category-bar">
+            <view class="bar-fill" style="width: {{item.percentage}}%; background: {{item.color}};"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 趋势图 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">收支趋势</text>
+    </view>
+    <view class="chart-container">
+      <ec-canvas id="trendChart" canvas-id="trendChart" ec="{{trendChart}}"></ec-canvas>
+    </view>
+  </view>
+
+  <!-- 消费明细 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">最近交易</text>
+      <text class="card-more" bindtap="viewAllTransactions">查看全部</text>
+    </view>
+    <view class="transaction-list">
+      <view class="transaction-item" wx:for="{{recentTransactions}}" wx:key="id">
+        <view class="transaction-icon">{{item.icon}}</view>
+        <view class="transaction-info">
+          <text class="transaction-name">{{item.item || item.category}}</text>
+          <text class="transaction-date">{{item.date}}</text>
+        </view>
+        <text class="transaction-amount" style="color: {{item.type === 'income' ? '#10b981' : '#ef4444'}}">
+          {{item.type === 'income' ? '+' : '-'}}¥{{item.amount}}
+        </text>
+      </view>
+      <view class="empty-state" wx:if="{{recentTransactions.length === 0}}">
+        <text class="empty-icon">📝</text>
+        <text class="empty-text">暂无交易记录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 体验版提示 -->
+  <view class="trial-banner" wx:if="{{!isLoggedIn}}">
+    <view class="trial-icon">🎉</view>
+    <view class="trial-content">
+      <text class="trial-title">体验模式</text>
+      <text class="trial-desc">当前展示虚拟数据，登录查看真实账单</text>
+    </view>
+    <view class="trial-btn" bindtap="goToLogin">登录</view>
+  </view>
+
+  <!-- 语音记账按钮 -->
+  <view class="voice-button-section">
+    <view class="voice-button" bindlongpress="startRecording" bindtouchend="stopRecording">
+      <text class="voice-icon">🎤</text>
+      <text class="voice-text">语音记账</text>
+    </view>
+  </view>
+  <tab-bar></tab-bar>
+</view>

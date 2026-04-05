@@ -1,0 +1,173 @@
+<!-- pages/product/product.wxml -->
+<view class="container">
+  <!-- 产品头部 -->
+  <view class="product-header">
+    <view class="header-bg"></view>
+    <view class="header-content">
+      <text class="header-title">AI记账小助手</text>
+      <text class="header-subtitle">智能记账 · 轻松理财</text>
+      <text class="header-desc">让每一笔账目都清清楚楚</text>
+    </view>
+  </view>
+
+  <!-- 版本对比 -->
+  <view class="section">
+    <view class="section-title">选择适合您的版本</view>
+    <view class="version-cards">
+      <!-- 个人版 -->
+      <view class="version-card">
+        <view class="version-header">
+          <text class="version-icon">👤</text>
+          <text class="version-name">个人版</text>
+        </view>
+        <view class="version-features">
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">独立账户管理</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">智能账单分析</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">预算管理提醒</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">快捷记账入口</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">数据云端同步</text>
+          </view>
+        </view>
+        <view class="version-price">
+          <text class="price-label">适合人群</text>
+          <text class="price-value">个人用户、学生、上班族</text>
+        </view>
+      </view>
+
+      <!-- 家庭版 -->
+      <view class="version-card featured">
+        <view class="featured-badge">推荐</view>
+        <view class="version-header">
+          <text class="version-icon">👨‍👩‍👧‍👦</text>
+          <text class="version-name">家庭版</text>
+        </view>
+        <view class="version-features">
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">包含个人版全部功能</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">家庭成员共享</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">账单合并统计</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">家庭预算管理</text>
+          </view>
+          <view class="feature-item">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">最多支持5位成员</text>
+          </view>
+        </view>
+        <view class="version-price">
+          <text class="price-label">适合人群</text>
+          <text class="price-value">家庭用户、情侣、合租室友</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 如何申请 -->
+  <view class="section">
+    <view class="section-title">如何申请账号</view>
+    <view class="apply-card">
+      <view class="apply-step">
+        <view class="step-number">1</view>
+        <view class="step-content">
+          <text class="step-title">添加企业微信</text>
+          <text class="step-desc">搜索企业微信：AI自动账客服</text>
+        </view>
+      </view>
+      <view class="apply-step">
+        <view class="step-number">2</view>
+        <view class="step-content">
+          <text class="step-title">选择版本</text>
+          <text class="step-desc">告知客服您需要的版本类型</text>
+        </view>
+      </view>
+      <view class="apply-step">
+        <view class="step-number">3</view>
+        <view class="step-content">
+          <text class="step-title">获取账号</text>
+          <text class="step-desc">客服将为您创建账号并提供登录信息</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="contact-card">
+      <view class="contact-icon">📱</view>
+      <view class="contact-info">
+        <text class="contact-label">企业微信客服</text>
+        <text class="contact-value">AI自动账客服</text>
+      </view>
+      <button class="contact-btn" bindtap="copyWechat">复制</button>
+    </view>
+  </view>
+
+  <!-- 授权码说明 -->
+  <view class="section">
+    <view class="section-title">授权码便利性</view>
+    <view class="auth-card">
+      <view class="auth-header">
+        <text class="auth-icon">🔐</text>
+        <text class="auth-title">什么是授权码？</text>
+      </view>
+      <text class="auth-desc">授权码是一种便捷的登录凭证，获取授权码后，您可以：</text>
+      <view class="auth-benefits">
+        <view class="benefit-item">
+          <text class="benefit-icon">🚀</text>
+          <text class="benefit-text">无需记忆账号密码</text>
+        </view>
+        <view class="benefit-item">
+          <text class="benefit-icon">⚡</text>
+          <text class="benefit-text">快捷记账更便捷</text>
+        </view>
+        <view class="benefit-item">
+          <text class="benefit-icon">🔒</text>
+          <text class="benefit-text">安全可靠有保障</text>
+        </view>
+      </view>
+      <view class="auth-note">
+        <text class="note-icon">💡</text>
+        <text class="note-text">授权码由客服提供，可在快捷指令中使用实现一键记账</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 体验版提示 -->
+  <view class="trial-banner" wx:if="{{!isLoggedIn}}">
+    <view class="trial-icon">🎉</view>
+    <view class="trial-content">
+      <text class="trial-title">体验模式</text>
+      <text class="trial-desc">当前展示虚拟数据，登录查看真实账单</text>
+    </view>
+    <view class="trial-btn" bindtap="goToLogin">登录</view>
+  </view>
+
+  <!-- 语音记账按钮 -->
+  <view class="voice-button-section">
+    <view class="voice-button" bindlongpress="startRecording" bindtouchend="stopRecording">
+      <text class="voice-icon">🎤</text>
+      <text class="voice-text">语音记账</text>
+    </view>
+  </view>
+  <tab-bar></tab-bar>
+</view>
