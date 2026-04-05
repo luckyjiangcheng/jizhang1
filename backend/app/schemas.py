@@ -11,7 +11,7 @@ class UserCreate(BaseModel):
 
 
 class UserLogin(BaseModel):
-    phone: str = Field(..., pattern="^1\\d{10}$")
+    phone: str = Field(..., max_length=100)
     password: str
 
 
@@ -39,7 +39,7 @@ class AdminLoginRequest(BaseModel):
 
 
 class AdminCreateUserRequest(BaseModel):
-    phone: str = Field(..., pattern="^1\\d{10}$")
+    phone: str = Field(..., max_length=100)
     account_type: str = Field(..., pattern="^(personal|family)$")
 
 
@@ -75,7 +75,7 @@ class LicenseCodeResponse(BaseModel):
 
 
 class IssueLicenseCodeRequest(BaseModel):
-    phone: str = Field(..., pattern="^1\\d{10}$")
+    phone: str = Field(..., max_length=100)
 
 
 class DisableLicenseCodeRequest(BaseModel):
@@ -160,7 +160,7 @@ class FamilyResponse(BaseModel):
 
 
 class FamilyInvite(BaseModel):
-    phone: str = Field(..., pattern="^1\\d{10}$")
+    phone: str = Field(..., max_length=100)
 
 
 class TransactionCreate(BaseModel):
